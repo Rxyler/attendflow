@@ -20,7 +20,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, TentativesConnexion tentatives) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/mot-de-passe-oublie", "/reinitialiser",
@@ -35,7 +35,9 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .passwordParameter("motDePasse")
                         .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?erreur")
+                        // Meme message pour un compte bloque, existant ou non : on ne revele pas les comptes.
+                        .failureHandler((req, rep, ex) -> rep.sendRedirect(req.getContextPath()
+                                + (tentatives.bloque(req.getParameter("email")) ? "/login?bloque" : "/login?erreur")))
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?deconnexion")

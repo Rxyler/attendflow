@@ -34,7 +34,7 @@ public class MotDePasseServiceImpl implements MotDePasseService {
     @Override
     @Transactional
     public void demanderReinitialisation(String email, String urlDeBase) {
-        utilisateurs.findByEmail(email.trim()).ifPresent(u -> {
+        utilisateurs.findByEmail(email.trim().toLowerCase(java.util.Locale.ROOT)).ifPresent(u -> {
             String token = UUID.randomUUID().toString();
             tokens.save(new TokenReinitialisation(u, token, LocalDateTime.now().plusMinutes(DUREE_VALIDITE_MINUTES)));
             this.email.envoyer(u.getEmail(), "Fas3a - Réinitialisation de votre mot de passe",
@@ -59,6 +59,9 @@ public class MotDePasseServiceImpl implements MotDePasseService {
                 .orElseThrow(() -> new IllegalArgumentException("Ce lien est invalide ou a expiré."));
         if (nouveauMotDePasse == null || nouveauMotDePasse.length() < LONGUEUR_MIN) {
             throw new IllegalArgumentException("Le mot de passe doit contenir au moins " + LONGUEUR_MIN + " caractères.");
+        }
+        if (nouveauMotDePasse.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {   // limite de BCrypt
+            throw new IllegalArgumentException("Le mot de passe est trop long (72 caractères maximum).");
         }
         t.getUtilisateur().setMotDePasse(encoder.encode(nouveauMotDePasse));
         t.setUtilise(true);

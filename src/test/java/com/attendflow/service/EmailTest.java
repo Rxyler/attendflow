@@ -43,11 +43,13 @@ class EmailTest {
 
     @Test
     void lienDeReinitialisationParEmail() throws Exception {
-        mvc.perform(post("/mot-de-passe-oublie").with(csrf()).param("email", "sara.mansouri@univ.tn"))
+        // En-tete Host falsifie : le lien doit rester sur l'adresse configuree (sinon vol du jeton).
+        mvc.perform(post("/mot-de-passe-oublie").with(csrf()).header("Host", "pirate.example")
+                        .param("email", "Sara.Mansouri@univ.tn"))
                 .andExpect(redirectedUrl("/mot-de-passe-oublie?envoye"));
         SimpleMailMessage m = envoye();
         assertThat(m.getTo()).containsExactly("sara.mansouri@univ.tn");
-        assertThat(m.getText()).contains("/reinitialiser?token=");
+        assertThat(m.getText()).contains("http://localhost:8081/reinitialiser?token=").doesNotContain("pirate");
     }
 
     @Test

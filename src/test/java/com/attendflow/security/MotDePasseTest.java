@@ -70,6 +70,7 @@ class MotDePasseTest {
         // confirmation differente, puis mot de passe trop court : refuses
         envoyer(token, "nouveau-mdp-1", "autre-chose-1");
         envoyer(token, "court", "court");
+        envoyer(token, "a".repeat(80), "a".repeat(80));   // au-dela de la limite BCrypt (72 octets)
         assertThat(encoder.matches("ancien-mdp", compte.getMotDePasse())).isTrue();
 
         mvc.perform(post("/reinitialiser").with(csrf())

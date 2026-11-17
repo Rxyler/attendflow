@@ -79,8 +79,10 @@ Avec Gmail, utiliser des comptes dont l'adresse email est réelle et vous appart
 ./mvnw test
 ```
 
-61 tests (base H2 en mémoire, aucune configuration requise) : sécurité, synchronisation, prise de présence,
-tableaux de bord, notifications, emails, justificatifs, référentiel, rapports et exports, paramètres.
+76 tests (base H2 en mémoire, aucune configuration requise) : sécurité, synchronisation, prise de présence,
+tableaux de bord, notifications, emails, justificatifs, référentiel, rapports et exports, paramètres, compagnons.
+`SecuriteEntreesTest` couvre les entrées hostiles : injection SQL, HTML/JS saisi (XSS), formulaire sans jeton CSRF,
+valeurs trop longues ou invalides, force brute (blocage 5 min après 5 échecs) et page d'erreur sans détail technique.
 
 ## Fonctionnalités (cahier des charges)
 

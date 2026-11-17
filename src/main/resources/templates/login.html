@@ -42,6 +42,7 @@
         <p class="text-secondary mb-4">Accédez à votre espace personnel</p>
 
         <div th:if="${param.erreur}" class="alert alert-danger py-2" role="alert">Email ou mot de passe incorrect.</div>
+        <div th:if="${param.bloque}" class="alert alert-danger py-2" role="alert">Trop de tentatives : réessayez dans 5 minutes.</div>
         <div th:if="${param.deconnexion}" class="alert alert-success py-2" role="status">Vous êtes déconnecté.</div>
         <div th:if="${param.reinitialise}" class="alert alert-success py-2" role="status">Mot de passe modifié. Vous pouvez vous connecter.</div>
 
