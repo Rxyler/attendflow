@@ -133,6 +133,19 @@ docs/diagramme-classes.puml   diagramme de classes (PlantUML, importable dans dr
 
 Les seuils et délais métier se règlent dans l'application : **Administration > Paramètres**.
 
+## Mise en ligne gratuite (Render + Neon, sans carte bancaire)
+
+1. **GitHub** : créer un dépôt privé vide `attendflow`, puis `git remote add origin https://github.com/<compte>/attendflow.git` et `git push -u origin main`.
+2. **Neon** (neon.com) : créer un projet PostgreSQL, région Frankfurt. Noter l’hôte, la base, l’utilisateur et le mot de passe.
+3. **Render** (render.com) : New → Web Service → choisir le dépôt. Langage **Docker**, région **Frankfurt**, type **Free**. Variables d’environnement :
+   - `DB_URL` = `jdbc:postgresql://<hôte-neon>/<base>?sslmode=require`
+   - `DB_USERNAME`, `DB_PASSWORD` = ceux de Neon
+   - `SHOW_SQL` = `false`
+   - `APP_URL` = l’adresse donnée par Render (`https://….onrender.com`)
+4. Chaque `git push` redéploie automatiquement.
+
+Limites de l’offre gratuite : mise en veille après 15 min sans visite (1 à 2 min pour se réveiller) ; les fichiers déposés (justificatifs) sont effacés à chaque redémarrage ; Render bloque l’envoi d’emails (la réinitialisation par email ne marche pas en ligne) ; les comptes de démo sont publics, ne pas y mettre de vraies données.
+
 ## Limites connues
 
 - L'emploi du temps partenaire est simulé (`EmploiDuTempsMock`) ; brancher la vraie API en implémentant `EmploiDuTempsProvider`.
