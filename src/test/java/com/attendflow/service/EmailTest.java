@@ -64,7 +64,7 @@ class EmailTest {
         try {
             SimpleMailMessage m = envoye();
             assertThat(m.getTo()).containsExactly("rami.gharbi@univ.tn");
-            assertThat(m.getSubject()).isEqualTo("AttendFlow - Test email");
+            assertThat(m.getSubject()).isEqualTo("Fas3a - Test email");
             assertThat(m.getText()).contains("Contenu du test.", "/notifications");
         } finally {
             notifications.deleteById(n.getId());

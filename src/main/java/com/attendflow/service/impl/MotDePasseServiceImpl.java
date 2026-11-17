@@ -37,11 +37,11 @@ public class MotDePasseServiceImpl implements MotDePasseService {
         utilisateurs.findByEmail(email.trim()).ifPresent(u -> {
             String token = UUID.randomUUID().toString();
             tokens.save(new TokenReinitialisation(u, token, LocalDateTime.now().plusMinutes(DUREE_VALIDITE_MINUTES)));
-            this.email.envoyer(u.getEmail(), "AttendFlow - Réinitialisation de votre mot de passe",
+            this.email.envoyer(u.getEmail(), "Fas3a - Réinitialisation de votre mot de passe",
                     "Bonjour " + u.getNomComplet() + ",\n\n"
                     + "Pour choisir un nouveau mot de passe, ouvrez ce lien (valable " + DUREE_VALIDITE_MINUTES + " minutes, une seule fois) :\n"
                     + urlDeBase + "/reinitialiser?token=" + token + "\n\n"
-                    + "Si vous n'avez rien demandé, ignorez cet email : votre mot de passe reste inchangé.\n\n-- AttendFlow");
+                    + "Si vous n'avez rien demandé, ignorez cet email : votre mot de passe reste inchangé.\n\n-- Fas3a");
         });
     }
 

@@ -55,7 +55,7 @@ public class ExportServiceImpl implements ExportService {
         Font sousTitre = new Font(Font.HELVETICA, 12, Font.BOLD);
         Font petit = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.DARK_GRAY);
 
-        doc.add(new Paragraph("AttendFlow — Rapport des présences", titre));
+        doc.add(new Paragraph("Fas3a — Rapport des présences", titre));
         doc.add(new Paragraph(r.description(), petit));
         doc.add(new Paragraph("Généré le " + LocalDateTime.now().format(HORODATAGE), petit));
 
@@ -131,7 +131,7 @@ public class ExportServiceImpl implements ExportService {
             entete.setFont(gras);
 
             Sheet synthese = wb.createSheet("Synthèse");
-            ligne(synthese, 0, null, "AttendFlow — Rapport des présences");
+            ligne(synthese, 0, null, "Fas3a — Rapport des présences");
             ligne(synthese, 1, null, r.description());
             ligne(synthese, 2, null, "Généré le " + LocalDateTime.now().format(HORODATAGE));
             ligne(synthese, 4, entete, "Séances saisies", "Taux de présence (%)", "Présents", "Absents", "Retards", "Justifiés");

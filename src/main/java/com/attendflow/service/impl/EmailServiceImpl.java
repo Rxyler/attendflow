@@ -18,7 +18,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final String expediteur;
 
-    public EmailServiceImpl(JavaMailSender mailSender, @Value("${attendflow.mail.from:AttendFlow <no-reply@attendflow.local>}") String expediteur) {
+    public EmailServiceImpl(JavaMailSender mailSender, @Value("${attendflow.mail.from:Fas3a <no-reply@fas3a.local>}") String expediteur) {
         this.mailSender = mailSender;
         this.expediteur = expediteur;
     }

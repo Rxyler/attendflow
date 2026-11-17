@@ -1,4 +1,4 @@
-# AttendFlow
+# Fas3a (AttendFlow)
 
 Plateforme web de gestion des absences : prise de présence par séance, justificatifs, alertes,
 tableaux de bord et rapports exportables. Les séances proviennent de l'emploi du temps d'un projet partenaire.

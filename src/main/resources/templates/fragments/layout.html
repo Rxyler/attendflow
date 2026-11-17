@@ -6,7 +6,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#070b16">
-  <title th:text="${titre} + ' · AttendFlow'">AttendFlow</title>
+  <title th:text="${titre} + ' · Fas3a'">Fas3a</title>
+  <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -57,7 +58,7 @@
   <a th:href="@{/}" class="af-tete d-flex align-items-center gap-2 px-2 mb-2 text-decoration-none">
     <span class="af-logo" aria-hidden="true"></span>
     <span class="d-flex flex-column">
-      <span class="af-marque fw-semibold lh-sm">AttendFlow</span>
+      <span class="af-marque fw-semibold lh-sm">Fas3a</span>
       <span class="af-espace"
             th:text="${role == 'ADMIN'} ? 'Administration' : (${role == 'ENSEIGNANT'} ? 'Espace enseignant' : 'Espace étudiant')">Espace</span>
     </span>

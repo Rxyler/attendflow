@@ -50,9 +50,9 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification notifier(Notification n) {
         Notification enregistree = notifications.save(n);
         String a = n.getDestinataire().getEmail();
-        String sujet = "AttendFlow - " + n.getTitre();
+        String sujet = "Fas3a - " + n.getTitre();
         String texte = "Bonjour " + n.getDestinataire().getNomComplet() + ",\n\n" + n.getMessage()
-                + "\n\nVoir vos notifications : " + urlApplication + "/notifications\n\n-- AttendFlow";
+                + "\n\nVoir vos notifications : " + urlApplication + "/notifications\n\n-- Fas3a";
         // Apres le commit : pas d'email pour une operation annulee (rollback).
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

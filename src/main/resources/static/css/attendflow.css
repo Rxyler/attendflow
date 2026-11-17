@@ -309,8 +309,7 @@ caption { color: var(--af-subtle); }
 pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-neutral-soft) !important; border-color: var(--af-glass-line) !important; }
 
 /* ---------- Logo ---------- */
-.af-logo { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 11px; background: var(--af-grad); color: #fff; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 8px 24px -8px rgba(129, 140, 248, .9); }
-.af-logo::before { content: ""; width: .95rem; height: .55rem; border-left: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: translateY(-2px) rotate(-45deg); border-radius: 1px; }
+.af-logo { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 13px; background: #4338ca url(/images/logo.jpg) center / cover; color: #fff; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 8px 24px -8px rgba(129, 140, 248, .9); }
 
 /* ---------- Barre laterale ---------- */
 .af-sidebar { width: 15.5rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--af-glass-bg); -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%); border-right: 1px solid var(--af-glass-line); color: var(--af-ink-2); view-transition-name: af-sidebar; }
@@ -406,7 +405,6 @@ th.af-aujourdhui { color: #818cf8 !important; }
 /* ---------- Prechargement ---------- */
 .af-chargement { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: var(--af-bg); }
 .af-chargement .af-logo { width: 3.5rem; height: 3.5rem; border-radius: 18px; }
-.af-chargement .af-logo::before { width: 1.5rem; height: .85rem; border-width: 3.5px; }
 .af-chargement .af-ligne { width: 10rem; height: 2px; margin-top: 1.5rem; border-radius: 999px; background: var(--af-neutral-soft); overflow: hidden; }
 .af-chargement .af-ligne span { display: block; height: 100%; width: 0; background: var(--af-grad); box-shadow: 0 0 12px rgba(129, 140, 248, .9); }
 
@@ -586,3 +584,4 @@ a.af-avatar:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 .af-jour.aujourdhui { outline: 2px solid var(--af-ink); outline-offset: 1px; }
 .af-legende .af-jour { width: .75rem; margin-right: .35rem; vertical-align: -1px; }
 @media (prefers-reduced-motion: reduce) { .af-compagnon-img::before { animation: none !important; } }
+.af-fourmi { position: relative; margin: 0 auto; width: 9.5rem; height: 9.5rem; }
