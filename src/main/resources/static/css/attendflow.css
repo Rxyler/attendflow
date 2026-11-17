@@ -312,8 +312,10 @@ pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-
 .af-logo { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 13px; background: #4338ca url(/images/logo.jpg) center / cover; color: #fff; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 8px 24px -8px rgba(129, 140, 248, .9); }
 
 /* ---------- Barre laterale ---------- */
-.af-sidebar { width: 15.5rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--af-glass-bg); -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%); border-right: 1px solid var(--af-glass-line); color: var(--af-ink-2); view-transition-name: af-sidebar; }
+.af-sidebar { width: 15.5rem; position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; background: var(--af-glass-bg); -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%); border-right: 1px solid var(--af-glass-line); color: var(--af-ink-2); view-transition-name: af-sidebar; }
 .af-sidebar .af-marque { color: var(--af-ink); }
+/* seuls les liens defilent : le compte (theme, deconnexion) reste toujours visible en bas */
+@media (min-width: 768px) { .af-sidebar { overflow-y: hidden; } .af-navs { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; margin-right: -.5rem; padding-right: .5rem; } }
 .af-sidebar .af-espace, .af-sidebar .af-section { color: var(--af-subtle); font-size: .68rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 500; }
 .af-sidebar .af-section { padding: 1rem .7rem .4rem; }
 .af-sidebar .nav-link { position: relative; display: flex; align-items: center; gap: .65rem; padding: .5rem .7rem; border-radius: var(--af-r); font-size: .875rem; font-weight: 500; color: var(--af-muted) !important; border: 1px solid transparent; transition: background-color var(--af-fast) var(--af-ease), color var(--af-fast) var(--af-ease), border-color var(--af-fast); }
@@ -416,14 +418,16 @@ th.af-aujourdhui { color: #818cf8 !important; }
 .af-pill { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .9rem .35rem .5rem; border-radius: 999px; font-size: .8rem; font-weight: 500; color: var(--af-ink-2); background: var(--af-glass-bg); border: 1px solid var(--af-glass-line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .af-pill .af-point { width: .5rem; height: .5rem; border-radius: 50%; background: var(--af-success); box-shadow: 0 0 10px var(--af-success); margin-left: .35rem; animation: af-pulse 2s infinite; }
 @keyframes af-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, .6); } 60% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); } }
-.af-hero { padding: 3.5rem 0 2rem; }
-.af-hero h1 { font-size: clamp(2.5rem, 6vw, 4.8rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.04em; }
+/* Le heros remplit l'ecran sous la barre en laissant voir le bandeau, contenu centre : ni vide en haut ni coupe en bas */
+.af-hero { padding: 1.5rem 0; min-height: calc(100svh - 10rem); display: flex; align-items: center; }
+.af-hero > .row { flex: 1; }
+.af-hero h1 { font-size: clamp(2.3rem, min(5vw, 8.4vh), 5.2rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.04em; }
 .af-hero h1 .af-mot { display: inline-block; }
 .af-rotatif { display: inline-block; position: relative; white-space: nowrap; }
 .af-hero .lead { font-size: 1.15rem; color: var(--af-muted); max-width: 34rem; }
 
-.af-scene { perspective: 1400px; min-height: 32rem; position: relative; }
-.af-scene-inner { position: relative; transform-style: preserve-3d; width: 100%; height: 100%; min-height: 32rem; will-change: transform; }
+.af-scene { perspective: 1400px; min-height: min(32rem, 64vh); position: relative; }
+.af-scene-inner { position: relative; transform-style: preserve-3d; width: 100%; height: 100%; min-height: min(32rem, 64vh); will-change: transform; }
 .af-flot { position: absolute; transform-style: preserve-3d; will-change: transform; }
 .af-flot .af-glass { box-shadow: inset 0 1px 0 var(--af-reflet), 0 40px 80px -30px rgba(0, 0, 0, .8), 0 0 60px -20px rgba(129, 140, 248, .35); }
 [data-bs-theme="light"] .af-flot .af-glass { box-shadow: inset 0 1px 0 var(--af-reflet), 0 40px 80px -30px rgba(30, 41, 90, .4); }
@@ -479,6 +483,7 @@ th.af-aujourdhui { color: #818cf8 !important; }
 
 /* ---------- Mise en page ---------- */
 main.d-grid { grid-template-columns: minmax(0, 1fr); }
+.min-w-0 { min-width: 0 !important; }   /* absent de Bootstrap : laisse les blocs flex retrecir (compte, colonne principale) */
 main#contenu { max-width: 92rem; width: 100%; }
 @media (max-width: 991.98px) { .af-chiffres { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 767.98px) {
@@ -495,7 +500,7 @@ main#contenu { max-width: 92rem; width: 100%; }
   .af-compte .af-identite { display: none; }
   .af-header { position: static; padding-left: 1rem !important; padding-right: 1rem !important; }
   main#contenu { padding: 1rem !important; }
-  .af-hero { padding: 2rem 0 1rem; }
+  .af-hero { padding: 2rem 0 1rem; min-height: 0; }
   /* phone: the 3D card stack overlaps, so lay the cards out flat */
   .af-scene, .af-scene-inner { min-height: 0; perspective: none; transform: none !important; }
   .af-scene-inner { display: grid; gap: .75rem; }
