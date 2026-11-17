@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<!-- En-tete commun : polices, Bootstrap 5, theme, mouvement (GSAP + Lenis), icones (Lucide) -->
+<head th:fragment="head(titre)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b16">
+  <title th:text="${titre} + ' · AttendFlow'">AttendFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/lenis@1.1.13/dist/lenis.css" rel="stylesheet">
+  <link th:href="@{/css/attendflow.css}" rel="stylesheet">
+  <!-- Masque le contenu jusqu'a l'animation d'entree (evite le clignotement) ; filet de securite 1,5 s -->
+  <script>
+    var t = 'dark'; try { t = localStorage.getItem('af-theme') || 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-bs-theme', t);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('af-prep');
+      setTimeout(function () { document.documentElement.classList.remove('af-prep'); }, 1500);
+    }
+  </script>
+  <script defer src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer th:src="@{/js/attendflow.js}"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script defer th:src="@{/js/compagnons.js}"></script>
+</head>
+
+<body>
+<!-- Fond commun : aurora animee (canvas), grille, grain -->
+<th:block th:fragment="fond">
+  <canvas class="af-fond-shader" aria-hidden="true"></canvas>
+  <div class="af-voile" aria-hidden="true"></div>
+  <canvas class="af-particules" aria-hidden="true"></canvas>
+  <div class="af-grain" aria-hidden="true"></div>
+</th:block>
+
+<!-- Interrupteur clair / sombre -->
+<th:block th:fragment="theme">
+  <button type="button" class="af-theme" aria-label="Changer de thème" title="Thème clair / sombre">
+    <i data-lucide="sun" class="af-soleil" aria-hidden="true"></i>
+    <i data-lucide="moon" class="af-lune" aria-hidden="true"></i>
+  </button>
+</th:block>
+
+<!-- Barre laterale commune -->
+<nav th:fragment="sidebar(utilisateur, actif)" class="af-sidebar d-flex flex-column px-3 py-3 flex-shrink-0"
+     aria-label="Navigation principale"
+     th:with="role=${utilisateur.role.name()}">
+  <a href="#contenu" class="visually-hidden-focusable btn btn-light btn-sm mb-2">Aller au contenu</a>
+
+  <a th:href="@{/}" class="af-tete d-flex align-items-center gap-2 px-2 mb-2 text-decoration-none">
+    <span class="af-logo" aria-hidden="true"></span>
+    <span class="d-flex flex-column">
+      <span class="af-marque fw-semibold lh-sm">AttendFlow</span>
+      <span class="af-espace"
+            th:text="${role == 'ADMIN'} ? 'Administration' : (${role == 'ENSEIGNANT'} ? 'Espace enseignant' : 'Espace étudiant')">Espace</span>
+    </span>
+  </a>
+
+  <div class="af-navs">
+  <div class="af-section">Général</div>
+  <ul class="nav flex-column gap-1">
+    <li class="nav-item">
+      <a th:href="@{/}" class="nav-link" th:classappend="${actif == 'accueil'} ? 'active'"
+         th:attr="aria-current=${actif == 'accueil'} ? 'page' : null">
+        <i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Tableau de bord</span></a>
+    </li>
+    <li class="nav-item">
+      <a th:href="@{/emploi-du-temps}" class="nav-link" th:classappend="${actif == 'emploi-du-temps'} ? 'active'"
+         th:attr="aria-current=${actif == 'emploi-du-temps'} ? 'page' : null">
+        <i data-lucide="calendar-days" aria-hidden="true"></i><span>Emploi du temps</span></a>
+    </li>
+    <li class="nav-item" th:if="${role != 'ETUDIANT'}">
+      <a th:href="@{/rapports}" class="nav-link" th:classappend="${actif == 'rapports'} ? 'active'"
+         th:attr="aria-current=${actif == 'rapports'} ? 'page' : null">
+        <i data-lucide="chart-column" aria-hidden="true"></i>
+        <span th:text="${role == 'ADMIN'} ? 'Rapports' : 'Mes statistiques'">Rapports</span></a>
+    </li>
+    <li class="nav-item" th:if="${role == 'ETUDIANT'}">
+      <a th:href="@{/etudiant/historique}" class="nav-link" th:classappend="${actif == 'historique'} ? 'active'"
+         th:attr="aria-current=${actif == 'historique'} ? 'page' : null">
+        <i data-lucide="history" aria-hidden="true"></i><span>Mon historique</span></a>
+    </li>
+    <li class="nav-item" th:if="${role != 'ENSEIGNANT'}">
+      <a th:href="${role == 'ADMIN'} ? @{/admin/justificatifs} : @{/etudiant/justificatifs}" class="nav-link"
+         th:classappend="${actif == 'justificatifs'} ? 'active'"
+         th:attr="aria-current=${actif == 'justificatifs'} ? 'page' : null">
+        <i data-lucide="file-check" aria-hidden="true"></i>
+        <span th:text="${role == 'ADMIN'} ? 'Justificatifs' : 'Mes justificatifs'">Justificatifs</span></a>
+    </li>
+    <li class="nav-item">
+      <a th:href="@{/notifications}" class="nav-link" th:classappend="${actif == 'notifications'} ? 'active'"
+         th:attr="aria-current=${actif == 'notifications'} ? 'page' : null">
+        <i data-lucide="bell" aria-hidden="true"></i><span>Notifications</span>
+        <span th:if="${nbNonLues != null and nbNonLues > 0}" class="badge text-bg-danger"
+              th:text="${nbNonLues}" th:attr="aria-label=${nbNonLues} + ' non lue(s)'">2</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a th:href="@{/profil}" class="nav-link" th:classappend="${actif == 'profil'} ? 'active'"
+         th:attr="aria-current=${actif == 'profil'} ? 'page' : null">
+        <i data-lucide="smile" aria-hidden="true"></i><span>Mon profil</span></a>
+    </li>
+  </ul>
+
+  <th:block th:if="${role == 'ADMIN'}">
+    <div class="af-section">Administration</div>
+    <ul class="nav flex-column gap-1">
+      <li class="nav-item" th:each="lien : ${ {{'etudiants','Étudiants','graduation-cap'},{'classes','Classes','users'},{'matieres','Matières','book-open'},{'enseignants','Enseignants','user-round'},{'synchronisation','Synchronisation','refresh-cw'},{'parametres','Paramètres','sliders-horizontal'}} }">
+        <a th:href="@{/admin/{p}(p=${lien[0]})}" class="nav-link" th:classappend="${actif == lien[0]} ? 'active'"
+           th:attr="aria-current=${actif == lien[0]} ? 'page' : null">
+          <i th:attr="data-lucide=${lien[2]}" aria-hidden="true"></i><span th:text="${lien[1]}">Lien</span></a>
+      </li>
+    </ul>
+  </th:block>
+  </div>
+
+  <div class="mt-auto pt-3">
+    <div class="af-compte">
+      <a th:href="@{/profil}" class="af-avatar" title="Mon profil" aria-label="Mon profil">
+        <img th:if="${utilisateur.mascotte}" th:src="@{${utilisateur.mascotte.image}}" alt="">
+        <th:block th:unless="${utilisateur.mascotte}"
+                  th:text="${#strings.toUpperCase(#strings.substring(utilisateur.prenom, 0, 1) + #strings.substring(utilisateur.nom, 0, 1))}">SA</th:block></a>
+      <span class="af-identite flex-grow-1 min-w-0">
+        <span class="af-nom d-block text-truncate" th:text="${utilisateur.nomComplet}">Nom</span>
+        <span class="af-mail d-block text-truncate" th:text="${utilisateur.email}">email</span>
+      </span>
+      <button th:replace="~{fragments/layout :: theme}"></button>
+      <form th:action="@{/logout}" method="post" class="m-0">
+        <button type="submit" class="af-deconnexion" title="Déconnexion" aria-label="Déconnexion">
+          <i data-lucide="log-out" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- Carte statistique : icone et teinte deduites du libelle ; la valeur s'anime si elle est numerique -->
+<div th:fragment="carte(libelle, valeur, detail)" class="af-glass af-stat h-100" data-tilt="6"
+     th:with="l=${#strings.toLowerCase(libelle)},
+              icone=${#strings.contains(l, 'taux')} ? 'percent' :
+                    (${#strings.contains(l, 'absence')} ? 'user-x' :
+                    (${#strings.contains(l, 'retard')} ? 'clock' :
+                    (${#strings.contains(l, 'justifi')} ? 'file-check' :
+                    (${#strings.contains(l, 'présen')} ? 'user-check' :
+                    (${#strings.contains(l, 'séance')} ? 'calendar-check' :
+                    (${#strings.contains(l, 'étudiant')} ? 'graduation-cap' : 'activity')))))),
+              ton=${#strings.contains(l, 'taux')} ? 'bleu' :
+                    (${#strings.contains(l, 'absence')} ? 'rouge' :
+                    (${#strings.contains(l, 'retard')} ? 'orange' :
+                    (${#strings.contains(l, 'présen')} ? 'vert' : 'neutre')))"
+     th:attr="data-ton=${ton}">
+  <div class="af-stat-tete">
+    <p class="af-stat-libelle" th:text="${libelle}">Libellé</p>
+    <span class="af-stat-icone" aria-hidden="true"><i th:attr="data-lucide=${icone}"></i></span>
+  </div>
+  <p class="af-stat-value" data-compteur th:text="${valeur}">0</p>
+  <p class="af-stat-detail" th:if="${detail}" th:text="${detail}">détail</p>
+</div>
+
+<!-- Graphique du taux de presence (Chart.js) ; donnees : joursGraphique et tauxGraphique -->
+<section th:fragment="graphique(titre, sousTitre)" class="af-glass p-4 h-100" aria-labelledby="g7-titre">
+  <h2 id="g7-titre" class="h6 mb-1" th:text="${titre}">Taux de présence</h2>
+  <p class="small text-secondary mb-3" th:text="${sousTitre}">détail</p>
+  <canvas id="graphique-7j" height="160" role="img" th:attr="aria-label=${titre}"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script th:src="@{/js/graphiques.js}"></script>
+  <script th:inline="javascript">
+    new Chart(document.getElementById('graphique-7j'), {
+      type: 'line',
+      data: {
+        labels: /*[[${joursGraphique}]]*/ [],
+        datasets: [{ label: 'Taux', data: /*[[${tauxGraphique}]]*/ [], borderColor: '#818cf8', borderWidth: 2,
+          backgroundColor: 'rgba(129, 140, 248, 0.16)', fill: true, tension: 0.3, spanGaps: false,
+          pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#0b1222', pointBorderWidth: 2 }]
+      },
+      options: { scales: { y: { min: 0, max: 100, ticks: { callback: v => v + ' %' } } },
+                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' %' } } } }
+    });
+  </script>
+</section>
+</body>
+</html>

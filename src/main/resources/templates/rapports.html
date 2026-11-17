@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Rapports et statistiques')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100" th:with="r=${rapport}">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'rapports')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <h1 class="h5 fw-bold mb-0" th:text="${utilisateur.role.name() == 'ADMIN'} ? 'Rapports et statistiques' : 'Mes statistiques'">Rapports</h1>
+        <p class="small text-secondary mb-0" th:text="${r.description}">filtres</p>
+      </div>
+      <!-- F-31 : exports fideles aux filtres affiches -->
+      <div class="d-flex gap-2">
+        <a class="btn btn-light border"
+           th:href="@{/rapports/export.pdf(du=${f.du},au=${f.au},classe=${f.classeId},matiere=${f.matiereId},enseignant=${f.enseignantId})}"><i data-lucide="file-text" aria-hidden="true"></i>Exporter PDF</a>
+        <a class="btn btn-light border"
+           th:href="@{/rapports/export.xlsx(du=${f.du},au=${f.au},classe=${f.classeId},matiere=${f.matiereId},enseignant=${f.enseignantId})}"><i data-lucide="file-spreadsheet" aria-hidden="true"></i>Exporter Excel</a>
+      </div>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <!-- F-29 : filtres -->
+      <form th:action="@{/rapports}" method="get" class="af-glass p-3 row g-2 align-items-end">
+        <div class="col-6 col-lg"><label for="du" class="form-label small fw-medium mb-1">Du</label>
+          <input id="du" name="du" type="date" class="form-control" th:value="${f.du}"></div>
+        <div class="col-6 col-lg"><label for="au" class="form-label small fw-medium mb-1">Au</label>
+          <input id="au" name="au" type="date" class="form-control" th:value="${f.au}"></div>
+        <div class="col-md-4 col-lg"><label for="classe" class="form-label small fw-medium mb-1">Classe</label>
+          <select id="classe" name="classe" class="form-select">
+            <option value="">Toutes</option>
+            <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.nom}" th:selected="${c.id == f.classeId}">c</option>
+          </select></div>
+        <div class="col-md-4 col-lg"><label for="matiere" class="form-label small fw-medium mb-1">Matière</label>
+          <select id="matiere" name="matiere" class="form-select">
+            <option value="">Toutes</option>
+            <option th:each="m : ${matieres}" th:value="${m.id}" th:text="${m.intitule}" th:selected="${m.id == f.matiereId}">m</option>
+          </select></div>
+        <div class="col-md-4 col-lg" th:if="${enseignants}"><label for="enseignant" class="form-label small fw-medium mb-1">Enseignant</label>
+          <select id="enseignant" name="enseignant" class="form-select">
+            <option value="">Tous</option>
+            <option th:each="e : ${enseignants}" th:value="${e.id}" th:text="${e.nomComplet}" th:selected="${e.id == f.enseignantId}">e</option>
+          </select></div>
+        <div class="col-12 col-lg-auto d-flex gap-2 ms-lg-auto">
+          <button type="submit" class="btn btn-af flex-grow-1"><i data-lucide="filter" aria-hidden="true"></i>Filtrer</button>
+          <a th:href="@{/rapports}" class="btn btn-link px-2">Réinitialiser</a>
+        </div>
+      </form>
+
+      <div class="row g-3">
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Séances saisies', ${r.nbSeances}, 'Sur la période')}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Taux de présence', ${r.taux != null} ? ${r.taux} + ' %' : '—', null)}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Absences', ${r.absents}, ${r.justifies} + ' justifiée(s) en plus')}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Retards', ${r.retards}, null)}"></div></div>
+      </div>
+
+      <p th:if="${r.nbSeances == 0}" class="af-glass p-4 text-center text-secondary mb-0">
+        Aucune présence enregistrée pour ces filtres. Élargissez la période ou réinitialisez les filtres.
+      </p>
+
+      <!-- F-30 : 4 graphiques -->
+      <div class="row g-4" th:unless="${r.nbSeances == 0}">
+        <div class="col-xl-6"><section class="af-glass p-4 h-100"><h2 class="h6 fw-bold">Taux de présence par classe</h2>
+          <canvas id="g-classe" height="180" role="img" aria-label="Taux de présence par classe"></canvas></section></div>
+        <div class="col-xl-6"><section class="af-glass p-4 h-100"><h2 class="h6 fw-bold">Absences par matière</h2>
+          <canvas id="g-matiere" height="180" role="img" aria-label="Absences par matière"></canvas></section></div>
+        <div class="col-xl-6"><section class="af-glass p-4 h-100"><h2 class="h6 fw-bold">Évolution du taux de présence</h2>
+          <canvas id="g-evolution" height="180" role="img" aria-label="Évolution du taux de présence dans le temps"></canvas></section></div>
+        <div class="col-xl-6"><section class="af-glass p-4 h-100"><h2 class="h6 fw-bold">Répartition des statuts</h2>
+          <canvas id="g-statuts" height="180" role="img" aria-label="Répartition des statuts de présence"></canvas></section></div>
+      </div>
+
+      <!-- F-30 : etudiants a absences frequentes -->
+      <section class="af-glass p-0 overflow-auto" th:unless="${r.nbSeances == 0}" aria-labelledby="risque-titre">
+        <h2 id="risque-titre" class="h6 fw-bold px-4 pt-4">Étudiants à absences fréquentes</h2>
+        <p th:if="${#lists.isEmpty(r.aRisque)}" class="px-4 pb-4 text-secondary mb-0">Aucun étudiant au-delà du seuil sur cette période.</p>
+        <table class="table align-middle mb-0" th:unless="${#lists.isEmpty(r.aRisque)}">
+          <thead><tr><th scope="col" class="ps-4">Étudiant</th><th scope="col">Matricule</th><th scope="col">Classe</th><th scope="col">Absences</th><th scope="col" class="pe-4">Taux</th></tr></thead>
+          <tbody>
+          <tr th:each="e : ${r.aRisque}">
+            <td class="ps-4 fw-semibold" th:text="${e.etudiant.nomComplet}">Nom</td>
+            <td class="font-monospace small" th:text="${e.etudiant.matricule}">m</td>
+            <td th:text="${e.etudiant.classe.nom}">classe</td>
+            <td th:text="${e.absences}">0</td>
+            <td class="pe-4 fw-bold text-danger" th:text="${e.taux} + ' %'">0 %</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Detail des seances -->
+      <section class="af-glass p-0 overflow-auto" th:unless="${r.nbSeances == 0}" aria-labelledby="detail-titre">
+        <h2 id="detail-titre" class="h6 fw-bold px-4 pt-4">Détail des séances</h2>
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr><th scope="col" class="ps-4">Date</th><th scope="col">Horaire</th><th scope="col">Matière</th><th scope="col">Classe</th><th scope="col">Enseignant</th>
+            <th scope="col"><abbr title="Présents">Prés.</abbr></th><th scope="col"><abbr title="Absents">Abs.</abbr></th><th scope="col"><abbr title="Retards">Ret.</abbr></th><th scope="col"><abbr title="Justifiés">Just.</abbr></th><th scope="col" class="pe-4">Taux</th></tr></thead>
+          <tbody>
+          <tr th:each="l : ${r.seances}">
+            <td class="ps-4 font-monospace small" th:text="${#temporals.format(l.seance.date, 'dd/MM/yyyy')}">date</td>
+            <td class="small" th:text="${l.seance.heureDebut} + '–' + ${l.seance.heureFin}">h</td>
+            <td th:text="${l.seance.matiere.intitule}">m</td>
+            <td th:text="${l.seance.classe.nom}">c</td>
+            <td class="small" th:text="${l.seance.enseignant.nomComplet}">e</td>
+            <td class="text-success fw-semibold" th:text="${l.presents}">0</td>
+            <td class="text-danger fw-semibold" th:text="${l.absents}">0</td>
+            <td class="text-warning-emphasis fw-semibold" th:text="${l.retards}">0</td>
+            <td class="text-secondary fw-semibold" th:text="${l.justifies}">0</td>
+            <td class="pe-4" th:text="${l.taux != null} ? ${l.taux} + ' %' : '—'">%</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script th:src="@{/js/graphiques.js}"></script>
+<script th:inline="javascript" th:unless="${rapport.nbSeances == 0}">
+  (function () {
+    const anime = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : {};
+    const pct = { min: 0, max: 100, ticks: { callback: v => v + ' %' } };
+    const sansLegende = { legend: { display: false } };
+    new Chart(document.getElementById('g-classe'), { type: 'bar',
+      data: { labels: /*[[${rapport.parClasse.![classe]}]]*/ [], datasets: [{ data: /*[[${rapport.parClasse.![taux]}]]*/ [], backgroundColor: '#818cf8' }] },
+      options: { scales: { y: pct }, plugins: sansLegende, animation: anime } });
+    new Chart(document.getElementById('g-matiere'), { type: 'bar',
+      data: { labels: /*[[${rapport.parMatiere.![matiere]}]]*/ [], datasets: [{ data: /*[[${rapport.parMatiere.![absences]}]]*/ [], backgroundColor: '#fb7185' }] },
+      options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: sansLegende, animation: anime } });
+    new Chart(document.getElementById('g-evolution'), { type: 'line',
+      data: { labels: /*[[${rapport.evolution.![#temporals.format(jour, 'dd/MM')]}]]*/ [],
+              datasets: [{ data: /*[[${rapport.evolution.![taux]}]]*/ [], borderColor: '#818cf8', borderWidth: 2, backgroundColor: 'rgba(129,140,248,.16)', fill: true, tension: .3, pointRadius: 3, pointBackgroundColor: '#0b1222', pointBorderWidth: 2 }] },
+      options: { scales: { y: pct }, plugins: sansLegende, animation: anime } });
+    new Chart(document.getElementById('g-statuts'), { type: 'doughnut',
+      data: { labels: ['Présent', 'Absent', 'Retard', 'Justifié'],
+              datasets: [{ data: [ /*[[${rapport.presents}]]*/ 0, /*[[${rapport.absents}]]*/ 0, /*[[${rapport.retards}]]*/ 0, /*[[${rapport.justifies}]]*/ 0 ],
+                           backgroundColor: ['#34d399', '#fb7185', '#fbbf24', '#64748b'], cutout: '68%' }] },
+      options: { aspectRatio: 2, plugins: { legend: { position: 'right' } }, animation: anime, interaction: { mode: 'nearest', intersect: true } } });
+  })();
+</script>
+</body>
+</html>

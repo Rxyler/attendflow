@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Emploi du temps')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'emploi-du-temps')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0"
+          th:text="${admin} ? 'Tous les emplois du temps' : (${classeEtudiant != null} ? 'Emploi du temps — ' + ${classeEtudiant} : 'Mon emploi du temps')">Emploi du temps</h1>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+
+      <!-- Navigation semaine (F-13) -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <p class="text-secondary mb-0">
+          Semaine du <strong th:text="${#temporals.format(lundi, 'd MMMM')}">21 septembre</strong>
+          au <strong th:text="${#temporals.format(jours[4], 'd MMMM yyyy')}">25 septembre 2026</strong>
+        </p>
+        <nav class="btn-group" aria-label="Changer de semaine">
+          <a class="btn btn-light border" aria-label="Semaine précédente"
+             th:href="@{/emploi-du-temps(semaine=${lundi.minusWeeks(1)},classe=${classeFiltre},enseignant=${enseignantFiltre})}">‹</a>
+          <a class="btn btn-light border"
+             th:href="@{/emploi-du-temps(classe=${classeFiltre},enseignant=${enseignantFiltre})}">Cette semaine</a>
+          <a class="btn btn-light border" aria-label="Semaine suivante"
+             th:href="@{/emploi-du-temps(semaine=${lundi.plusWeeks(1)},classe=${classeFiltre},enseignant=${enseignantFiltre})}">›</a>
+        </nav>
+      </div>
+
+      <!-- Filtres admin (F-14) -->
+      <form th:if="${admin}" th:action="@{/emploi-du-temps}" method="get" class="af-glass p-3 d-flex flex-wrap gap-3 align-items-end">
+        <input type="hidden" name="semaine" th:value="${lundi}">
+        <div>
+          <label for="classe" class="form-label small fw-medium mb-1">Classe</label>
+          <select id="classe" name="classe" class="form-select">
+            <option value="">Toutes les classes</option>
+            <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.nom}"
+                    th:selected="${c.id == classeFiltre}">Classe</option>
+          </select>
+        </div>
+        <div>
+          <label for="enseignant" class="form-label small fw-medium mb-1">Enseignant</label>
+          <select id="enseignant" name="enseignant" class="form-select">
+            <option value="">Tous les enseignants</option>
+            <option th:each="e : ${enseignants}" th:value="${e.id}" th:text="${e.nomComplet}"
+                    th:selected="${e.id == enseignantFiltre}">Enseignant</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-af"><i data-lucide="filter" aria-hidden="true"></i>Filtrer</button>
+        <a th:href="@{/emploi-du-temps(semaine=${lundi})}" class="btn btn-link">Réinitialiser</a>
+      </form>
+
+      <!-- Grille lundi-vendredi -->
+      <div class="af-glass p-0 overflow-auto">
+        <table class="table af-edt align-top mb-0">
+          <caption class="px-4">Créneaux de 2 heures, du lundi au vendredi. Cliquez sur une séance pour voir le détail.</caption>
+          <thead>
+          <tr>
+            <th scope="col" class="af-heure ps-3"><span class="visually-hidden">Horaire</span></th>
+            <th scope="col" th:each="jour : ${jours}" class="text-center text-uppercase small"
+                th:classappend="${jour == aujourdhui} ? 'af-aujourdhui text-primary' : 'text-secondary'">
+              <span th:text="${#temporals.format(jour, 'EEEE')}">lundi</span><br>
+              <span class="fw-normal" th:text="${#temporals.format(jour, 'dd/MM')}">21/09</span>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="ligne : ${lignes}">
+            <th scope="row" class="af-heure ps-3 small">
+              <span th:text="${ligne.debut}">08:00</span><br>
+              <span class="text-secondary fw-normal" th:text="${ligne.fin}">10:00</span>
+            </th>
+            <td th:each="cellule, it : ${ligne.jours}" class="p-2"
+                th:classappend="${jours[it.index] == aujourdhui} ? 'af-aujourdhui'">
+              <div class="d-grid gap-2">
+                <a th:each="s : ${cellule}" class="af-seance"
+                   th:classappend="${(s.etat.name() == 'MODIFIEE' ? 'af-modifiee ' : '') + (s.etat.name() == 'ANNULEE' ? 'af-annulee ' : '') + (selection != null and selection.id == s.id ? 'af-selection' : '')}"
+                   th:href="@{/emploi-du-temps(semaine=${lundi},classe=${classeFiltre},enseignant=${enseignantFiltre},seance=${s.id})}">
+                  <span class="af-titre fw-semibold d-block" th:text="${s.matiere.intitule}">Matière</span>
+                  <span class="d-block" th:text="${s.classe.nom} + ' · ' + ${s.salle.nom}">Classe · Salle</span>
+                  <span class="d-block opacity-75" th:if="${admin}" th:text="${s.enseignant.nomComplet}">Enseignant</span>
+                  <span class="badge mt-1" th:if="${s.etat.name() != 'PLANIFIEE'}"
+                        th:classappend="${s.etat.name() == 'ANNULEE'} ? 'text-bg-danger' : 'text-bg-warning'"
+                        th:text="${s.etat.name() == 'ANNULEE'} ? 'Annulée' : 'Modifiée'">État</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p th:if="${#lists.isEmpty(seances)}" class="text-secondary text-center mb-0">Aucune séance cette semaine.</p>
+
+      <!-- Detail d'une seance (F-15) -->
+      <section th:if="${selection}" class="af-glass p-4" aria-labelledby="detail-titre">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <p class="small text-uppercase text-secondary fw-semibold mb-1">Détail de la séance</p>
+            <h2 id="detail-titre" class="h4 fw-bold mb-0"
+                th:classappend="${selection.etat.name() == 'ANNULEE'} ? 'text-decoration-line-through'"
+                th:text="${selection.matiere.intitule}">Matière</h2>
+          </div>
+          <a th:href="@{/emploi-du-temps(semaine=${lundi},classe=${classeFiltre},enseignant=${enseignantFiltre})}"
+             class="btn-close" aria-label="Fermer le détail"></a>
+        </div>
+        <dl class="row mt-3 mb-0">
+          <dt class="col-sm-3 text-secondary fw-normal">Classe</dt><dd class="col-sm-9" th:text="${selection.classe.nom}">Classe</dd>
+          <dt class="col-sm-3 text-secondary fw-normal">Enseignant</dt><dd class="col-sm-9" th:text="${selection.enseignant.nomComplet}">Enseignant</dd>
+          <dt class="col-sm-3 text-secondary fw-normal">Salle</dt><dd class="col-sm-9" th:text="${selection.salle.nom}">Salle</dd>
+          <dt class="col-sm-3 text-secondary fw-normal">Date</dt><dd class="col-sm-9" th:text="${#temporals.format(selection.date, 'EEEE d MMMM yyyy')}">Date</dd>
+          <dt class="col-sm-3 text-secondary fw-normal">Horaire</dt><dd class="col-sm-9" th:text="${selection.heureDebut} + ' — ' + ${selection.heureFin}">Horaire</dd>
+          <dt class="col-sm-3 text-secondary fw-normal">État</dt>
+          <dd class="col-sm-9" th:text="${selection.etat.name() == 'PLANIFIEE'} ? 'Planifiée' : (${selection.etat.name() == 'MODIFIEE'} ? 'Modifiée' : 'Annulée')">État</dd>
+        </dl>
+        <p th:if="${selection.etat.name() == 'ANNULEE'}" class="text-danger small mt-3 mb-0">
+          Cette séance est annulée : la prise des présences n’est pas possible.
+        </p>
+        <a th:if="${selection.etat.name() != 'ANNULEE' and utilisateur.role.name() != 'ETUDIANT'}"
+           th:href="@{/seances/{id}/presences(id=${selection.id})}" class="btn btn-af mt-3"><i data-lucide="list-checks" aria-hidden="true"></i>Prendre les présences</a>
+      </section>
+
+      <p class="small text-secondary mb-0">Emploi du temps fourni par le projet partenaire — lecture seule.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mes justificatifs')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'justificatifs')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0">Mes justificatifs</h1>
+      <p class="small text-secondary mb-0">Justifiez une absence avec un document (PDF ou image, 5 Mo maximum).</p>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <div th:if="${succes}" class="alert alert-success mb-0" role="status" th:text="${succes}">ok</div>
+      <div th:if="${erreur}" class="alert alert-danger mb-0" role="alert" th:text="${erreur}">erreur</div>
+
+      <!-- F-24 : depot -->
+      <section class="af-glass p-4" aria-labelledby="depot-titre">
+        <h2 id="depot-titre" class="h6 fw-bold">Justifier une absence</h2>
+        <p th:if="${#lists.isEmpty(absences)}" class="text-secondary mb-0">Aucune absence à justifier.</p>
+        <form th:unless="${#lists.isEmpty(absences)}" th:action="@{/etudiant/justificatifs}" method="post"
+              enctype="multipart/form-data" class="row g-3">
+          <div class="col-md-6">
+            <label for="presence" class="form-label fw-medium">Absence</label>
+            <select id="presence" name="presence" class="form-select" required>
+              <option th:each="p : ${absences}" th:value="${p.id}" th:selected="${p.id == presenceChoisie}"
+                      th:text="${#temporals.format(p.seance.date, 'dd/MM/yyyy')} + ' · ' + ${p.seance.heureDebut} + ' · ' + ${p.seance.matiere.intitule} + (${p.justificatif != null} ? ' (refusé, à redéposer)' : '')">absence</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="fichier" class="form-label fw-medium">Document</label>
+            <input type="file" id="fichier" name="fichier" class="form-control" accept=".pdf,.png,.jpg,.jpeg" required>
+            <div class="form-text">PDF, PNG ou JPG — 5 Mo maximum.</div>
+          </div>
+          <div class="col-12">
+            <label for="motif" class="form-label fw-medium">Motif</label>
+            <textarea id="motif" name="motif" class="form-control" rows="2" maxlength="500" required
+                      placeholder="Ex. : certificat médical, convocation officielle…"></textarea>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-af px-4"><i data-lucide="upload" aria-hidden="true"></i>Envoyer le justificatif</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Suivi -->
+      <div class="af-glass p-0 overflow-hidden">
+        <table class="table align-middle mb-0">
+          <caption class="px-4">Mes justificatifs déposés</caption>
+          <thead>
+          <tr>
+            <th scope="col" class="ps-4">Absence</th>
+            <th scope="col">Motif</th>
+            <th scope="col">Déposé le</th>
+            <th scope="col">Document</th>
+            <th scope="col" class="pe-4">État</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:if="${#lists.isEmpty(justificatifs)}">
+            <td colspan="5" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucun justificatif déposé.</td>
+          </tr>
+          <tr th:each="j : ${justificatifs}">
+            <td class="ps-4">
+              <span class="fw-semibold" th:text="${j.presence.seance.matiere.intitule}">Matière</span><br>
+              <span class="small text-secondary" th:text="${#temporals.format(j.presence.seance.date, 'dd/MM/yyyy')}">date</span>
+            </td>
+            <td class="small" th:text="${j.motif}">motif</td>
+            <td class="small font-monospace" th:text="${#temporals.format(j.dateDepot, 'dd/MM/yyyy HH:mm')}">date</td>
+            <td><a th:href="@{/justificatifs/{id}/fichier(id=${j.id})}" target="_blank" rel="noopener">Ouvrir</a></td>
+            <td class="pe-4">
+              <span class="badge rounded-pill"
+                    th:classappend="${j.etat.name() == 'ACCEPTE'} ? 'text-bg-success' : (${j.etat.name() == 'REFUSE'} ? 'text-bg-danger' : 'text-bg-warning')"
+                    th:text="${j.etat.name() == 'ACCEPTE'} ? 'Accepté' : (${j.etat.name() == 'REFUSE'} ? 'Refusé' : 'En attente')">État</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

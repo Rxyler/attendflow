@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Accueil')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Prechargement : logo puis rideau (retire par attendflow.js) -->
+<div class="af-chargement" aria-hidden="true">
+  <div class="d-flex flex-column align-items-center">
+    <span class="af-logo"></span>
+    <div class="af-ligne"><span></span></div>
+  </div>
+</div>
+
+<div class="af-vitrine">
+  <a href="#contenu" class="visually-hidden-focusable btn btn-light btn-sm m-2">Aller au contenu</a>
+
+  <nav class="af-nav-vitrine af-glass d-flex align-items-center gap-2" aria-label="Navigation">
+    <a th:href="@{/}" class="d-flex align-items-center gap-2 text-decoration-none me-auto">
+      <span class="af-logo" aria-hidden="true"></span>
+      <span class="fw-semibold text-white">AttendFlow</span>
+    </a>
+    <ul class="nav d-none d-md-flex">
+      <li class="nav-item"><a class="nav-link" href="#fonctions">Fonctions</a></li>
+      <li class="nav-item"><a class="nav-link" href="#parcours">Parcours</a></li>
+      <li class="nav-item"><a class="nav-link" href="#roles">Rôles</a></li>
+      <li class="nav-item"><a class="nav-link" href="#compagnons">Compagnons</a></li>
+    </ul>
+    <button th:replace="~{fragments/layout :: theme}"></button>
+    <a th:href="@{/login}" class="btn btn-af" data-magnetic>Se connecter <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+  </nav>
+
+  <main id="contenu" class="container-xl px-3 px-lg-4" style="max-width: 76rem">
+
+    <!-- ===== Hero ===== -->
+    <section class="af-hero position-relative">
+      <span class="af-orbe" style="width: 28rem; height: 28rem; left: -10rem; top: -6rem; background: #6366f1"></span>
+      <span class="af-orbe" style="width: 22rem; height: 22rem; right: -6rem; top: 10rem; background: #22d3ee; opacity: .35"></span>
+      <span class="af-orbe" style="width: 18rem; height: 18rem; left: 40%; bottom: -8rem; background: #c084fc; opacity: .4"></span>
+
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="af-pill mb-4" data-hero><span class="af-point" aria-hidden="true"></span>Synchronisé avec l’emploi du temps officiel</span>
+          <h1 class="text-white mb-4">La présence,
+            <span class="af-gradient-text af-rotatif" data-mots="en un geste.|sans papier.|en temps réel.|sous contrôle.">en un geste.</span><br>
+            Les absences, maîtrisées.</h1>
+          <p class="lead mb-4" data-hero>
+            AttendFlow relie l’appel à l’emploi du temps : chaque enseignant retrouve ses séances,
+            l’administration voit les alertes, les étudiants suivent leur dossier. Zéro feuille, zéro oubli.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mb-4" data-hero>
+            <a th:href="@{/login}" class="btn btn-af btn-lg af-pulse" data-magnetic>Ouvrir mon espace <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a href="#fonctions" class="btn btn-light btn-lg">Découvrir <i data-lucide="chevron-down" aria-hidden="true"></i></a>
+          </div>
+          <div class="d-flex flex-wrap gap-4 small text-secondary" data-hero>
+            <span class="d-inline-flex align-items-center gap-2"><i data-lucide="shield-check" aria-hidden="true" style="width:1rem;height:1rem;color:#818cf8"></i>Accès par rôle</span>
+            <span class="d-inline-flex align-items-center gap-2"><i data-lucide="history" aria-hidden="true" style="width:1rem;height:1rem;color:#818cf8"></i>Chaque modification tracée</span>
+            <span class="d-inline-flex align-items-center gap-2"><i data-lucide="file-spreadsheet" aria-hidden="true" style="width:1rem;height:1rem;color:#818cf8"></i>Exports PDF et Excel</span>
+          </div>
+        </div>
+
+        <!-- Scene 3D : objet Three.js derriere, cartes en verre devant -->
+        <div class="col-lg-6">
+          <div class="af-scene" aria-hidden="true">
+            <div class="af-3d"></div>
+            <div class="af-scene-inner">
+              <div class="af-flot" data-z="0" style="left: 4%; top: 6%; width: 78%">
+                <div class="af-glass af-beam af-beam-lent p-4">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div><div class="small text-secondary">Aujourd’hui</div><div class="fw-semibold text-white">Mes séances</div></div>
+                    <span class="af-pill" style="padding:.25rem .7rem"><span class="af-point" style="margin:0 .3rem 0 0"></span>Direct</span>
+                  </div>
+                  <div class="af-mini-edt">
+                    <span class="h">08:00</span><span class="af-mini-chip">Développement Web · 3ème INFO · B12</span>
+                    <span class="h">10:00</span><span class="af-mini-chip v">Base de données · 1ère INFO · B08</span>
+                    <span class="h">14:00</span><span class="af-mini-chip c">Java · 2ème INFO · A05</span>
+                  </div>
+                </div>
+              </div>
+              <div class="af-flot" data-z="90" style="right: 0; top: 46%; width: 54%">
+                <div class="af-glass af-stat" data-ton="bleu">
+                  <div class="af-stat-tete"><p class="af-stat-libelle">Taux de présence</p><span class="af-stat-icone"><i data-lucide="percent"></i></span></div>
+                  <p class="af-stat-value" data-compteur>94 %</p>
+                  <div class="af-barre mt-3"><span style="width: 94%"></span></div>
+                  <p class="af-stat-detail">+3 pts cette semaine</p>
+                </div>
+              </div>
+              <div class="af-flot" data-z="160" style="left: -2%; top: 66%; width: 52%">
+                <div class="af-glass p-3 d-flex align-items-start gap-3">
+                  <span style="background:var(--af-warning-soft);color:var(--af-warning);border:1px solid var(--af-warning-line);display:inline-grid;place-items:center;width:2.1rem;height:2.1rem;border-radius:10px;flex:none;box-shadow:0 0 18px -4px rgba(251,191,36,.7)"><i data-lucide="bell" style="width:1rem;height:1rem"></i></span>
+                  <div class="small">
+                    <div class="fw-semibold text-white">Seuil d’absence dépassé</div>
+                    <div class="text-secondary">Rim Saad (3ème INFO) · 4 absences</div>
+                  </div>
+                </div>
+              </div>
+              <div class="af-flot" data-z="40" style="right: 6%; top: -4%; width: 34%">
+                <div class="af-glass p-3 text-center">
+                  <div class="small text-secondary mb-1">Appel</div>
+                  <div class="d-flex justify-content-center gap-2">
+                    <span class="badge text-bg-success">28 P</span><span class="badge" style="background:var(--af-danger-soft);color:var(--af-danger)">2 A</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Bandeau defilant ===== -->
+    <div class="af-bandeau my-4" aria-hidden="true">
+      <div class="af-bandeau-piste">
+        <th:block th:each="i : ${#numbers.sequence(1, 2)}">
+          <span><i data-lucide="refresh-cw"></i>Synchronisation chaque jour ouvré à 7h00</span>
+          <span><i data-lucide="list-checks"></i>Appel en quelques secondes</span>
+          <span><i data-lucide="bell"></i>Alerte dès le seuil franchi</span>
+          <span><i data-lucide="file-check"></i>Justificatifs en ligne</span>
+          <span><i data-lucide="chart-column"></i>Rapports par classe et matière</span>
+          <span><i data-lucide="mail"></i>Notifications par email</span>
+          <span><i data-lucide="smartphone"></i>Pensé pour le téléphone</span>
+        </th:block>
+      </div>
+    </div>
+
+    <!-- ===== Chiffres ===== -->
+    <section class="py-4" data-reveal>
+      <div class="af-chiffres">
+        <div><div class="af-grand af-gradient-text" data-compteur>3</div><div class="af-legende">espaces : admin, enseignant, étudiant</div></div>
+        <div><div class="af-grand af-gradient-text" data-compteur>4</div><div class="af-legende">graphiques par rapport</div></div>
+        <div><div class="af-grand af-gradient-text" data-compteur>2</div><div class="af-legende">formats d’export, PDF et Excel</div></div>
+        <div><div class="af-grand af-gradient-text" data-compteur>100 %</div><div class="af-legende">des modifications tracées</div></div>
+      </div>
+    </section>
+
+    <!-- ===== Fonctions ===== -->
+    <section id="fonctions" class="py-5">
+      <div class="af-section-titre text-center mb-5" data-reveal>
+        <span class="af-pill mb-3">Fonctions</span>
+        <h2 class="text-white">Tout ce qu’il faut pour tenir les présences,<br class="d-none d-md-inline"> <span class="af-gradient-text">rien de superflu.</span></h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="calendar-days"></i></span>
+          <h3>Emploi du temps en lecture seule</h3>
+          <p>Les séances arrivent du système partenaire. Modifiées ou annulées, elles sont marquées et verrouillées.</p>
+        </div></div>
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="list-checks"></i></span>
+          <h3>Appel express</h3>
+          <p>« Tous présents », puis on corrige. Recherche, filtre par statut, compteurs en direct, même sur téléphone.</p>
+        </div></div>
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="bell-ring"></i></span>
+          <h3>Alertes automatiques</h3>
+          <p>Rappel avant la séance, résumé du soir, alerte dès qu’un étudiant franchit le seuil d’absence.</p>
+        </div></div>
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="file-check"></i></span>
+          <h3>Justificatifs en ligne</h3>
+          <p>L’étudiant dépose un PDF ou une photo, l’administration accepte ou refuse, le taux se recalcule.</p>
+        </div></div>
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="chart-column"></i></span>
+          <h3>Rapports et exports</h3>
+          <p>Filtres par période, classe, matière, enseignant. Quatre graphiques, export PDF et Excel identiques à l’écran.</p>
+        </div></div>
+        <div class="col-md-6 col-lg-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="history"></i></span>
+          <h3>Traçabilité totale</h3>
+          <p>Chaque changement de statut garde son auteur et sa date. Délai de modification configurable.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ===== Parcours ===== -->
+    <section id="parcours" class="py-5">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-5" data-reveal>
+          <span class="af-pill mb-3">Parcours</span>
+          <h2 class="text-white" style="font-size: clamp(1.8rem, 3.6vw, 2.6rem); font-weight: 600; letter-spacing: -.035em">Trois gestes, et la journée est <span class="af-gradient-text">bouclée.</span></h2>
+          <p class="text-secondary mt-3">Pas de paramétrage le matin, pas de ressaisie le soir. AttendFlow s’occupe du reste.</p>
+        </div>
+        <div class="col-lg-7">
+          <div class="d-grid gap-3">
+            <div class="af-glass af-etape" data-reveal data-tilt="4">
+              <div class="af-num">01 — 07:00</div>
+              <h3>Les séances se synchronisent</h3>
+              <p>Ajouts, changements de salle, annulations : le journal garde la trace et prévient l’administration si des présences étaient déjà saisies.</p>
+            </div>
+            <div class="af-glass af-etape" data-reveal data-tilt="4">
+              <div class="af-num">02 — EN SÉANCE</div>
+              <h3>L’enseignant fait l’appel</h3>
+              <p>Depuis son emploi du temps, en quelques secondes. Un retard, une absence justifiée : tout est à un clic.</p>
+            </div>
+            <div class="af-glass af-etape" data-reveal data-tilt="4">
+              <div class="af-num">03 — 18:00</div>
+              <h3>Chacun est informé</h3>
+              <p>Résumé du jour, alertes de seuil, email à l’étudiant et à l’administration. Les rapports sont prêts quand on en a besoin.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Roles ===== -->
+    <section id="roles" class="py-5">
+      <div class="af-section-titre text-center mb-5" data-reveal>
+        <span class="af-pill mb-3">Rôles</span>
+        <h2 class="text-white">Un espace par rôle, <span class="af-gradient-text">rien de plus.</span></h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="shield-check"></i></span>
+          <h3>Administration</h3>
+          <p>Référentiel, justificatifs, seuils, rapports, synchronisation. Vue d’ensemble et alertes.</p>
+        </div></div>
+        <div class="col-md-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="user-round"></i></span>
+          <h3>Enseignant</h3>
+          <p>Ses séances, ses étudiants, ses statistiques. L’appel, et rien d’autre à gérer.</p>
+        </div></div>
+        <div class="col-md-4" data-reveal><div class="af-glass af-feature" data-tilt="6">
+          <span class="af-ico"><i data-lucide="graduation-cap"></i></span>
+          <h3>Étudiant</h3>
+          <p>Son emploi du temps, son historique, ses justificatifs et ses notifications.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ===== Compagnons ===== -->
+    <section id="compagnons" class="py-5">
+      <div class="af-section-titre text-center mb-5" data-reveal>
+        <span class="af-pill mb-3">Compagnons</span>
+        <h2 class="text-white">Choisis ton <span class="af-gradient-text">compagnon.</span></h2>
+        <p style="color: var(--af-muted)">Il devient ta photo de profil, fête tes séries de présences et t’aide à débloquer des badges.</p>
+      </div>
+      <div class="af-choix-mascottes af-vitrine-mascottes"
+           th:with="mascottes=${T(com.attendflow.model.enums.Mascotte).values()}">
+        <div class="af-glass af-choix-carte" data-reveal data-tilt="10" th:each="m, i : ${mascottes}"
+             th:style="'--af-delai:' + ${i.index * 0.35} + 's'">
+          <img th:src="@{${m.image}}" alt="" class="af-mascotte" width="104" height="104">
+          <strong th:text="${m.nom}">Nom</strong>
+          <span class="small" th:text="${m.phrase}">phrase</span>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-2 flex-wrap mt-5" data-reveal>
+        <span class="af-pill"><i data-lucide="flame" aria-hidden="true"></i>Séries de présences</span>
+        <span class="af-pill"><i data-lucide="star" aria-hidden="true"></i>Niveaux et points</span>
+        <span class="af-pill"><i data-lucide="award" aria-hidden="true"></i>Six badges à débloquer</span>
+      </div>
+    </section>
+
+    <!-- ===== Appel a l'action ===== -->
+    <section class="py-5" data-reveal>
+      <div class="af-glass af-beam af-cta">
+        <span class="af-orbe" style="width: 26rem; height: 26rem; left: -8rem; top: -10rem; background: #6366f1"></span>
+        <span class="af-orbe" style="width: 20rem; height: 20rem; right: -6rem; bottom: -10rem; background: #c084fc"></span>
+        <h2 class="text-white mb-3">Prêt à faire l’appel <span class="af-gradient-text">autrement ?</span></h2>
+        <p class="text-secondary mb-4" style="max-width: 32rem; margin: 0 auto">Connectez-vous avec votre compte universitaire. Votre espace est déjà prêt.</p>
+        <a th:href="@{/login}" class="btn btn-af btn-lg af-pulse" data-magnetic>Se connecter <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </section>
+
+    <footer class="af-pied py-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="d-flex align-items-center gap-2"><span class="af-logo" style="width:1.5rem;height:1.5rem;border-radius:7px"></span>AttendFlow</span>
+      <span>Gestion des absences · © 2026</span>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

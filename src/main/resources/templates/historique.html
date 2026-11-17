@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Historique des présences')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100" th:with="h=${historique}">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'historique')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0"
+          th:text="${utilisateur.role.name() == 'ETUDIANT'} ? 'Mon historique' : 'Historique de ' + ${etudiant.nomComplet}">Historique</h1>
+      <p class="small text-secondary mb-0"
+         th:text="${etudiant.classe.nom} + ' · matricule ' + ${etudiant.matricule}">classe</p>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <div class="row g-3">
+        <div class="col-6 col-lg"><div th:replace="~{fragments/layout :: carte('Taux de présence', ${h.taux != null} ? ${h.taux} + ' %' : '—', null)}"></div></div>
+        <div class="col-6 col-lg"><div th:replace="~{fragments/layout :: carte('Présences', ${h.presents}, null)}"></div></div>
+        <div class="col-6 col-lg"><div th:replace="~{fragments/layout :: carte('Absences', ${h.absents}, null)}"></div></div>
+        <div class="col-6 col-lg"><div th:replace="~{fragments/layout :: carte('Retards', ${h.retards}, null)}"></div></div>
+        <div class="col-6 col-lg"><div th:replace="~{fragments/layout :: carte('Justifiés', ${h.justifies}, null)}"></div></div>
+      </div>
+
+      <section th:unless="${#lists.isEmpty(h.lignes)}"
+               th:replace="~{fragments/layout :: graphique('Évolution du taux de présence', 'Taux cumulé à la fin de chaque journée de cours.')}"></section>
+
+      <!-- F-28 : date, matiere, enseignant, horaire, statut -->
+      <div class="af-glass p-0 overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+          <caption class="px-4">Toutes les séances enregistrées, la plus récente en premier.</caption>
+          <thead>
+          <tr>
+            <th scope="col" class="ps-4">Date</th>
+            <th scope="col">Matière</th>
+            <th scope="col">Enseignant</th>
+            <th scope="col">Horaire</th>
+            <th scope="col" class="pe-4">Statut</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:if="${#lists.isEmpty(h.lignes)}">
+            <td colspan="5" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucune présence enregistrée pour l’instant.</td>
+          </tr>
+          <tr th:each="p : ${h.lignes}">
+            <td class="ps-4 font-monospace small" th:text="${#temporals.format(p.seance.date, 'dd/MM/yyyy')}">date</td>
+            <td class="fw-semibold" th:text="${p.seance.matiere.intitule}">Matière</td>
+            <td th:text="${p.seance.enseignant.nomComplet}">Enseignant</td>
+            <td class="small" th:text="${p.seance.heureDebut} + ' — ' + ${p.seance.heureFin}">horaire</td>
+            <td class="pe-4">
+              <span class="badge rounded-pill"
+                    th:classappend="${p.statut.name() == 'PRESENT'} ? 'text-bg-success' : (${p.statut.name() == 'ABSENT'} ? 'text-bg-danger' : (${p.statut.name() == 'RETARD'} ? 'text-bg-warning' : 'text-bg-secondary'))"
+                    th:text="${p.statut.name() == 'PRESENT'} ? 'Présent' : (${p.statut.name() == 'ABSENT'} ? 'Absent' : (${p.statut.name() == 'RETARD'} ? 'Retard' : 'Justifié'))">Statut</span>
+              <span th:if="${p.justificatif != null and p.justificatif.etat.name() == 'EN_ATTENTE'}"
+                    class="small text-secondary ms-1">justificatif en attente</span>
+              <a th:if="${utilisateur.role.name() == 'ETUDIANT' and p.statut.name() == 'ABSENT' and (p.justificatif == null or p.justificatif.etat.name() == 'REFUSE')}"
+                 th:href="@{/etudiant/justificatifs(presence=${p.id})}" class="small ms-2">Justifier</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mon tableau de bord')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100" th:with="t=${tableau}">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'accueil')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0">Mon tableau de bord</h1>
+      <p class="small text-secondary mb-0" th:text="${#temporals.format(#temporals.createToday(), 'EEEE d MMMM yyyy')}">date</p>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <h2 class="h4 fw-bold mb-0">Bonjour, <span th:text="${utilisateur.prenom}">Prénom</span></h2>
+
+      <div class="row g-3">
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Séances aujourd’hui', ${#lists.size(t.seancesDuJour)}, null)}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Présents', ${t.presents}, '7 derniers jours')}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Absences', ${t.absents}, '7 derniers jours')}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Taux de présence', ${t.taux != null} ? ${t.taux} + ' %' : '—', '7 derniers jours')}"></div></div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-xl-7 d-grid gap-4 align-content-start">
+          <!-- Seance actuelle (F-16) -->
+          <section class="af-glass p-4" aria-labelledby="actuelle-titre">
+            <h2 id="actuelle-titre" class="h6 fw-bold">Séance actuelle</h2>
+            <div th:if="${t.seanceActuelle}" th:with="s=${t.seanceActuelle}">
+              <p class="fs-5 fw-bold mb-0" th:text="${s.matiere.intitule}">Matière</p>
+              <p class="text-secondary" th:text="${s.classe.nom} + ' · Salle ' + ${s.salle.nom} + ' · ' + ${s.heureDebut} + ' — ' + ${s.heureFin}">détail</p>
+              <a th:href="@{/seances/{id}/presences(id=${s.id})}" class="btn btn-af"><i data-lucide="list-checks" aria-hidden="true"></i>Prendre les présences</a>
+            </div>
+            <p th:unless="${t.seanceActuelle}" class="text-secondary mb-0">Aucune séance en cours.</p>
+          </section>
+
+          <!-- Prochaines seances du jour (F-16) -->
+          <section class="af-glass p-4" aria-labelledby="prochaines-titre">
+            <h2 id="prochaines-titre" class="h6 fw-bold">Prochaines séances aujourd’hui</h2>
+            <p th:if="${#lists.isEmpty(t.prochaines)}" class="text-secondary mb-0">Plus de séance prévue aujourd’hui.</p>
+            <ul class="list-group list-group-flush" th:unless="${#lists.isEmpty(t.prochaines)}">
+              <li class="list-group-item bg-transparent px-0 d-flex justify-content-between align-items-center"
+                  th:each="s : ${t.prochaines}">
+                <span>
+                  <strong th:text="${s.heureDebut}">10:00</strong>
+                  <span th:text="${s.matiere.intitule} + ' · ' + ${s.classe.nom} + ' · ' + ${s.salle.nom}">détail</span>
+                  <span th:if="${s.etat.name() == 'ANNULEE'}" class="badge text-bg-danger ms-1">Annulée</span>
+                </span>
+                <a th:href="@{/emploi-du-temps(seance=${s.id})}" class="small">Voir</a>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="col-xl-5"><section th:replace="~{fragments/layout :: graphique('Taux de présence — 7 derniers jours', 'Jours sans séance laissés vides.')}"></section></div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

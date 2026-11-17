@@ -1,0 +1,43 @@
+package com.attendflow.web;
+
+import com.attendflow.model.Utilisateur;
+import com.attendflow.model.enums.Mascotte;
+import com.attendflow.repository.UtilisateurRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+/** Mon profil : chaque utilisateur choisit son compagnon (ou garde ses initiales). */
+@Controller
+public class ProfilController {
+
+    private final UtilisateurRepository utilisateurs;
+
+    public ProfilController(UtilisateurRepository utilisateurs) {
+        this.utilisateurs = utilisateurs;
+    }
+
+    @GetMapping("/profil")
+    public String profil(@AuthenticationPrincipal UserDetails compte, Model model) {
+        model.addAttribute("utilisateur", utilisateurs.findByEmail(compte.getUsername()).orElseThrow());
+        model.addAttribute("mascottes", Mascotte.values());
+        return "profil";
+    }
+
+    /** mascotte absente ou vide : retour aux initiales. Une valeur inconnue est refusee (400) par la conversion d'enum. */
+    @PostMapping("/profil/mascotte")
+    public String choisir(@AuthenticationPrincipal UserDetails compte,
+                          @RequestParam(required = false) Mascotte mascotte, RedirectAttributes redirection) {
+        Utilisateur u = utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
+        u.setMascotte(mascotte);
+        utilisateurs.save(u);
+        redirection.addFlashAttribute("succes", mascotte == null ? "Initiales rétablies."
+                : mascotte.getNom() + " est maintenant ton compagnon !");
+        return "redirect:/profil";
+    }
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Matières')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'matieres')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0">Matières</h1>
+      <p class="small text-secondary mb-0" th:text="${#lists.size(matieres)} + ' matière(s)'">0</p>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <div th:if="${succes}" class="alert alert-success mb-0" role="status" th:text="${succes}">ok</div>
+      <div th:if="${erreur}" class="alert alert-danger mb-0" role="alert" th:text="${erreur}">erreur</div>
+
+      <div class="row g-4">
+        <div class="col-xl-8">
+          <div class="af-glass p-0 overflow-auto">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr>
+                <th scope="col" class="ps-4">Intitulé</th>
+                <th scope="col">Code</th>
+                <th scope="col">Coefficient</th>
+                <th scope="col">Enseignants</th>
+                <th scope="col" class="pe-4 text-end">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:if="${#lists.isEmpty(matieres)}"><td colspan="5" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucune matière.</td></tr>
+              <tr th:each="m : ${matieres}">
+                <td class="ps-4 fw-semibold" th:text="${m.intitule}">Matière</td>
+                <td class="font-monospace small" th:text="${m.code}">CODE</td>
+                <td th:text="${m.coefficient} ?: '—'">2</td>
+                <td>
+                  <span th:if="${#sets.isEmpty(m.enseignants)}" class="small text-secondary fst-italic">Aucun enseignant</span>
+                  <span th:each="e : ${m.enseignants}" class="badge rounded-pill text-bg-light border me-1" th:text="${e.nomComplet}">prof</span>
+                </td>
+                <td class="pe-4 text-end text-nowrap">
+                  <a th:href="@{/admin/matieres(modifier=${m.id})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>Modifier</a>
+                  <form th:action="@{/admin/matieres/{id}/supprimer(id=${m.id})}" method="post" class="d-inline"
+                        th:attr="onsubmit='return confirm(\'Supprimer ' + ${m.intitule} + ' ?\')'">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small text-secondary mt-2 mb-0">Les enseignants s’affectent depuis la page Enseignants.</p>
+        </div>
+
+        <div class="col-xl-4">
+          <form th:action="@{/admin/matieres}" method="post" class="af-glass p-4 d-grid gap-3">
+            <h2 class="h6 fw-bold mb-0" th:text="${formId != null} ? 'Modifier la matière' : 'Ajouter une matière'">Ajouter</h2>
+            <input type="hidden" name="id" th:value="${formId}">
+            <div><label for="m-intitule" class="form-label">Intitulé</label>
+              <input id="m-intitule" name="intitule" class="form-control" th:value="${form?.intitule}" required maxlength="120"></div>
+            <div><label for="m-code" class="form-label">Code</label>
+              <input id="m-code" name="code" class="form-control text-uppercase" th:value="${form?.code}" required maxlength="20" placeholder="GL"></div>
+            <div><label for="m-coef" class="form-label">Coefficient</label>
+              <input id="m-coef" name="coefficient" type="number" step="0.5" min="0.5" class="form-control" th:value="${form?.coefficient}"></div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-af">Enregistrer</button>
+              <a th:if="${formId != null}" th:href="@{/admin/matieres}" class="btn btn-light border">Annuler</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

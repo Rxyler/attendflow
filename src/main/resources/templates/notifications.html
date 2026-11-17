@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Notifications')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'notifications')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div>
+        <h1 class="h5 fw-bold mb-0">Notifications</h1>
+        <p class="small text-secondary mb-0" th:text="${nbNonLues} + ' non lue(s) — pour vous uniquement'">0 non lue</p>
+      </div>
+      <form th:action="@{/notifications/tout-lu}" method="post">
+        <button type="submit" class="btn btn-sm btn-link fw-semibold" th:disabled="${nbNonLues == 0}"><i data-lucide="check-check" aria-hidden="true"></i>Tout marquer comme lu</button>
+      </form>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-3 align-content-start">
+      <div class="d-flex gap-2 small">
+        <span class="badge rounded-pill text-bg-primary">Information</span>
+        <span class="badge rounded-pill text-bg-warning">Avertissement</span>
+        <span class="badge rounded-pill text-bg-success">Succès</span>
+      </div>
+
+      <div th:if="${#lists.isEmpty(notifications)}" class="af-glass p-5 text-center text-secondary">
+        Aucune notification pour le moment.
+      </div>
+
+      <!-- F-35 : trois niveaux visuels -->
+      <article th:each="n : ${notifications}" class="af-glass p-3 d-flex gap-3 align-items-start"
+               th:classappend="${n.lue} ? 'opacity-75'">
+        <span class="badge rounded-pill flex-shrink-0 mt-1"
+              th:classappend="${n.type.name() == 'INFORMATION'} ? 'text-bg-primary' : (${n.type.name() == 'AVERTISSEMENT'} ? 'text-bg-warning' : 'text-bg-success')"
+              th:text="${n.type.name() == 'INFORMATION'} ? 'Information' : (${n.type.name() == 'AVERTISSEMENT'} ? 'Avertissement' : 'Succès')">Type</span>
+        <div class="flex-grow-1">
+          <h2 class="h6 fw-bold mb-1">
+            <span th:text="${n.titre}">Titre</span>
+            <span th:unless="${n.lue}" class="badge rounded-pill text-bg-primary ms-1" style="font-size:.6rem">Nouveau</span>
+          </h2>
+          <p class="mb-1" th:text="${n.message}">Message</p>
+          <p class="small text-secondary mb-0" th:text="${#temporals.format(n.date, 'dd/MM/yyyy HH:mm')}">date</p>
+        </div>
+        <form th:unless="${n.lue}" th:action="@{/notifications/{id}/lue(id=${n.id})}" method="post">
+          <button type="submit" class="btn btn-sm btn-light border"><i data-lucide="check" aria-hidden="true"></i>Marquer comme lu</button>
+        </form>
+      </article>
+    </main>
+  </div>
+</div>
+</body>
+</html>

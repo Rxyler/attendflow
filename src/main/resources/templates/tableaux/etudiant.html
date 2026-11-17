@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Tableau de bord')}"></head>
+<body>
+<th:block th:replace="~{fragments/layout :: fond}"></th:block>
+<div class="d-flex min-vh-100" th:with="t=${tableau}">
+  <nav th:replace="~{fragments/layout :: sidebar(${utilisateur}, 'accueil')}"></nav>
+
+  <div class="flex-grow-1 d-flex flex-column min-w-0">
+    <header class="af-header px-4 py-3">
+      <h1 class="h5 fw-bold mb-0">Tableau de bord</h1>
+      <p class="small text-secondary mb-0" th:text="${utilisateur.classe.nom} + ' · matricule ' + ${utilisateur.matricule}">classe</p>
+    </header>
+
+    <main id="contenu" class="p-4 d-grid gap-4">
+      <h2 class="h4 fw-bold mb-0" th:with="h=${T(java.time.LocalTime).now().hour}">
+        <span th:text="${h < 5 or h >= 22} ? 'Encore debout' : (${h < 12} ? 'Bonjour' : (${h < 18} ? 'Bon après-midi' : 'Bonsoir'))">Bonjour</span>,
+        <span th:text="${utilisateur.prenom}">Prénom</span></h2>
+
+      <!-- F-27 -->
+      <div class="row g-3">
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Taux de présence', ${t.taux != null} ? ${t.taux} + ' %' : '—', null)}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Présences', ${t.presents}, null)}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Absences', ${t.absents}, ${t.justifies} + ' justifiée(s) en plus')}"></div></div>
+        <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte('Retards', ${t.retards}, null)}"></div></div>
+      </div>
+
+      <!-- Compagnon et progression ludique -->
+      <section class="af-glass af-beam af-beam-lent af-compagnon p-4" aria-labelledby="progression-titre"
+               th:with="g=${t.progression}, m=${utilisateur.mascotte ?: T(com.attendflow.model.enums.Mascotte).PLUME}">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6 d-flex align-items-center gap-4">
+            <div class="flex-none text-center">
+              <button type="button" class="af-compagnon-img" th:classappend="'af-rang-' + ${g.niveau > 5 ? 5 : g.niveau}"
+                      data-compagnon th:attr="data-nom=${m.nom},data-badges=${g.badgesObtenus()},data-niveau=${g.niveau}"
+                      th:aria-label="'Caresser ' + ${m.nom}">
+                <i data-lucide="crown" class="af-couronne" aria-hidden="true"></i>
+                <img th:src="@{${m.image}}" alt="" class="af-mascotte" width="120" height="120">
+              </button>
+              <a th:href="@{/profil}" class="d-block small mt-2 text-decoration-none text-secondary">Changer</a>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <p class="small mb-1" style="color: var(--af-muted)">
+                Niveau <strong data-compteur th:text="${g.niveau}">1</strong> · <span th:text="${g.points}">0</span> pts
+              </p>
+              <h2 id="progression-titre" class="h4 fw-bold mb-2"><span class="af-gradient-text" th:text="${g.titre}">Débutant</span></h2>
+              <p class="af-bulle mb-3" th:text="${g.message(m.nom)}">message</p>
+              <div class="af-jauge" role="progressbar" th:attr="aria-valuenow=${g.pourcentNiveau}" aria-valuemin="0" aria-valuemax="100"
+                   th:aria-label="'Progression vers le niveau ' + ${g.niveau + 1}">
+                <span th:style="'width:' + ${g.pourcentNiveau} + '%'"></span>
+              </div>
+              <p class="small text-secondary mt-1 mb-2" th:text="'Prochain niveau dans ' + ${100 - g.pourcentNiveau} + ' points'">prochain</p>
+              <div class="d-flex gap-2 flex-wrap">
+                <span class="af-pill af-pill-feu"><i data-lucide="flame" aria-hidden="true"></i><span th:text="${g.serie} + ' en série'">0</span></span>
+                <span class="af-pill"><i data-lucide="trophy" aria-hidden="true"></i><span th:text="'Record ' + ${g.record}">0</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="d-flex justify-content-between align-items-baseline mb-2">
+              <h3 class="h6 fw-bold mb-0">Badges</h3>
+              <span class="small text-secondary" th:text="${g.badgesObtenus()} + ' / ' + ${#lists.size(g.badges)}">0 / 6</span>
+            </div>
+            <ul class="af-badges list-unstyled mb-0">
+              <li th:each="b : ${g.badges}" class="af-badge" th:classappend="${b.obtenu} ? 'obtenu'"
+                  th:title="${b.description}" th:attr="aria-label=${b.nom} + (${b.obtenu} ? ' : obtenu' : ' : à débloquer') + ' — ' + ${b.description}">
+                <i th:attr="data-lucide=${b.obtenu} ? ${b.icone} : 'lock'" aria-hidden="true"></i>
+                <span th:text="${b.nom}">Badge</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="row g-4">
+        <!-- Defi de la semaine -->
+        <div class="col-xl-5">
+          <section class="af-glass p-4 h-100 af-defi" aria-labelledby="defi-titre"
+                   th:with="fini=${t.defiTotal > 0 and t.defiFaites >= t.defiTotal}"
+                   th:classappend="${fini} ? 'fini'">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <span class="af-anneau" th:style="'--p:' + ${t.defiTotal == 0 ? 0 : t.defiFaites * 100 / t.defiTotal}">
+                <span th:text="${t.defiFaites} + '/' + ${t.defiTotal}">0/0</span>
+              </span>
+              <div>
+                <h2 id="defi-titre" class="h6 fw-bold mb-1"><i data-lucide="swords" aria-hidden="true"></i> Défi de la semaine</h2>
+                <p class="small mb-0" style="color: var(--af-muted)"
+                   th:text="${t.defiTotal == 0} ? 'Pas de séance cette semaine. Repos mérité !'
+                          : (${fini} ? 'Défi réussi ! Toutes les séances de la semaine sont validées.'
+                          : 'Assiste à toutes tes séances de la semaine pour le réussir.')">texte</p>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- Calendrier des 12 dernieres semaines -->
+        <div class="col-xl-7">
+          <section class="af-glass p-4 h-100" aria-labelledby="cal-titre">
+            <h2 id="cal-titre" class="h6 fw-bold mb-3">Mes 12 dernières semaines</h2>
+            <div class="af-calendrier" role="img" aria-label="Calendrier de présence des 12 dernières semaines">
+              <span th:each="j : ${t.calendrier}" th:class="'af-jour ' + ${j.etat}"
+                    th:classappend="${j.date == T(java.time.LocalDate).now()} ? 'aujourdhui'"
+                    th:title="${#temporals.format(j.date, 'EEE d MMM')} + (${j.etat == ''} ? '' : ' : ' + ${j.etat})"></span>
+            </div>
+            <div class="d-flex gap-3 flex-wrap small text-secondary mt-3 af-legende">
+              <span><span class="af-jour present"></span>Présent</span>
+              <span><span class="af-jour retard"></span>Retard</span>
+              <span><span class="af-jour justifie"></span>Justifié</span>
+              <span><span class="af-jour absent"></span>Absent</span>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-xl-5">
+          <section class="af-glass p-4 h-100" aria-labelledby="prochaine-titre">
+            <h2 id="prochaine-titre" class="h6 fw-bold">Prochaine séance</h2>
+            <div th:if="${t.prochaineSeance}" th:with="s=${t.prochaineSeance}">
+              <p class="fs-5 fw-bold mb-0" th:text="${s.matiere.intitule}">Matière</p>
+              <p class="text-secondary mb-0"
+                 th:text="${#temporals.format(s.date, 'EEEE d MMMM')} + ' · ' + ${s.heureDebut} + ' — ' + ${s.heureFin}">quand</p>
+              <p class="text-secondary mb-0" th:text="'Salle ' + ${s.salle.nom} + ' · ' + ${s.enseignant.nomComplet}">où</p>
+            </div>
+            <p th:unless="${t.prochaineSeance}" class="text-secondary mb-0">Aucune séance prévue dans les 30 prochains jours.</p>
+          </section>
+        </div>
+
+        <div class="col-xl-7">
+          <section class="af-glass p-4 h-100" aria-labelledby="absences-titre">
+            <h2 id="absences-titre" class="h6 fw-bold">Dernières absences</h2>
+            <div th:if="${#lists.isEmpty(t.dernieresAbsences)}" class="af-vide">
+              <img th:src="@{/images/mascottes/comete.svg}" alt="" class="af-mascotte" width="72" height="72">
+              <p class="text-secondary mb-0">Aucune absence. Bravo !</p>
+            </div>
+            <ul class="list-group list-group-flush" th:unless="${#lists.isEmpty(t.dernieresAbsences)}">
+              <li class="list-group-item bg-transparent px-0 d-flex justify-content-between" th:each="p : ${t.dernieresAbsences}">
+                <span>
+                  <strong th:text="${p.seance.matiere.intitule}">Matière</strong>
+                  <span class="text-secondary" th:text="' · ' + ${p.seance.enseignant.nomComplet}">enseignant</span>
+                </span>
+                <span class="small text-secondary" th:text="${#temporals.format(p.seance.date, 'dd/MM/yyyy')} + ' ' + ${p.seance.heureDebut}">date</span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

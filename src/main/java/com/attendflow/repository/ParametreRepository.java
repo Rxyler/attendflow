@@ -1,0 +1,12 @@
+package com.attendflow.repository;
+
+import com.attendflow.model.Parametre;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface ParametreRepository extends JpaRepository<Parametre, Long> {
+
+    /** Une seule ligne de parametres pour toute la plateforme. */
+    Optional<Parametre> findFirstByOrderByIdAsc();
+}
