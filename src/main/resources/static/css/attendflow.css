@@ -416,7 +416,7 @@ th.af-aujourdhui { color: #818cf8 !important; }
 .af-pill { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .9rem .35rem .5rem; border-radius: 999px; font-size: .8rem; font-weight: 500; color: var(--af-ink-2); background: var(--af-glass-bg); border: 1px solid var(--af-glass-line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .af-pill .af-point { width: .5rem; height: .5rem; border-radius: 50%; background: var(--af-success); box-shadow: 0 0 10px var(--af-success); margin-left: .35rem; animation: af-pulse 2s infinite; }
 @keyframes af-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, .6); } 60% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); } }
-.af-hero { padding: 6rem 0 3rem; }
+.af-hero { padding: 3.5rem 0 2rem; }
 .af-hero h1 { font-size: clamp(2.5rem, 6vw, 4.8rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.04em; }
 .af-hero h1 .af-mot { display: inline-block; }
 .af-rotatif { display: inline-block; position: relative; white-space: nowrap; }
@@ -495,9 +495,12 @@ main#contenu { max-width: 92rem; width: 100%; }
   .af-compte .af-identite { display: none; }
   .af-header { position: static; padding-left: 1rem !important; padding-right: 1rem !important; }
   main#contenu { padding: 1rem !important; }
-  .af-hero { padding: 3.5rem 0 2rem; }
-  .af-scene, .af-scene-inner { min-height: 22rem; }
-  .af-scene { perspective: 900px; }
+  .af-hero { padding: 2rem 0 1rem; }
+  /* phone: the 3D card stack overlaps, so lay the cards out flat */
+  .af-scene, .af-scene-inner { min-height: 0; perspective: none; transform: none !important; }
+  .af-scene-inner { display: grid; gap: .75rem; }
+  .af-flot { position: relative; inset: auto !important; width: auto !important; transform: none !important; }
+  .af-flot:last-child, .af-3d { display: none; }
   .af-flot .af-glass { --af-blur: 10px; }
   .af-nav-vitrine { top: .5rem; margin: .5rem .75rem 0; }
   .af-glass { --af-blur: 14px; }
@@ -585,3 +588,15 @@ a.af-avatar:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 .af-legende .af-jour { width: .75rem; margin-right: .35rem; vertical-align: -1px; }
 @media (prefers-reduced-motion: reduce) { .af-compagnon-img::before { animation: none !important; } }
 .af-fourmi { position: relative; margin: 0 auto; width: 9.5rem; height: 9.5rem; }
+
+/* ---------- Telephone : feuille d'appel empilee ---------- */
+@media (max-width: 575.98px) {
+  .af-feuille thead { display: none; }
+  .af-feuille tr.af-ligne { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: .6rem; padding: .7rem 1rem; border-bottom: 1px solid var(--af-glass-line); }
+  .af-feuille tr.af-ligne[hidden] { display: none; }
+  .af-feuille tr.af-ligne > td { padding: 0 !important; border: 0; background: none; }
+  .af-feuille tr.af-ligne > td:last-child { grid-column: 1 / -1; margin-top: .55rem; }
+  .af-feuille .btn-group { display: flex; width: 100%; }
+  .af-feuille .btn-group .btn { flex: 1; padding-inline: .25rem; }
+  #recherche, #filtre-statut { max-width: none !important; flex: 1 1 10rem; }
+}

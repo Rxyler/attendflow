@@ -272,7 +272,7 @@
     var reveals = $$('[data-reveal]');
     if (reveals.length && window.ScrollTrigger) {
       gsap.set(reveals, { y: 30, autoAlpha: 0 });
-      ScrollTrigger.batch(reveals, { start: 'top 88%', once: true, onEnter: function (lot) { gsap.to(lot, { y: 0, autoAlpha: 1, duration: .8, stagger: .08, clearProps: 'transform,opacity,visibility' }); } });
+      ScrollTrigger.batch(reveals, { start: 'top bottom', once: true, onEnter: function (lot) { gsap.to(lot, { y: 0, autoAlpha: 1, duration: .8, stagger: .08, clearProps: 'transform,opacity,visibility' }); } });
     }
 
     /* Compteurs : partout, declenches a l'apparition */

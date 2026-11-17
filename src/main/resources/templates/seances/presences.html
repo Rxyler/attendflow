@@ -68,7 +68,7 @@
                     th:text="${#lists.size(feuille.lignes)} + ' étudiant(s) · ' + ${s.classe.nom}">N étudiants</span>
             </div>
 
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 af-feuille">
               <thead>
               <tr>
                 <th scope="col" class="ps-3">#</th>
@@ -103,10 +103,10 @@
               </tbody>
             </table>
 
-            <div class="d-flex justify-content-between align-items-center p-3 border-top">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center p-3 border-top">
               <span class="small text-secondary"
                     th:text="${feuille.dejaSaisie} ? 'Présences déjà enregistrées : toute modification est tracée.' : 'Aucune présence enregistrée pour cette séance.'">état</span>
-              <button type="submit" class="btn btn-af px-4" th:disabled="${!feuille.modifiable}"><i data-lucide="check" aria-hidden="true"></i>Enregistrer les présences</button>
+              <button type="submit" class="btn btn-af px-4 text-nowrap" th:disabled="${!feuille.modifiable}"><i data-lucide="check" aria-hidden="true"></i>Enregistrer les présences</button>
             </div>
           </form>
         </div>
