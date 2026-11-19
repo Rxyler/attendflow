@@ -4,6 +4,7 @@ import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Admin;
 import com.attendflow.model.Etudiant;
 import com.attendflow.model.Presence;
+import com.attendflow.model.Utilisateur;
 import com.attendflow.model.enums.EtatJustificatif;
 import com.attendflow.model.enums.StatutPresence;
 import com.attendflow.repository.EtudiantRepository;
@@ -74,30 +75,37 @@ public class JustificatifController {
         return "redirect:/etudiant/justificatifs";
     }
 
-    // ----- Administrateur (F-25) -----
+    // ----- Administrateur, ou enseignant pour ses propres seances (F-25) -----
+    // meme page aux deux adresses ; /admin/** et /enseignant/** sont reserves a leur role par SecurityConfig
 
-    @GetMapping("/admin/justificatifs")
+    @GetMapping({"/admin/justificatifs", "/enseignant/justificatifs"})
     public String aTraiter(@AuthenticationPrincipal UserDetails compte, Model model) {
-        model.addAttribute("utilisateur", utilisateurs.findByEmail(compte.getUsername()).orElseThrow());
-        model.addAttribute("enAttente", justificatifService.enAttente());
-        model.addAttribute("traites", justificatifService.traitesRecemment());
+        Utilisateur utilisateur = utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
+        model.addAttribute("utilisateur", utilisateur);
+        model.addAttribute("base", base(utilisateur));
+        model.addAttribute("enAttente", justificatifService.enAttente(utilisateur));
+        model.addAttribute("traites", justificatifService.traitesRecemment(utilisateur));
         return "justificatifs/admin";
     }
 
-    @PostMapping("/admin/justificatifs/{id}/{decision:accepter|refuser}")
+    @PostMapping({"/admin/justificatifs/{id}/{decision:accepter|refuser}", "/enseignant/justificatifs/{id}/{decision:accepter|refuser}"})
     public String traiter(@PathVariable Long id, @PathVariable String decision,
                           @AuthenticationPrincipal UserDetails compte, RedirectAttributes redirect) {
-        Admin admin = (Admin) utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
+        Utilisateur traitant = utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
         boolean accepte = decision.equals("accepter");
         try {
-            justificatifService.traiter(admin, id, accepte);
+            justificatifService.traiter(traitant, id, accepte);
             redirect.addFlashAttribute("succes", accepte
                     ? t("Justificatif accepté : l'absence est maintenant justifiée.")
                     : t("Justificatif refusé : l'étudiant a été prévenu."));
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
         }
-        return "redirect:/admin/justificatifs";
+        return "redirect:" + base(traitant);
+    }
+
+    private static String base(Utilisateur u) {
+        return u instanceof Admin ? "/admin/justificatifs" : "/enseignant/justificatifs";
     }
 
     // ----- Fichier (admin ou etudiant concerne) -----

@@ -27,7 +27,7 @@ class DeploiementTest {
                 .andExpect(redirectedUrl("/login?erreur"));
         mvc.perform(formLogin().user("email", "admin@univ.tn").password("motDePasse", "un-secret-solide"))
                 .andExpect(redirectedUrl("/"));
-        mvc.perform(formLogin().user("email", "manar.nouira@univ.tn").password("motDePasse", "1234"))
+        mvc.perform(formLogin().user("email", "lina.ferjani@univ.tn").password("motDePasse", "1234"))
                 .andExpect(redirectedUrl("/login?erreur"));
     }
 

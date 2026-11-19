@@ -30,7 +30,7 @@ class SecurityTest {
     void chaqueRoleArriveSurSonTableauDeBord() throws Exception {
         connexionMeneA("admin@univ.tn", "admin", "/admin");
         connexionMeneA("ahmed.bensalah@univ.tn", "1234", "/enseignant");
-        connexionMeneA("manar.nouira@univ.tn", "1234", "/etudiant");
+        connexionMeneA("lina.ferjani@univ.tn", "1234", "/etudiant");
     }
 
     @Test

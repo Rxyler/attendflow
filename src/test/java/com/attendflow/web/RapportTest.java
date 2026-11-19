@@ -57,7 +57,7 @@ class RapportTest {
 
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
-    static final RequestPostProcessor MANAR = user("manar.nouira@univ.tn").roles("ETUDIANT");
+    static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
     static final String DU = "2031-01-01", AU = "2031-01-31";
 
     int effectif;
@@ -118,8 +118,8 @@ class RapportTest {
         RapportService.Rapport r = rapport(AHMED, "enseignant", sara.toString());   // tente de voir Sara
         assertThat(r.nbSeances()).isEqualTo(2);
         assertThat(r.seances()).allMatch(l -> l.seance().getEnseignant().getEmail().equals("ahmed.bensalah@univ.tn"));
-        mvc.perform(get("/rapports").with(MANAR)).andExpect(status().isForbidden());
-        mvc.perform(get("/rapports/export.pdf").with(MANAR)).andExpect(status().isForbidden());
+        mvc.perform(get("/rapports").with(LINA)).andExpect(status().isForbidden());
+        mvc.perform(get("/rapports/export.pdf").with(LINA)).andExpect(status().isForbidden());
     }
 
     @Test

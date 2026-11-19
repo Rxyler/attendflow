@@ -65,7 +65,7 @@ class ReferentielTest {
 
         // RG-06 : email ou matricule deja pris -> refuse, formulaire rouvert
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN)
-                        .param("nom", "X").param("prenom", "Y").param("email", "manar.nouira@univ.tn")
+                        .param("nom", "X").param("prenom", "Y").param("email", "lina.ferjani@univ.tn")
                         .param("matricule", "20268888").param("classeId", info3().toString()))
                 .andExpect(flash().attributeExists("erreur")).andExpect(flash().attribute("ouvrir", true));
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN)
@@ -83,7 +83,7 @@ class ReferentielTest {
 
     @Test
     void rechercheEtFiltreF10() throws Exception {
-        assertThat(liste("q", "nouira")).extracting(Etudiant::getMatricule).containsExactly("20260001");
+        assertThat(liste("q", "ferjani")).extracting(Etudiant::getMatricule).containsExactly("20260001");
         assertThat(liste("q", "20260007")).extracting(Etudiant::getNom).containsExactly("Chaabane");
         Long info2 = classes.findByNom("2ème INFO").orElseThrow().getId();
         assertThat(liste("classe", info2.toString())).isNotEmpty().allMatch(e -> e.getClasse().getNom().equals("2ème INFO"));
@@ -91,17 +91,17 @@ class ReferentielTest {
 
     @Test
     void suppressionRefuseeSiHistorique() throws Exception {
-        Etudiant manar = etudiants.findWithClasseByEmail("manar.nouira@univ.tn").orElseThrow();
+        Etudiant lina = etudiants.findWithClasseByEmail("lina.ferjani@univ.tn").orElseThrow();
         Seance s = new Seance("T-" + UUID.randomUUID(), LocalDate.now().minusDays(1), LocalTime.of(8, 0), LocalTime.of(10, 0),
-                manar.getClasse(), matieres.findByCode("JAVA").orElseThrow(), salles.findByNom("A05").orElseThrow(),
+                lina.getClasse(), matieres.findByCode("JAVA").orElseThrow(), salles.findByNom("A05").orElseThrow(),
                 enseignants.findByEmail("ahmed.bensalah@univ.tn").orElseThrow());
         seances.saveAndFlush(s);
         presenceService.enregistrer(utilisateurs.findByEmail("admin@univ.tn").orElseThrow(), s.getId(),
-                Map.of(manar.getId(), StatutPresence.PRESENT));
+                Map.of(lina.getId(), StatutPresence.PRESENT));
 
-        mvc.perform(post("/admin/etudiants/" + manar.getId() + "/supprimer").with(csrf()).with(ADMIN))
+        mvc.perform(post("/admin/etudiants/" + lina.getId() + "/supprimer").with(csrf()).with(ADMIN))
                 .andExpect(flash().attributeExists("erreur"));
-        assertThat(etudiants.findById(manar.getId())).isPresent();
+        assertThat(etudiants.findById(lina.getId())).isPresent();
 
         Etudiant sansHistorique = referentiel.enregistrerEtudiant(null, new ReferentielService.EtudiantForm(
                 "Vide", "Compte", "vide@univ.tn", null, "20267777", null, info3()), null);
@@ -115,7 +115,7 @@ class ReferentielTest {
         String csv = "﻿nom;prenom;email;matricule;classe;date_naissance\n"
                 + "Alpha;Ali;ali.alpha@univ.tn;20265001;3ème INFO;2005-01-02\n"
                 + "Beta;Bea;bea.beta@univ.tn;20265002;CLASSE-INCONNUE;\n"
-                + "Gamma;Gil;manar.nouira@univ.tn;20265003;1ère INFO;\n"
+                + "Gamma;Gil;lina.ferjani@univ.tn;20265003;1ère INFO;\n"
                 + "Delta;Dan;dan.delta@univ.tn;20265004;2ème INFO;12/03/2004\n";
         mvc.perform(multipart("/admin/etudiants/import").file(new MockMultipartFile("fichier", "e.csv", "text/csv", csv.getBytes()))
                         .with(csrf()).with(ADMIN))

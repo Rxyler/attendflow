@@ -28,7 +28,7 @@
 | **Authentication** | Role-based login (admin, teacher, student), one-time password reset links (30 min), lockout after 5 failed attempts |
 | **Timetable** | Daily or on-demand sync with the partner timetable system, sync log, changed and cancelled sessions, weekly view per role |
 | **Attendance** | Per-session sheet, "everyone present" shortcut, search, edit window, no entry before the session starts, change history, cancelled sessions locked |
-| **Absence excuses** | Students upload a PDF or image (5 MB max, content checked), admins approve or reject |
+| **Absence excuses** | Students upload a PDF or image (5 MB max, content checked), admins, or the teacher of that class, approve or reject |
 | **Alerts** | Reminder before each session, daily summary, alert when a student crosses the absence threshold (in-app and by email) |
 | **Dashboards** | Admin, teacher and student views; attendance rate and at-risk students |
 | **Records** | Manage students (photo, Excel / CSV import, search), classes, subjects and teachers |
@@ -66,7 +66,7 @@ On first start the app fills in demo data: 6 subjects, 4 classes, 3 teachers and
 |---|---|
 | Admin | `admin@univ.tn` |
 | Teachers | `ahmed.bensalah@univ.tn`, `sara.mansouri@univ.tn`, `rami.gharbi@univ.tn` |
-| Students | `firstname.lastname@univ.tn` (e.g. `manar.nouira@univ.tn`) |
+| Students | `firstname.lastname@univ.tn` (e.g. `lina.ferjani@univ.tn`) |
 
 Demo passwords are in [`DonneesDemo.java`](src/main/java/com/attendflow/config/DonneesDemo.java) for local use only.
 On a public deployment, set `DEMO_PASSWORD`: it replaces them, including on accounts that already exist.
@@ -89,7 +89,7 @@ In production, set `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `
 ./mvnw test
 ```
 
-82 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
+85 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
 dashboards, notifications, emails, excuses, records, reports and exports, and settings.
 `SecuriteEntreesTest` focuses on hostile input: SQL injection, XSS, missing CSRF tokens, oversized or invalid values,
 brute-force lockout, and error pages that leak no technical details.

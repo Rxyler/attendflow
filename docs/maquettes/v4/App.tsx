@@ -152,7 +152,7 @@ const TEACHERS: Teacher[] = [
     role: 'admin', password: 'admin'
   },
   {
-    id: 101, nom: 'Nouira', prenom: 'Manar', email: 'manar.nouira@univ.tn',
+    id: 101, nom: 'Ferjani', prenom: 'Lina', email: 'lina.ferjani@univ.tn',
     phone: '+216 22 111 001', avatar: 'MN',
     matieres: [], classes: ['3ème INFO'],
     role: 'student', password: '1234', studentId: 1
@@ -166,7 +166,7 @@ const TEACHERS: Teacher[] = [
 ]
 
 const ALL_STUDENTS: Student[] = [
-  { id: 1, nom: 'Nouira', prenom: 'Manar', matricule: '20260001', classe: '3ème INFO', email: 'manar.nouira@univ.tn', taux: 94, absences: 3 },
+  { id: 1, nom: 'Ferjani', prenom: 'Lina', matricule: '20260001', classe: '3ème INFO', email: 'lina.ferjani@univ.tn', taux: 94, absences: 3 },
   { id: 2, nom: 'Trabelsi', prenom: 'Ahmed', matricule: '20260002', classe: '3ème INFO', email: 'ahmed.trabelsi@univ.tn', taux: 88, absences: 6 },
   { id: 3, nom: 'Ben Ali', prenom: 'Mariem', matricule: '20260003', classe: '3ème INFO', email: 'mariem.benali@univ.tn', taux: 97, absences: 1 },
   { id: 4, nom: 'Jlassi', prenom: 'Mohamed', matricule: '20260004', classe: '3ème INFO', email: 'mohamed.jlassi@univ.tn', taux: 65, absences: 12 },

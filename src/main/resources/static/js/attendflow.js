@@ -204,7 +204,16 @@
     defs.style.position = 'absolute';
     defs.innerHTML = '<filter id="dd-crayon" x="-10%" y="-10%" width="120%" height="120%">'
       + '<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="bruit"/>'
-      + '<feDisplacementMap in="SourceGraphic" in2="bruit" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>';
+      + '<feDisplacementMap in="SourceGraphic" in2="bruit" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>'
+      // trait qui "bout" : trois tremblements differents, alternes par doodle.css comme un dessin image par image
+      // dd-bout : fort (doodles) ; dd-frisson : leger (logo, soulignes), pour garder le texte lisible
+      + [['bout', 5], ['frisson', 2.2]].map(function (f) {
+        return [1, 2, 3].map(function (i) {
+          return '<filter id="dd-' + f[0] + '-' + i + '" x="-15%" y="-15%" width="130%" height="130%">'
+            + '<feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="' + (i * 11) + '" result="b"/>'
+            + '<feDisplacementMap in="SourceGraphic" in2="b" scale="' + f[1] + '" xChannelSelector="R" yChannelSelector="G"/></filter>';
+        }).join('');
+      }).join('');
     document.body.appendChild(defs);
   }
   if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 1.75 } });

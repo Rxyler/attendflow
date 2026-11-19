@@ -95,9 +95,9 @@ class SynchronisationServiceTest {
     void annulationConservePresencesEtAlerteAdmin() {
         source.add(seance("A05", false));
         service.synchroniser(null);
-        Etudiant manar = (Etudiant) utilisateurs.findByEmail("manar.nouira@univ.tn").orElseThrow();
+        Etudiant lina = (Etudiant) utilisateurs.findByEmail("lina.ferjani@univ.tn").orElseThrow();
         Seance s = enBase();
-        s.getPresences().add(new Presence(s, manar, StatutPresence.PRESENT));
+        s.getPresences().add(new Presence(s, lina, StatutPresence.PRESENT));
         seances.saveAndFlush(s);
 
         var admin = utilisateurs.findByRole(Role.ADMIN).getFirst();

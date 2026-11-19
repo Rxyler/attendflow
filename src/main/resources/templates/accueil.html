@@ -12,6 +12,16 @@
   </div>
 </div>
 
+<!-- Griffonnages dans les marges : ils flottent et "bouillent" comme un dessin anime a la main (grands ecrans) -->
+<div class="dd-marges" aria-hidden="true">
+  <svg class="g" style="--y:20%; --t:7s; --r:-8deg" viewBox="0 0 48 48"><path d="M24 5 L29 18 L43 18 L32 27 L36 41 L24 33 L12 41 L16 27 L5 18 L19 18 Z" fill="var(--dd-jaune)"/></svg>
+  <svg class="g" style="--y:52%; --t:6s; --r:6deg" viewBox="0 0 48 48"><path d="M24 42 C 6 30, 4 16, 14 11 C 20 8, 24 13, 24 17 C 24 13, 28 8, 34 11 C 44 16, 42 30, 24 42 Z" fill="var(--dd-rose)"/></svg>
+  <svg class="g" style="--y:80%; --t:8s; --r:-4deg" viewBox="0 0 48 48"><path d="M24 24 C 24 20, 30 20, 30 25 C 30 31, 20 32, 18 25 C 16 16, 30 12, 35 21 C 40 31, 28 41, 18 37" stroke="var(--dd-rose)"/></svg>
+  <svg class="d" style="--y:17%; --t:6.5s; --r:10deg" viewBox="0 0 48 48"><path d="M4 22 L44 6 L30 42 L22 28 Z" fill="var(--dd-papier)"/><path d="M22 28 L44 6"/></svg>
+  <svg class="d" style="--y:47%; --t:7.5s; --r:-6deg" viewBox="0 0 48 48"><path d="M4 30 C 10 14, 16 14, 18 26 S 28 40, 32 24 S 42 10, 44 22" stroke="var(--dd-sarcelle)" stroke-width="3.5"/></svg>
+  <svg class="d" style="--y:76%; --t:6.8s; --r:8deg" viewBox="0 0 48 48"><path d="M10 38 L32 8 L40 14 L18 44 Z" fill="var(--dd-jaune)"/><path d="M32 8 L36 3 L44 9 L40 14" fill="var(--dd-rose)"/><path d="M10 38 L8 46 L18 44"/></svg>
+</div>
+
 <div class="af-vitrine">
   <a href="#contenu" class="visually-hidden-focusable btn btn-light btn-sm m-2" th:text="#{commun.allerContenu}">Aller au contenu</a>
 
@@ -63,7 +73,7 @@
               <ol>
                 <li><span>1</span><span>Mariem Ben Ali</span><span class="dd-tampon p">P</span></li>
                 <li><span>2</span><span>Mohamed Jlassi</span><span class="dd-tampon p">P</span></li>
-                <li><span>3</span><span>Manar Nouira</span><span class="dd-tampon r">R</span></li>
+                <li><span>3</span><span>Lina Ferjani</span><span class="dd-tampon r">R</span></li>
                 <li><span>4</span><span>Rim Saad</span><span class="dd-tampon a">A</span></li>
                 <li><span>5</span><span>Ahmed Trabelsi</span><span class="dd-tampon p">P</span></li>
               </ol>
@@ -244,7 +254,7 @@
     <!-- ===== Appel a l'action ===== -->
     <section class="py-5" data-reveal>
       <div class="af-glass af-beam af-cta">
-        <img th:src="@{/images/fas3a.jpg}" th:alt="#{accueil.fourmiAlt}" class="af-mascotte af-fourmi mb-3" width="150" height="150">
+        <img th:src="@{/images/logo-croquis.svg}" th:alt="#{accueil.fourmiAlt}" class="dd-cta-fourmi mb-3" width="128" height="128">
         <h2 class="text-white mb-3" th:text="#{accueil.ctaTitre}">Prêt</h2>
         <p class="text-secondary mb-4" style="max-width: 32rem; margin: 0 auto" th:text="#{accueil.ctaTexte}">Connectez-vous</p>
         <a th:href="@{/login}" class="btn btn-af btn-lg" data-magnetic th:text="#{accueil.seConnecter}">Se connecter</a>

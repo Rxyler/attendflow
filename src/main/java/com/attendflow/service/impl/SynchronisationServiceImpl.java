@@ -137,7 +137,8 @@ public class SynchronisationServiceImpl implements SynchronisationService {
                 Locale langue = LangueConfig.de(admin);
                 notifications.notifier(new Notification(admin, TypeNotification.AVERTISSEMENT,
                         t(langue, "Séance changée dans le planning source"),
-                        t(langue, "Séance {0}. Les présences déjà saisies sont conservées.", t(langue, alerte[0], alerte[1]))));
+                        t(langue, "Séance {0}. Les présences déjà saisies sont conservées.", t(langue, alerte[0], alerte[1])),
+                        "/admin/synchronisation"));
             }
         }
         return journaux.save(journal);

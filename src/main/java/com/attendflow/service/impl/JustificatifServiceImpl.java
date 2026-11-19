@@ -81,8 +81,13 @@ public class JustificatifServiceImpl implements JustificatifService {
         }
         for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
             notifications.notifier(new Notification(admin, TypeNotification.INFORMATION, t(LangueConfig.de(admin), "Nouveau justificatif"),
-                    t(LangueConfig.de(admin), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet())));
+                    t(LangueConfig.de(admin), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet()),
+                    "/admin/justificatifs"));
         }
+        Enseignant enseignant = presence.getSeance().getEnseignant();   // il peut aussi trancher
+        notifications.notifier(new Notification(enseignant, TypeNotification.INFORMATION, t(LangueConfig.de(enseignant), "Nouveau justificatif"),
+                t(LangueConfig.de(enseignant), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet()),
+                "/enseignant/justificatifs"));
         return j;
     }
 
@@ -94,37 +99,44 @@ public class JustificatifServiceImpl implements JustificatifService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Justificatif> enAttente() {
-        return justificatifs.findByEtatOrderByDateDepotAsc(EtatJustificatif.EN_ATTENTE);
+    public List<Justificatif> enAttente(Utilisateur utilisateur) {
+        return utilisateur instanceof Enseignant e
+                ? justificatifs.findByEtatAndPresenceSeanceEnseignantOrderByDateDepotAsc(EtatJustificatif.EN_ATTENTE, e)
+                : justificatifs.findByEtatOrderByDateDepotAsc(EtatJustificatif.EN_ATTENTE);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Justificatif> traitesRecemment() {
-        return justificatifs.findTop20ByEtatNotOrderByDateTraitementDesc(EtatJustificatif.EN_ATTENTE);
+    public List<Justificatif> traitesRecemment(Utilisateur utilisateur) {
+        return utilisateur instanceof Enseignant e
+                ? justificatifs.findTop20ByEtatNotAndPresenceSeanceEnseignantOrderByDateTraitementDesc(EtatJustificatif.EN_ATTENTE, e)
+                : justificatifs.findTop20ByEtatNotOrderByDateTraitementDesc(EtatJustificatif.EN_ATTENTE);
     }
 
     @Override
-    public void traiter(Admin admin, Long justificatifId, boolean accepte) {
+    public void traiter(Utilisateur traitant, Long justificatifId, boolean accepte) {
         Justificatif j = justificatifs.findWithPresenceById(justificatifId)
                 .orElseThrow(() -> new IllegalArgumentException(t("Justificatif introuvable.")));
+        if (!peutTrancher(traitant, j)) throw new AccessDeniedException("Ce justificatif ne concerne pas vos séances");
         if (j.getEtat() != EtatJustificatif.EN_ATTENTE) {
             throw new IllegalStateException(t("Ce justificatif a déjà été traité."));
         }
         j.setEtat(accepte ? EtatJustificatif.ACCEPTE : EtatJustificatif.REFUSE);
         j.setDateTraitement(LocalDateTime.now());
-        j.setTraitePar(admin);
+        if (traitant instanceof Admin admin) j.setTraitePar(admin);
+        else j.setTraiteParEnseignant((Enseignant) traitant);
 
         Presence presence = j.getPresence();
         if (accepte && presence.getStatut() != StatutPresence.JUSTIFIE) {
-            presence.getHistorique().add(new HistoriqueModification(presence, admin, presence.getStatut(), StatutPresence.JUSTIFIE));
+            presence.getHistorique().add(new HistoriqueModification(presence, traitant, presence.getStatut(), StatutPresence.JUSTIFIE));
             presence.setStatut(StatutPresence.JUSTIFIE);
         }
         notifications.notifier(new Notification(presence.getEtudiant(),
                 accepte ? TypeNotification.SUCCES : TypeNotification.AVERTISSEMENT,
                 t(LangueConfig.de(presence.getEtudiant()), accepte ? "Justificatif accepté" : "Justificatif refusé"),
                 t(LangueConfig.de(presence.getEtudiant()), accepte ? "Votre absence est maintenant justifiée."
-                        : "Votre justificatif a été refusé. Vous pouvez en déposer un nouveau.")));
+                        : "Votre justificatif a été refusé. Vous pouvez en déposer un nouveau."),
+                "/etudiant/justificatifs"));
     }
 
     @Override
@@ -132,9 +144,15 @@ public class JustificatifServiceImpl implements JustificatifService {
     public Fichier fichier(Utilisateur utilisateur, Long justificatifId) {
         Justificatif j = justificatifs.findWithPresenceById(justificatifId)
                 .orElseThrow(() -> new AccessDeniedException("Justificatif introuvable"));
-        boolean autorise = utilisateur instanceof Admin
+        boolean autorise = peutTrancher(utilisateur, j)
                 || j.getPresence().getEtudiant().getId().equals(utilisateur.getId());
         if (!autorise) throw new AccessDeniedException("Ce justificatif ne vous appartient pas");
         return new Fichier(stockage.chemin(dossier, j.getFichier()), stockage.typeContenu(j.getFichier()));
+    }
+
+    /** L'administrateur, ou l'enseignant de la seance ou l'absence a ete notee. */
+    private static boolean peutTrancher(Utilisateur u, Justificatif j) {
+        return u instanceof Admin
+                || u instanceof Enseignant && j.getPresence().getSeance().getEnseignant().getId().equals(u.getId());
     }
 }

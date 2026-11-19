@@ -95,11 +95,13 @@ public class PresenceServiceImpl implements PresenceService {
             for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
                 notifications.notifier(new Notification(admin, TypeNotification.AVERTISSEMENT, t(LangueConfig.de(admin), "Seuil d'absence dépassé"),
                         t(LangueConfig.de(admin), "{0} ({1}) : {2}", etudiant.getNomComplet(), seance.getClasse().getNom(),
-                                t(LangueConfig.de(admin), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences))));
+                                t(LangueConfig.de(admin), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences)),
+                        "/admin/etudiants/" + etudiant.getId() + "/historique"));
             }
             notifications.notifier(new Notification(etudiant, TypeNotification.AVERTISSEMENT, t(LangueConfig.de(etudiant), "Seuil d'absence dépassé"),
                     t(LangueConfig.de(etudiant), "Vous avez dépassé le seuil d'absence autorisé : {0}",
-                            t(LangueConfig.de(etudiant), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences))));
+                            t(LangueConfig.de(etudiant), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences)),
+                    "/etudiant/historique"));
         }
         return enregistrees;
     }

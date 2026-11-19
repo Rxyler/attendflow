@@ -17,8 +17,8 @@ public interface NotificationService {
 
     long nbNonLues(Utilisateur utilisateur);
 
-    /** Ne fait rien si la notification n'appartient pas a l'utilisateur. */
-    void marquerLue(Utilisateur utilisateur, Long notificationId);
+    /** Marque lue et renvoie la page a ouvrir (null : aucune) ; ne fait rien si la notification n'appartient pas a l'utilisateur. */
+    String marquerLue(Utilisateur utilisateur, Long notificationId);
 
     void toutMarquerLu(Utilisateur utilisateur);
 

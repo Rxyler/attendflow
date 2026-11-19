@@ -44,7 +44,7 @@ class PresenceTest {
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
     static final RequestPostProcessor SARA = user("sara.mansouri@univ.tn").roles("ENSEIGNANT");
-    static final RequestPostProcessor MANAR = user("manar.nouira@univ.tn").roles("ETUDIANT");
+    static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
 
     Seance seance(LocalDate date, EtatSeance etat) {
         Classe info3 = classes.findByNom("3ème INFO").orElseThrow();
@@ -108,7 +108,7 @@ class PresenceTest {
         Seance s = ouverte();
         mvc.perform(get("/seances/" + s.getId() + "/presences").with(SARA)).andExpect(status().isForbidden());   // RG-03
         mvc.perform(envoi(s, SARA, StatutPresence.ABSENT)).andExpect(status().isForbidden());
-        mvc.perform(get("/seances/" + s.getId() + "/presences").with(MANAR)).andExpect(status().isForbidden());
+        mvc.perform(get("/seances/" + s.getId() + "/presences").with(LINA)).andExpect(status().isForbidden());
         assertThat(presences.findBySeance(s)).isEmpty();
     }
 

@@ -41,11 +41,20 @@ public class Notification {
     @JoinColumn(name = "utilisateur_id", nullable = false)
     private Utilisateur destinataire;
 
+    /** Page interne ouverte au clic (ex. /admin/justificatifs) ; null : la notification n'ouvre rien. */
+    @Column(length = 200)
+    private String lien;
+
     public Notification(Utilisateur destinataire, TypeNotification type, String titre, String message) {
         this.destinataire = destinataire;
         this.type = type;
         this.titre = titre;
         this.message = message;
         this.date = LocalDateTime.now();
+    }
+
+    public Notification(Utilisateur destinataire, TypeNotification type, String titre, String message, String lien) {
+        this(destinataire, type, titre, message);
+        this.lien = lien;
     }
 }

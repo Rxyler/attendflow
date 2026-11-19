@@ -178,7 +178,9 @@ a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform
 .af-sidebar .nav-link.active svg.lucide { color: var(--dd-rose); }
 .af-compte { border-top: 2px dashed var(--dd-encre); }
 .af-avatar { background: var(--dd-jaune); color: #1f1d1a; border: 2px solid var(--dd-encre); box-shadow: none; }
-.af-logo { border: 2px solid var(--dd-encre); box-shadow: none; }
+/* logo : la fourmi croquee sur un post-it (le cadre est dans le dessin, pas de bordure CSS) */
+.af-logo { background: url(/images/logo-croquis.svg) center / contain no-repeat !important; border: 0 !important; border-radius: 0 !important; box-shadow: none; transition: transform .3s cubic-bezier(.2, 1.6, .4, 1); }
+a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 
 /* ---------- En-tete de page ---------- */
 .af-header { background: var(--af-bg); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 2px solid var(--dd-encre); }
@@ -335,3 +337,64 @@ body {
 @keyframes dd-clignote { 50% { opacity: .35; } }
 .form-control:focus, .form-select:focus, .form-check-input:focus { border-color: var(--dd-sarcelle); }
 @media (prefers-reduced-motion: reduce) { .af-pill .af-point { animation: none; } }
+
+/* ---------- Petits gestes de la main ---------- */
+/* le surligneur du titre de page passe de gauche a droite a l'ouverture */
+.af-header h1 { animation: dd-surligner .55s .15s cubic-bezier(.65, 0, .35, 1) backwards; }
+@keyframes dd-surligner { from { background-size: 0 .5em; } }
+/* le post-it se plaque sur la page */
+.alert { animation: dd-coller .38s cubic-bezier(.2, 1.4, .4, 1) backwards; }
+@keyframes dd-coller { from { opacity: 0; transform: translateY(-6px) rotate(-2.2deg) scale(1.03); } }
+/* les icones du menu frissonnent au survol */
+.af-sidebar .nav-link svg.lucide { transition: transform .25s cubic-bezier(.2, 1.6, .4, 1); }
+.af-sidebar .nav-link:hover svg.lucide { transform: rotate(-12deg) scale(1.1); }
+/* listes vides : une note griffonnee plutot qu'une ligne grise */
+td[colspan]:has(> svg.lucide-inbox) { font-family: var(--dd-hand); font-size: 1.2rem; color: var(--af-ink-2) !important; }
+td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose); transform: rotate(-8deg); opacity: .9 !important; }
+/* en pause ou mouvement reduit, tout est deja en place (une animation en pause cacherait le titre) */
+.af-calme .af-header h1, .af-calme .alert { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .af-header h1, .alert { animation: none; }
+  .af-sidebar .nav-link:hover svg.lucide { transform: none; }
+}
+
+/* ---------- Traits qui "bouillent" (dessin anime image par image) ---------- */
+/* trois tremblements (filtres dd-bout-*, ajoutes par attendflow.js) alternes ~4 fois par seconde */
+@keyframes dd-bouillir { 0% { filter: url(#dd-bout-1); } 33.3% { filter: url(#dd-bout-2); } 66.6% { filter: url(#dd-bout-3); } }
+.dd-doodle, .dd-fleche, .dd-trait-titre, .dd-mascotte { animation: dd-bouillir .6s steps(1) infinite; }
+/* plus discret, partout : le logo et les traits au feutre (soulignes, cercles, crochets) */
+@keyframes dd-frissonner { 0% { filter: url(#dd-frisson-1); } 33.3% { filter: url(#dd-frisson-2); } 66.6% { filter: url(#dd-frisson-3); } }
+.af-logo, svg.rough-annotation { animation: dd-frissonner .6s steps(1) infinite; }
+
+/* griffonnages des marges : seulement la ou il y a vraiment de la place a cote du contenu (76rem) */
+.dd-marges { display: none; }
+@media (min-width: 84rem) {
+  .dd-marges { display: block; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .dd-marges svg {
+    position: absolute; top: var(--y); width: 2.6rem; height: 2.6rem; overflow: visible;
+    fill: none; stroke: var(--af-ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    animation: dd-flotter var(--t) ease-in-out infinite alternate, dd-bouillir .6s steps(1) infinite;
+  }
+  .dd-marges .g { left: calc(50% - 38rem - 3.6rem); }
+  .dd-marges .d { right: calc(50% - 38rem - 3.6rem); }
+}
+@keyframes dd-flotter { from { transform: translateY(-8px) rotate(var(--r)); } to { transform: translateY(8px) rotate(calc(var(--r) * -1)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-doodle, .dd-fleche, .dd-trait-titre, .dd-mascotte, .dd-marges svg, .af-logo, svg.rough-annotation { animation: none; }
+}
+
+/* ---------- Notifications cliquables ---------- */
+.af-notif-lien { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.af-notif-lien:hover { transform: translate(-1px, -2px) rotate(-.3deg); box-shadow: 5px 6px 0 var(--dd-encre); }
+[data-bs-theme="dark"] .af-notif-lien:hover { box-shadow: 5px 6px 0 rgba(0, 0, 0, .5); }
+.af-notif-lien:has(.stretched-link:focus-visible) { box-shadow: var(--af-ring); }
+.af-notif-lien .stretched-link:focus-visible { outline: none; }
+.af-notif-fleche { width: 1.1rem; height: 1.1rem; color: var(--dd-rose); transition: transform .2s cubic-bezier(.2, 1.6, .4, 1); }
+.af-notif-lien:hover .af-notif-fleche { transform: translate(2px, -2px) rotate(8deg); }
+@media (prefers-reduced-motion: reduce) { .af-notif-lien:hover, .af-notif-lien:hover .af-notif-fleche { transform: none; } }
+
+/* fourmi croquee du dernier appel : elle se balance et son trait bout, comme les doodles du haut */
+.dd-cta-fourmi { display: block; margin: 0 auto; width: 8rem; height: 8rem; --r: -4deg;
+  animation: dd-flotter 3.2s ease-in-out infinite alternate, dd-bouillir .6s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .dd-cta-fourmi { animation: none; } }

@@ -47,6 +47,19 @@ public class Justificatif {
     @JoinColumn(name = "traite_par_id")
     private Admin traitePar;
 
+    /**
+     * Enseignant "0..1" -- "0..*" Justificatif : l'enseignant de la seance peut aussi trancher.
+     * Colonne a part : traite_par_id reste liee a la table admin dans les bases deja creees.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "traite_par_enseignant_id")
+    private Enseignant traiteParEnseignant;
+
+    /** Qui a accepte ou refuse : l'administrateur ou l'enseignant (null tant qu'il est en attente). */
+    public Utilisateur getTraitant() {
+        return traitePar != null ? traitePar : traiteParEnseignant;
+    }
+
     public Justificatif(Presence presence, String fichier, String motif) {
         this.presence = presence;
         this.fichier = fichier;

@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#fbf5e8">
   <title th:text="${titre} + ' · Fas3a'">Fas3a</title>
   <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+  <link rel="icon" type="image/svg+xml" th:href="@{/images/logo-croquis.svg}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Patrick+Hand+SC&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -100,12 +101,12 @@
          th:attr="aria-current=${actif == 'historique'} ? 'page' : null">
         <i data-lucide="history" aria-hidden="true"></i><span th:text="#{nav.historique}">Mon historique</span></a>
     </li>
-    <li class="nav-item" th:if="${role != 'ENSEIGNANT'}">
-      <a th:href="${role == 'ADMIN'} ? @{/admin/justificatifs} : @{/etudiant/justificatifs}" class="nav-link"
+    <li class="nav-item">
+      <a th:href="${role == 'ADMIN'} ? @{/admin/justificatifs} : (${role == 'ENSEIGNANT'} ? @{/enseignant/justificatifs} : @{/etudiant/justificatifs})" class="nav-link"
          th:classappend="${actif == 'justificatifs'} ? 'active'"
          th:attr="aria-current=${actif == 'justificatifs'} ? 'page' : null">
         <i data-lucide="file-check" aria-hidden="true"></i>
-        <span th:text="${role == 'ADMIN'} ? #{nav.justificatifs} : #{nav.mesJustificatifs}">Justificatifs</span></a>
+        <span th:text="${role != 'ETUDIANT'} ? #{nav.justificatifs} : #{nav.mesJustificatifs}">Justificatifs</span></a>
     </li>
     <li class="nav-item">
       <a th:href="@{/notifications}" class="nav-link" th:classappend="${actif == 'notifications'} ? 'active'"

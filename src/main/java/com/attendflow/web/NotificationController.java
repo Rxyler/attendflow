@@ -36,6 +36,14 @@ public class NotificationController {
         return "redirect:/notifications";
     }
 
+    /** Clic sur une notification : elle est lue, puis sa page s'ouvre (chemin interne uniquement, jamais une autre adresse). */
+    @GetMapping("/{id}")
+    public String ouvrir(@PathVariable Long id, @AuthenticationPrincipal UserDetails compte) {
+        String lien = notificationService.marquerLue(utilisateur(compte), id);
+        boolean interne = lien != null && lien.startsWith("/") && !lien.startsWith("//") && !lien.contains("\\");
+        return "redirect:" + (interne ? lien : "/notifications");
+    }
+
     @PostMapping("/tout-lu")
     public String toutMarquerLu(@AuthenticationPrincipal UserDetails compte) {
         notificationService.toutMarquerLu(utilisateur(compte));

@@ -31,7 +31,7 @@ class EmploiDuTempsTest {
 
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
-    static final RequestPostProcessor MANAR = user("manar.nouira@univ.tn").roles("ETUDIANT");
+    static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
 
     @SuppressWarnings("unchecked")
     private List<Seance> seancesAffichees(RequestPostProcessor qui, String... params) throws Exception {
@@ -50,7 +50,7 @@ class EmploiDuTempsTest {
 
     @Test
     void etudiantNeVoitQueSaClasse() throws Exception {
-        List<Seance> vues = seancesAffichees(MANAR);
+        List<Seance> vues = seancesAffichees(LINA);
         assertThat(vues).isNotEmpty().allMatch(s -> s.getClasse().getNom().equals("3ème INFO"));
     }
 

@@ -42,7 +42,7 @@ class TableauxDeBordTest {
 
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
-    static final RequestPostProcessor MANAR = user("manar.nouira@univ.tn").roles("ETUDIANT");
+    static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
 
     /** Seance d'Ahmed pour 3ème INFO. */
     Seance seance(LocalDate date, LocalTime debut, LocalTime fin) {
@@ -58,16 +58,16 @@ class TableauxDeBordTest {
                 .andReturn().getModelAndView().getModel().get("tableau");
     }
 
-    void absent(Etudiant manar, Seance s) {
+    void absent(Etudiant lina, Seance s) {
         Utilisateur admin = utilisateurs.findByEmail("admin@univ.tn").orElseThrow();
-        presenceService.enregistrer(admin, s.getId(), Map.of(manar.getId(), StatutPresence.ABSENT));
+        presenceService.enregistrer(admin, s.getId(), Map.of(lina.getId(), StatutPresence.ABSENT));
     }
 
     @Test
     void lesTroisTableauxSAffichent() throws Exception {
         assertThat(tableau("/admin", ADMIN)).isInstanceOf(StatistiqueService.TableauAdmin.class);
         assertThat(tableau("/enseignant", AHMED)).isInstanceOf(StatistiqueService.TableauEnseignant.class);
-        assertThat(tableau("/etudiant", MANAR)).isInstanceOf(StatistiqueService.TableauEtudiant.class);
+        assertThat(tableau("/etudiant", LINA)).isInstanceOf(StatistiqueService.TableauEtudiant.class);
     }
 
     @Test
@@ -87,27 +87,27 @@ class TableauxDeBordTest {
 
     @Test
     void absencesComptentDansTableauxEtAlerteF34UneSeuleFois() throws Exception {
-        Etudiant manar = (Etudiant) utilisateurs.findByEmail("manar.nouira@univ.tn").orElseThrow();
+        Etudiant lina = (Etudiant) utilisateurs.findByEmail("lina.ferjani@univ.tn").orElseThrow();
         Utilisateur admin = utilisateurs.findByRole(Role.ADMIN).getFirst();
         long alertesAdmin = notifications.countByDestinataireAndLueFalse(admin);
-        long alertesManar = notifications.countByDestinataireAndLueFalse(manar);
+        long alertesLina = notifications.countByDestinataireAndLueFalse(lina);
 
-        absent(manar, seance(LocalDate.now().minusDays(1), LocalTime.of(8, 0), LocalTime.of(10, 0)));
+        absent(lina, seance(LocalDate.now().minusDays(1), LocalTime.of(8, 0), LocalTime.of(10, 0)));
         // 1 absence sur 1 seance : seuil franchi -> une alerte pour l'admin et une pour l'etudiant
         assertThat(notifications.countByDestinataireAndLueFalse(admin)).isEqualTo(alertesAdmin + 1);
-        assertThat(notifications.countByDestinataireAndLueFalse(manar)).isEqualTo(alertesManar + 1);
+        assertThat(notifications.countByDestinataireAndLueFalse(lina)).isEqualTo(alertesLina + 1);
 
-        absent(manar, seance(LocalDate.now().minusDays(2), LocalTime.of(8, 0), LocalTime.of(10, 0)));
+        absent(lina, seance(LocalDate.now().minusDays(2), LocalTime.of(8, 0), LocalTime.of(10, 0)));
         // deja au-dela du seuil : pas de nouvelle alerte
         assertThat(notifications.countByDestinataireAndLueFalse(admin)).isEqualTo(alertesAdmin + 1);
 
-        var tEtudiant = (StatistiqueService.TableauEtudiant) tableau("/etudiant", MANAR);
+        var tEtudiant = (StatistiqueService.TableauEtudiant) tableau("/etudiant", LINA);
         assertThat(tEtudiant.absents()).isEqualTo(2);
         assertThat(tEtudiant.taux()).isZero();
         assertThat(tEtudiant.dernieresAbsences()).hasSize(2);
 
         var tAdmin = (StatistiqueService.TableauAdmin) tableau("/admin", ADMIN);
-        assertThat(tAdmin.aRisque()).anyMatch(r -> r.etudiant().getId().equals(manar.getId()));
+        assertThat(tAdmin.aRisque()).anyMatch(r -> r.etudiant().getId().equals(lina.getId()));
         assertThat(tAdmin.absents()).isGreaterThanOrEqualTo(2);
     }
 }

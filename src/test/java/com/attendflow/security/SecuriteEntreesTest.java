@@ -63,7 +63,7 @@ class SecuriteEntreesTest {
     @Test
     void formulaireSansJetonCsrfRefuse() throws Exception {
         mvc.perform(post("/admin/classes").with(ADMIN).param("nom", "Pirate")).andExpect(status().isForbidden());
-        mvc.perform(post("/etudiant/justificatifs").with(user("manar.nouira@univ.tn").roles("ETUDIANT")))
+        mvc.perform(post("/etudiant/justificatifs").with(user("lina.ferjani@univ.tn").roles("ETUDIANT")))
                 .andExpect(status().isForbidden());
     }
 

@@ -3,6 +3,7 @@ package com.attendflow.config;
 import com.attendflow.model.*;
 import com.attendflow.repository.ClasseRepository;
 import com.attendflow.repository.MatiereRepository;
+import com.attendflow.repository.NotificationRepository;
 import com.attendflow.repository.ParametreRepository;
 import com.attendflow.repository.SeanceRepository;
 import com.attendflow.repository.UtilisateurRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+
+import static com.attendflow.service.Textes.t;
 
 /**
  * Jeu de donnees de demonstration (livrable du cahier des charges), identique a la maquette Figma.
@@ -35,11 +38,13 @@ public class DonneesDemo implements CommandLineRunner {
     private final PasswordEncoder encoder;
     private final SynchronisationService synchronisation;
     private final ParametreRepository parametres;
+    private final NotificationRepository notifications;
 
     public DonneesDemo(UtilisateurRepository utilisateurs, ClasseRepository classes, MatiereRepository matieres,
                        SeanceRepository seances, PasswordEncoder encoder, SynchronisationService synchronisation,
-                       ParametreRepository parametres) {
+                       ParametreRepository parametres, NotificationRepository notifications) {
         this.parametres = parametres;
+        this.notifications = notifications;
         this.utilisateurs = utilisateurs;
         this.classes = classes;
         this.matieres = matieres;
@@ -70,7 +75,9 @@ public class DonneesDemo implements CommandLineRunner {
         enseignant("Mansouri", "Sara", "sara.mansouri@univ.tn", "Bases de données", bdd, algo);
         enseignant("Gharbi", "Rami", "rami.gharbi@univ.tn", "Réseaux et systèmes", res, sys);
 
-        etudiant("Nouira", "Manar", "20260001", info3);
+        renommerEtudiante();
+        lierAnciennesNotifications();
+        etudiant("Ferjani", "Lina", "20260001", info3);
         etudiant("Trabelsi", "Ahmed", "20260002", info3);
         etudiant("Ben Ali", "Mariem", "20260003", info3);
         etudiant("Jlassi", "Mohamed", "20260004", info3);
@@ -132,6 +139,53 @@ public class DonneesDemo implements CommandLineRunner {
                 .orElseGet(() -> new Enseignant(nom, prenom, email, encoder.encode(mdp(MDP_DEMO)), specialite));
         if (e.getMatieres().isEmpty()) e.getMatieres().addAll(Set.of(ses));
         utilisateurs.save(e);
+    }
+
+    /**
+     * La premiere etudiante de demonstration portait le nom d'une personne reelle : la base deja en ligne
+     * la renomme sur place (meme compte, meme historique) et corrige les notifications qui citaient ce nom.
+     */
+    static final String ANCIEN_NOM = "Manar Nouira", ANCIEN_EMAIL = "manar.nouira@univ.tn";
+
+    private void renommerEtudiante() {
+        String ancien = ANCIEN_NOM, nouveau = "Lina Ferjani";
+        utilisateurs.findByEmail(ANCIEN_EMAIL).ifPresent(u -> {
+            u.setPrenom("Lina");
+            u.setNom("Ferjani");
+            u.setEmail("lina.ferjani@univ.tn");
+            utilisateurs.save(u);
+        });
+        for (var n : notifications.findAll()) {
+            if (n.getMessage() != null && n.getMessage().contains(ancien)) {
+                n.setMessage(n.getMessage().replace(ancien, nouveau));
+                notifications.save(n);
+            }
+        }
+    }
+
+    /**
+     * Les notifications creees avant les liens n'ouvraient rien : on leur donne la page de leur sujet,
+     * reconnue a leur titre (francais ou anglais). Celles qui ont deja un lien ne sont pas touchees.
+     */
+    private void lierAnciennesNotifications() {
+        java.util.Map<String, String> liens = java.util.Map.of(
+                "Nouveau justificatif", "/admin/justificatifs",
+                "Justificatif accepté", "/etudiant/justificatifs",
+                "Justificatif refusé", "/etudiant/justificatifs",
+                "Séance dans 15 minutes", "/enseignant",
+                "Absences du jour", "/enseignant",
+                "Séance changée dans le planning source", "/admin/synchronisation",
+                "Seuil d'absence dépassé", "");
+        for (var n : notifications.findAll()) {
+            if (n.getLien() != null) continue;
+            liens.forEach((fr, lien) -> {
+                if (!fr.equals(n.getTitre()) && !t(java.util.Locale.ENGLISH, fr).equals(n.getTitre())) return;
+                // le seuil depasse concerne l'admin (vue des risques) ou l'etudiant (son historique)
+                n.setLien(!lien.isEmpty() ? lien
+                        : n.getDestinataire().getRole() == com.attendflow.model.enums.Role.ADMIN ? "/rapports" : "/etudiant/historique");
+                notifications.save(n);
+            });
+        }
     }
 
     private void etudiant(String nom, String prenom, String matricule, Classe classe) {

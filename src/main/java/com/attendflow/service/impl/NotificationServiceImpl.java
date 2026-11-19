@@ -82,8 +82,10 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void marquerLue(Utilisateur utilisateur, Long notificationId) {
-        notifications.findByIdAndDestinataire(notificationId, utilisateur).ifPresent(n -> n.setLue(true));
+    public String marquerLue(Utilisateur utilisateur, Long notificationId) {
+        return notifications.findByIdAndDestinataire(notificationId, utilisateur)
+                .map(n -> { n.setLue(true); return n.getLien(); })
+                .orElse(null);
     }
 
     @Override
@@ -118,7 +120,8 @@ public class NotificationServiceImpl implements NotificationService {
         aVenir.forEach(s -> notifier(new Notification(s.getEnseignant(), TypeNotification.INFORMATION,
                 t(LangueConfig.de(s.getEnseignant()), "Séance dans 15 minutes"),
                 t(LangueConfig.de(s.getEnseignant()), "Votre séance de {0} ({1}) commence à {2}, salle {3}.",
-                        s.getMatiere().getIntitule(), s.getClasse().getNom(), s.getHeureDebut(), s.getSalle().getNom()))));
+                        s.getMatiere().getIntitule(), s.getClasse().getNom(), s.getHeureDebut(), s.getSalle().getNom()),
+                "/seances/" + s.getId() + "/presences")));
         return aVenir.size();
     }
 
@@ -131,7 +134,7 @@ public class NotificationServiceImpl implements NotificationService {
             long absences = statuts.stream().filter(s -> s == StatutPresence.ABSENT).count();
             notifier(new Notification(enseignant, TypeNotification.INFORMATION, t(LangueConfig.de(enseignant), "Absences du jour"),
                     t(LangueConfig.de(enseignant), "{0} absence(s) enregistrée(s) dans vos séances aujourd'hui ({1} présence(s) saisie(s)).",
-                            absences, statuts.size())));
+                            absences, statuts.size()), "/enseignant"));
         });
         return parEnseignant.size();
     }

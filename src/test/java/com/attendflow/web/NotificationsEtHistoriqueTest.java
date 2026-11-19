@@ -47,7 +47,7 @@ class NotificationsEtHistoriqueTest {
 
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
     static final RequestPostProcessor SARA = user("sara.mansouri@univ.tn").roles("ENSEIGNANT");
-    static final RequestPostProcessor MANAR = user("manar.nouira@univ.tn").roles("ETUDIANT");
+    static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
 
     Utilisateur ahmed() { return utilisateurs.findByEmail("ahmed.bensalah@univ.tn").orElseThrow(); }
@@ -96,28 +96,28 @@ class NotificationsEtHistoriqueTest {
     void resumeF33ParEnseignant() {
         LocalDate jour = LocalDate.now().minusDays(1);
         Seance s = seance(jour, LocalTime.of(8, 0));
-        Etudiant manar = (Etudiant) utilisateurs.findByEmail("manar.nouira@univ.tn").orElseThrow();
+        Etudiant lina = (Etudiant) utilisateurs.findByEmail("lina.ferjani@univ.tn").orElseThrow();
         presenceService.enregistrer(utilisateurs.findByEmail("admin@univ.tn").orElseThrow(), s.getId(),
-                Map.of(manar.getId(), StatutPresence.ABSENT));
+                Map.of(lina.getId(), StatutPresence.ABSENT));
         assertThat(notificationService.resumeDuJour(jour)).isGreaterThanOrEqualTo(1);
         assertThat(notificationService.lister(ahmed())).anyMatch(n -> n.getTitre().equals("Absences du jour"));
     }
 
     @Test
     void historiqueEtudiantEtAdmin() throws Exception {
-        Etudiant manar = (Etudiant) utilisateurs.findByEmail("manar.nouira@univ.tn").orElseThrow();
+        Etudiant lina = (Etudiant) utilisateurs.findByEmail("lina.ferjani@univ.tn").orElseThrow();
         Seance s = seance(LocalDate.now().minusDays(1), LocalTime.of(8, 0));
         presenceService.enregistrer(utilisateurs.findByEmail("admin@univ.tn").orElseThrow(), s.getId(),
-                Map.of(manar.getId(), StatutPresence.RETARD));
+                Map.of(lina.getId(), StatutPresence.RETARD));
 
-        var h = (StatistiqueService.Historique) mvc.perform(get("/etudiant/historique").with(MANAR))
+        var h = (StatistiqueService.Historique) mvc.perform(get("/etudiant/historique").with(LINA))
                 .andExpect(status().isOk()).andReturn().getModelAndView().getModel().get("historique");
         assertThat(h.lignes()).anyMatch(p -> p.getSeance().getId().equals(s.getId()));
         assertThat(h.retards()).isGreaterThanOrEqualTo(1);
         assertThat(h.evolution()).isNotEmpty();
 
-        mvc.perform(get("/admin/etudiants/" + manar.getId() + "/historique").with(ADMIN)).andExpect(status().isOk());
-        mvc.perform(get("/admin/etudiants/" + manar.getId() + "/historique").with(AHMED)).andExpect(status().isForbidden());
+        mvc.perform(get("/admin/etudiants/" + lina.getId() + "/historique").with(ADMIN)).andExpect(status().isOk());
+        mvc.perform(get("/admin/etudiants/" + lina.getId() + "/historique").with(AHMED)).andExpect(status().isForbidden());
         mvc.perform(get("/etudiant/historique").with(AHMED)).andExpect(status().isForbidden());
     }
 }

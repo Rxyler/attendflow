@@ -63,7 +63,7 @@ class ParametreTest {
     void reserveALAdmin() throws Exception {
         mvc.perform(get("/admin/parametres").with(user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT")))
                 .andExpect(status().isForbidden());
-        mvc.perform(post("/admin/parametres").with(csrf()).with(user("manar.nouira@univ.tn").roles("ETUDIANT"))
+        mvc.perform(post("/admin/parametres").with(csrf()).with(user("lina.ferjani@univ.tn").roles("ETUDIANT"))
                         .param("seuilAbsence", "1"))
                 .andExpect(status().isForbidden());
     }

@@ -31,21 +31,21 @@ class RepositoryTest {
         Matiere matiere = matieres.save(new Matiere("Java", "JAVA", 3.0));
         Salle salle = salles.save(new Salle("A05", 30));
         Enseignant prof = enseignants.save(new Enseignant("Ben Salah", "Ahmed", "ahmed@univ.tn", "x", "Informatique"));
-        Etudiant manar = etudiants.save(new Etudiant("Nouira", "Manar", "manar@univ.tn", "x", "20260001", classe));
+        Etudiant lina = etudiants.save(new Etudiant("Ferjani", "Lina", "lina@univ.tn", "x", "20260001", classe));
         LocalDate jour = LocalDate.of(2026, 9, 25);
         Seance seance = seances.save(new Seance("EXT-1", jour, LocalTime.of(8, 0), LocalTime.of(10, 0), classe, matiere, salle, prof));
 
         // Heritage : un etudiant est retrouve via le repository des utilisateurs (connexion F-01)
-        assertThat(utilisateurs.findByEmail("manar@univ.tn")).get().isInstanceOf(Etudiant.class);
-        assertThat(etudiants.findByClasseOrderByNomAscPrenomAsc(classe)).containsExactly(manar);
+        assertThat(utilisateurs.findByEmail("lina@univ.tn")).get().isInstanceOf(Etudiant.class);
+        assertThat(etudiants.findByClasseOrderByNomAscPrenomAsc(classe)).containsExactly(lina);
         assertThat(seances.findByIdExterne("EXT-1")).isPresent();
         assertThat(seances.findByEnseignantAndDateBetweenOrderByDateAscHeureDebutAsc(prof, jour, jour)).hasSize(1);
 
-        presences.saveAndFlush(new Presence(seance, manar, StatutPresence.PRESENT));
-        assertThat(presences.findByEtudiantOrderBySeanceDateDesc(manar)).hasSize(1);
+        presences.saveAndFlush(new Presence(seance, lina, StatutPresence.PRESENT));
+        assertThat(presences.findByEtudiantOrderBySeanceDateDesc(lina)).hasSize(1);
 
         // RG-02 : un seul statut par etudiant et par seance
-        assertThatThrownBy(() -> presences.saveAndFlush(new Presence(seance, manar, StatutPresence.ABSENT)))
+        assertThatThrownBy(() -> presences.saveAndFlush(new Presence(seance, lina, StatutPresence.ABSENT)))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 }
