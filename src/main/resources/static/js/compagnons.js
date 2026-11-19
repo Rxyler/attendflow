@@ -4,7 +4,7 @@
   var en = document.documentElement.lang === 'en';
   function confettis(opts) {
     if (calme || !window.confetti) return;
-    var c = ['#2bc4b4', '#f4a940', '#f2766b', '#fbbf24', '#4cc38a', '#5fd8cb'];
+    var c = ['#ffd93d', '#ff6fa3', '#13a89e', '#1f1d1a', '#fffaf0'];   // marqueurs du carnet
     confetti(Object.assign({ particleCount: 120, spread: 80, origin: { y: .6 }, colors: c, disableForReducedMotion: true }, opts));
   }
   function lire(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

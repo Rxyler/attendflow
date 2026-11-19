@@ -6,18 +6,18 @@
   function palette() {
     var clair = document.documentElement.getAttribute('data-bs-theme') === 'light';
     return clair
-      ? { texte: '#4f6070', grille: 'rgba(15,23,42,.08)', bulle: 'rgba(255,255,255,.96)', bulleTexte: '#0d1b26', bord: 'rgba(15,23,42,.1)', arc: '#eef3f6' }
-      : { texte: '#8fa1b0', grille: 'rgba(255,255,255,.08)', bulle: 'rgba(13,19,36,.95)', bulleTexte: '#eaf1f6', bord: 'rgba(255,255,255,.12)', arc: '#0a1824' };
+      ? { texte: '#57524a', grille: 'rgba(31,29,26,.14)', bulle: '#fffaf0', bulleTexte: '#1f1d1a', bord: '#1f1d1a', arc: '#fbf5e8' }
+      : { texte: '#b9c2b9', grille: 'rgba(243,241,232,.14)', bulle: '#2a3a33', bulleTexte: '#f3f1e8', bord: '#f3f1e8', arc: '#22302a' };
   }
   function appliquer(p) {
     d.color = p.texte; d.borderColor = p.grille;
     d.plugins.tooltip.backgroundColor = p.bulle; d.plugins.tooltip.borderColor = p.bord; d.plugins.tooltip.titleColor = p.bulleTexte; d.plugins.tooltip.bodyColor = p.bulleTexte;
     d.elements.arc.borderColor = p.arc;
   }
-  d.font.family = "'Manrope', ui-sans-serif, system-ui, sans-serif";
-  d.font.size = 12;
+  d.font.family = "'Patrick Hand SC', 'Nunito', ui-sans-serif, sans-serif";
+  d.font.size = 13;
   d.animation = calme ? false : { duration: 700, easing: 'easeOutCubic' };
-  d.plugins.tooltip.borderWidth = 1;
+  d.plugins.tooltip.borderWidth = 2;
   d.plugins.tooltip.titleFont = { weight: '600' };
   d.plugins.tooltip.padding = 10;
   d.plugins.tooltip.cornerRadius = 8;

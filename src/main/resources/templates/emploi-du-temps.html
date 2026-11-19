@@ -96,7 +96,7 @@
       <p th:if="${#lists.isEmpty(seances)}" class="text-secondary text-center mb-0" th:text="#{edt.aucune}">Aucune séance cette semaine.</p>
 
       <!-- Detail d'une seance (F-15) -->
-      <section th:if="${selection}" class="af-glass p-4" aria-labelledby="detail-titre">
+      <section th:if="${selection}" id="detail-seance" class="af-glass p-4" aria-labelledby="detail-titre">
         <div class="d-flex justify-content-between align-items-start gap-3">
           <div>
             <p class="h6 mb-1" th:text="#{edt.detail}">Détail de la séance</p>

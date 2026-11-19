@@ -122,19 +122,19 @@
     const pct = { min: 0, max: 100, ticks: { callback: v => v + ' %' } };
     const sansLegende = { legend: { display: false } };
     new Chart(document.getElementById('g-classe'), { type: 'bar',
-      data: { labels: /*[[${rapport.parClasse.![classe]}]]*/ [], datasets: [{ data: /*[[${rapport.parClasse.![taux]}]]*/ [], backgroundColor: '#2bc4b4' }] },
+      data: { labels: /*[[${rapport.parClasse.![classe]}]]*/ [], datasets: [{ data: /*[[${rapport.parClasse.![taux]}]]*/ [], backgroundColor: '#13a89e' }] },
       options: { scales: { y: pct }, plugins: sansLegende, animation: anime } });
     new Chart(document.getElementById('g-matiere'), { type: 'bar',
-      data: { labels: /*[[${rapport.parMatiere.![matiere]}]]*/ [], datasets: [{ data: /*[[${rapport.parMatiere.![absences]}]]*/ [], backgroundColor: '#f2766b' }] },
+      data: { labels: /*[[${rapport.parMatiere.![matiere]}]]*/ [], datasets: [{ data: /*[[${rapport.parMatiere.![absences]}]]*/ [], backgroundColor: '#ff6fa3' }] },
       options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: sansLegende, animation: anime } });
     new Chart(document.getElementById('g-evolution'), { type: 'line',
       data: { labels: /*[[${rapport.evolution.![#temporals.format(jour, 'dd/MM')]}]]*/ [],
-              datasets: [{ data: /*[[${rapport.evolution.![taux]}]]*/ [], borderColor: '#2bc4b4', borderWidth: 2, backgroundColor: 'rgba(43,196,180,.16)', fill: true, tension: .3, pointRadius: 3, pointBackgroundColor: '#0a1824', pointBorderWidth: 2 }] },
+              datasets: [{ data: /*[[${rapport.evolution.![taux]}]]*/ [], borderColor: '#13a89e', borderWidth: 2, backgroundColor: 'rgba(19,168,158,.14)', fill: true, tension: .3, pointRadius: 3, pointBackgroundColor: '#fffaf0', pointBorderWidth: 2 }] },
       options: { scales: { y: pct }, plugins: sansLegende, animation: anime } });
     new Chart(document.getElementById('g-statuts'), { type: 'doughnut',
       data: { labels: [ /*[[#{statut.PRESENT}]]*/ 'Présent', /*[[#{statut.ABSENT}]]*/ 'Absent', /*[[#{statut.RETARD}]]*/ 'Retard', /*[[#{statut.JUSTIFIE}]]*/ 'Justifié' ],
               datasets: [{ data: [ /*[[${rapport.presents}]]*/ 0, /*[[${rapport.absents}]]*/ 0, /*[[${rapport.retards}]]*/ 0, /*[[${rapport.justifies}]]*/ 0 ],
-                           backgroundColor: ['#4cc38a', '#f2766b', '#fbbf24', '#64748b'], cutout: '68%' }] },
+                           backgroundColor: ['#1f8a4c', '#d93b62', '#c9590b', '#8a8378'], cutout: '68%' }] },
       options: { aspectRatio: 2, plugins: { legend: { position: 'right' } }, animation: anime, interaction: { mode: 'nearest', intersect: true } } });
   })();
 </script>

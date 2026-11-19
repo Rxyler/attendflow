@@ -289,3 +289,49 @@ h1, h2, h3, h4, h5, h6, .af-display, .af-feature h3, .af-role h3, .af-etape h3 {
 .af-feature h3, .af-role h3, .af-etape h3 { font-size: 1.3rem; }
 /* l%en-tete est une colonne flex : le titre garde la largeur de ses mots, le marqueur aussi */
 .af-header h1 { align-self: flex-start; }
+
+/* ---------- Finitions : crayon, grain du papier, gestes ---------- */
+/* les icones passent par le filtre "crayon" (injecte une fois par attendflow.js) : traits a main levee */
+svg.lucide { filter: url(#dd-crayon); }
+/* grain du papier par-dessus les points (fixe : peint une fois, ne bouge pas au defilement) */
+body {
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
+    radial-gradient(rgba(31, 29, 26, .09) 1px, transparent 1.2px);
+  background-size: 180px 180px, 22px 22px;
+}
+[data-bs-theme="dark"] body {
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .95  0 0 0 .05 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
+    radial-gradient(60rem 40rem at 20% 10%, rgba(255, 255, 255, .05), transparent 60%),
+    radial-gradient(50rem 40rem at 90% 80%, rgba(255, 255, 255, .04), transparent 60%),
+    radial-gradient(rgba(243, 241, 232, .07) 1px, transparent 1.2px);
+  background-size: 180px 180px, auto, auto, 24px 24px;
+}
+/* un bouton qu'on survole penche un peu, comme pose a la main */
+.btn:hover { transform: translate(-1px, -1px) rotate(-.6deg); }
+.btn-af:hover { transform: translate(-1px, -1px) rotate(.6deg); }
+/* barre de defilement a l'encre */
+* { scrollbar-color: var(--dd-encre) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--dd-encre); border-radius: 10px; border: 3px solid var(--af-bg); }
+/* les traits de Rough Notation ne captent jamais un clic */
+.rough-annotation { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .btn:hover, .btn-af:hover { transform: none; } }
+
+/* le titre du detail recoit le focus par script (accessibilite), sans anneau visuel : ce n est pas une commande */
+#detail-titre:focus { outline: none; }
+
+/* ---------- Restes du theme verre : halos flous remplaces par de l'encre ---------- */
+/* anneau de focus net (clavier) : liseré papier puis trait sarcelle, sans flou */
+:root { --af-ring: 0 0 0 2px var(--dd-papier), 0 0 0 4.5px var(--dd-sarcelle); }
+.af-seance:hover, .af-seance:focus-visible { box-shadow: 3px 3px 0 var(--dd-encre); color: var(--af-ink); }
+.af-seance:focus-visible { box-shadow: var(--af-ring); }
+/* seance ouverte : etiquette surlignee, pas de halo violet */
+.af-seance.af-selection { border-width: 2.5px !important; background: color-mix(in srgb, var(--dd-sarcelle) 16%, var(--dd-papier)); box-shadow: 3px 4px 0 var(--dd-sarcelle); transform: rotate(-1deg); }
+.af-feature:hover .af-ico { box-shadow: none; }
+.af-choix input:checked + .af-choix-carte { border-color: var(--dd-sarcelle); box-shadow: 4px 5px 0 var(--dd-sarcelle); transform: rotate(-.6deg); }
+.af-pill .af-point { box-shadow: none; animation: dd-clignote 1.6s steps(2, jump-none) infinite; }
+@keyframes dd-clignote { 50% { opacity: .35; } }
+.form-control:focus, .form-select:focus, .form-check-input:focus { border-color: var(--dd-sarcelle); }
+@media (prefers-reduced-motion: reduce) { .af-pill .af-point { animation: none; } }

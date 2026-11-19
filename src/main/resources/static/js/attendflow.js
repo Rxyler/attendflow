@@ -46,7 +46,7 @@
   function appliquerTheme(t) {
     racine.setAttribute('data-bs-theme', t);
     try { localStorage.setItem('af-theme', t); } catch (e) { /* stockage indisponible */ }
-    document.querySelector('meta[name=theme-color]') && document.querySelector('meta[name=theme-color]').setAttribute('content', t === 'light' ? '#eef3f6' : '#08121c');
+    document.querySelector('meta[name=theme-color]') && document.querySelector('meta[name=theme-color]').setAttribute('content', t === 'light' ? '#fbf5e8' : '#22302a');
     document.dispatchEvent(new CustomEvent('af:theme', { detail: t }));
   }
   document.addEventListener('click', function (e) {
@@ -196,7 +196,17 @@
   });
   function masquer(a) { if (!a.isConnected) return; a.classList.add('af-sortie'); setTimeout(function () { a.hidden = true; }, calme ? 0 : 260); }
 
-  /* ================= Icones ================= */
+  /* ================= Icones : tracees au crayon ================= */
+  // un filtre SVG unique deforme tres legerement les traits, comme dessines a main levee
+  if (!document.getElementById('dd-crayon')) {
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    defs.setAttribute('width', '0'); defs.setAttribute('height', '0'); defs.setAttribute('aria-hidden', 'true');
+    defs.style.position = 'absolute';
+    defs.innerHTML = '<filter id="dd-crayon" x="-10%" y="-10%" width="120%" height="120%">'
+      + '<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="bruit"/>'
+      + '<feDisplacementMap in="SourceGraphic" in2="bruit" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>';
+    document.body.appendChild(defs);
+  }
   if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 1.75 } });
 
   /* ================= Reflet du verre ================= */
@@ -240,6 +250,63 @@
       if (cible) { e.preventDefault(); lenis.scrollTo(cible, { offset: -90 }); }
     });
   }
+
+  // emploi du temps : la seance choisie recharge la page, on descend jusqu'a son detail
+  var detail = document.getElementById('detail-seance');
+  if (detail) {
+    var titreDetail = document.getElementById('detail-titre');
+    titreDetail.setAttribute('tabindex', '-1');
+    titreDetail.focus({ preventScroll: true });   // lecteurs d'ecran et clavier arrivent sur le detail
+    // grille plus large que l'ecran (telephone) : la seance choisie est ramenee au centre de sa ligne
+    var choisie = document.querySelector('.af-seance.af-selection'), boite = choisie && choisie.closest('.overflow-auto');
+    if (boite) {
+      var rc = choisie.getBoundingClientRect(), rb = boite.getBoundingClientRect();
+      boite.scrollLeft += rc.left - rb.left - (rb.width - rc.width) / 2;
+    }
+    setTimeout(function () {
+      if (lenis) lenis.scrollTo(detail, { offset: -24, duration: 1.2 });
+      else detail.scrollIntoView({ block: 'start' });
+    }, calme ? 0 : 350);
+  }
+
+  /* ================= Annotations au feutre (Rough Notation) ================= */
+  // soulignes, cercles et crochets traces a la main, dessines quand l'element arrive a l'ecran
+  (function annoter() {
+    if (!window.RoughNotation || !window.IntersectionObserver) return;
+    var couleur = function (v) { return getComputedStyle(racine).getPropertyValue(v).trim(); };
+    var notes = [];
+    var noter = function (el, type, jeton, o) {
+      o = o || {};
+      o.type = type; o.color = couleur(jeton); o.animate = !calme; o.animationDuration = 850;
+      // un titre est un bloc pleine largeur : on annote une enveloppe en ligne pour que le trait suive le texte
+      var cible = el;
+      if (o.texte) {
+        cible = document.createElement('span');
+        while (el.firstChild) cible.appendChild(el.firstChild);
+        el.appendChild(cible);
+        delete o.texte;
+      }
+      notes.push({ el: el, jeton: jeton, a: RoughNotation.annotate(cible, o) });
+    };
+    $$('.af-vitrine .af-h2').forEach(function (el) { noter(el, 'underline', '--dd-sarcelle', { texte: true, strokeWidth: 3, padding: 4, iterations: 2, multiline: true }); });
+    $$('.af-chiffres .af-grand').forEach(function (el) { noter(el, 'circle', '--dd-rose', { strokeWidth: 2.5, padding: [6, 16] }); });
+    $$('.af-cta h2').forEach(function (el) { noter(el, 'bracket', '--dd-rose', { texte: true, brackets: ['left', 'right'], strokeWidth: 3, padding: [4, 10] }); });
+    $$('.af-login-hero h1').forEach(function (el) { noter(el, 'underline', '--dd-sarcelle', { texte: true, strokeWidth: 3, padding: 4, multiline: true }); });
+    if (!notes.length) return;
+    // apres l'entree de la section (elle glisse de 30 px), sinon le trait se poserait a l'ancienne place
+    var io = new IntersectionObserver(function (vus) {
+      vus.forEach(function (v) {
+        if (!v.isIntersecting) return;
+        io.unobserve(v.target);
+        notes.forEach(function (n) { if (n.el === v.target) setTimeout(function () { n.a.show(); }, calme ? 0 : 950); });
+      });
+    }, { threshold: .6 });
+    notes.forEach(function (n) { io.observe(n.el); });
+    // le theme change : les traits prennent la couleur de la craie ou du feutre
+    document.addEventListener('af:theme', function () {
+      setTimeout(function () { notes.forEach(function (n) { n.a.color = couleur(n.jeton); }); }, 60);
+    });
+  })();
 
   /* ================= Mouvement (GSAP) ================= */
   if (!window.gsap) {
@@ -331,6 +398,12 @@
       // les tampons P / A / R tombent sur la feuille un par un, comme a l'appel
       entrees.push(gsap.from('.dd-tampon', { scale: 2.2, autoAlpha: 0, rotation: -30, duration: .35, ease: 'back.out(2.2)', stagger: .18, delay: retard + 1 }));
     }
+    var yeux = document.querySelector('.dd-yeux'), antennes = document.querySelector('.dd-antennes');
+    if (yeux) ambiance.push(gsap.timeline({ repeat: -1, repeatDelay: 3.2, delay: retard + 2 })
+      .to(yeux, { scaleY: .08, transformOrigin: '50% 50%', duration: .09, ease: 'power1.in' })
+      .to(yeux, { scaleY: 1, duration: .14, ease: 'power1.out' }));
+    if (antennes) ambiance.push(gsap.fromTo(antennes, { rotation: -3, transformOrigin: '50% 100%' },
+      { rotation: 3, duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
     var titre = document.querySelector('.af-hero h1');
     if (titre && !titre.dataset.decoupe) {
       titre.dataset.decoupe = '1';

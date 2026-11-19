@@ -33,6 +33,7 @@
       setTimeout(function () { document.documentElement.classList.remove('af-prep'); }, 1500);
     }
   </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js" integrity="sha384-IW2mAEaBUcGJfuKi7uhlzpZGhnDDnjI9NLtADxl9xKV6VJPzuuIqhIKyLwiAuRmu" crossorigin="anonymous"></script>
   <script defer src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
@@ -189,9 +190,9 @@
       type: 'line',
       data: {
         labels: /*[[${joursGraphique}]]*/ [],
-        datasets: [{ label: /*[[#{graphique.taux}]]*/ 'Taux', data: /*[[${tauxGraphique}]]*/ [], borderColor: '#2bc4b4', borderWidth: 2,
-          backgroundColor: 'rgba(43, 196, 180, 0.16)', fill: true, tension: 0.3, spanGaps: false,
-          pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#0a1824', pointBorderWidth: 2 }]
+        datasets: [{ label: /*[[#{graphique.taux}]]*/ 'Taux', data: /*[[${tauxGraphique}]]*/ [], borderColor: '#13a89e', borderWidth: 2.5,
+          backgroundColor: 'rgba(19, 168, 158, 0.14)', fill: true, tension: 0.3, spanGaps: false,
+          pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#fffaf0', pointBorderWidth: 2 }]
       },
       options: { scales: { y: { min: 0, max: 100, ticks: { callback: v => v + ' %' } } },
                  plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' %' } } } }
