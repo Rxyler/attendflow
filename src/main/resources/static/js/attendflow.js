@@ -322,6 +322,15 @@
       if (window.ScrollTrigger) gsap.to('.af-scene', { yPercent: 18, ease: 'none', scrollTrigger: { trigger: '.af-hero', start: 'top top', end: 'bottom top', scrub: true } });
       objet3D();
     }
+    /* Croquis : chaque trait (soulignement, fleche, etoile, fourmi) se dessine comme au feutre.
+       Visible par defaut ; seule l'animation le cache au depart (pathLength="1" : longueur 0 a 1). */
+    var traits = $$('.dd-dessin');
+    if (traits.length) {
+      entrees.push(gsap.fromTo(traits, { strokeDasharray: 1, strokeDashoffset: 1 },
+        { strokeDashoffset: 0, duration: .7, ease: 'power2.inOut', stagger: .12, delay: retard + .5 }));
+      // les tampons P / A / R tombent sur la feuille un par un, comme a l'appel
+      entrees.push(gsap.from('.dd-tampon', { scale: 2.2, autoAlpha: 0, rotation: -30, duration: .35, ease: 'back.out(2.2)', stagger: .18, delay: retard + 1 }));
+    }
     var titre = document.querySelector('.af-hero h1');
     if (titre && !titre.dataset.decoupe) {
       titre.dataset.decoupe = '1';

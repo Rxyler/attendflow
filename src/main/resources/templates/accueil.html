@@ -3,7 +3,6 @@
 <head th:replace="~{fragments/layout :: head(#{titre.accueil})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
 
 <!-- Prechargement : logo puis rideau (retire par attendflow.js) -->
 <div class="af-chargement" aria-hidden="true">
@@ -35,15 +34,15 @@
 
     <!-- ===== Hero ===== -->
     <section class="af-hero position-relative">
-      <span class="af-orbe" style="width: 28rem; height: 28rem; left: -10rem; top: -6rem; background: var(--af-teal)"></span>
-      <span class="af-orbe" style="width: 22rem; height: 22rem; right: -6rem; top: 10rem; background: var(--af-blue); opacity: .35"></span>
-      <span class="af-orbe" style="width: 18rem; height: 18rem; left: 40%; bottom: -8rem; background: var(--af-blue); opacity: .4"></span>
 
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
           <h1 class="text-white mb-4" th:attr="aria-label=#{accueil.h1Label}">[[#{accueil.h1Debut}]]
             <span class="af-gradient-text af-rotatif" aria-hidden="true" th:attr="data-mots=#{accueil.h1Mots}" th:text="#{accueil.h1Mot}">en un geste.</span><br>
             [[#{accueil.h1Fin}]]</h1>
+          <svg class="dd-trait-titre" viewBox="0 0 480 18" preserveAspectRatio="none" aria-hidden="true">
+            <path class="dd-dessin" pathLength="1" d="M4 12 C 90 4, 180 15, 260 9 S 410 4, 476 10" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </svg>
           <p class="lead mb-4" data-hero th:text="#{accueil.lead}">L’appel relié à l’emploi du temps.</p>
           <div class="d-flex flex-wrap gap-3 mb-4" data-hero>
             <a th:href="@{/login}" class="btn btn-af btn-lg" data-magnetic th:text="#{accueil.ouvrir}">Ouvrir mon espace</a>
@@ -56,50 +55,44 @@
           </div>
         </div>
 
-        <!-- Scene 3D : objet Three.js derriere, cartes en verre devant -->
+        <!-- Croquis : la feuille d'appel posee de biais, la fourmi Fas3a la montre du doigt -->
         <div class="col-lg-6">
-          <div class="af-scene" aria-hidden="true">
-            <div class="af-3d"></div>
-            <div class="af-scene-inner">
-              <div class="af-flot" data-z="0" style="left: 4%; top: 6%; width: 78%">
-                <div class="af-glass af-beam af-beam-lent p-4">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div><div class="small text-secondary" th:text="#{accueil.aujourdhui}">Aujourd’hui</div><div class="fw-semibold text-white" th:text="#{accueil.mesSeances}">Mes séances</div></div>
-                    <span class="af-pill" style="padding:.25rem .7rem"><span class="af-point" style="margin:0 .3rem 0 0"></span>[[#{accueil.direct}]]</span>
-                  </div>
-                  <div class="af-mini-edt">
-                    <span class="h">08:00</span><span class="af-mini-chip"><strong>Développement Web</strong> 3ème INFO, B12</span>
-                    <span class="h">10:00</span><span class="af-mini-chip v"><strong>Base de données</strong> 1ère INFO, B08</span>
-                    <span class="h">14:00</span><span class="af-mini-chip c"><strong>Java</strong> 2ème INFO, A05</span>
-                  </div>
-                </div>
-              </div>
-              <div class="af-flot" data-z="90" style="right: 0; top: 46%; width: 54%">
-                <div class="af-glass af-stat" data-ton="bleu">
-                  <div class="af-stat-tete"><p class="af-stat-libelle" th:text="#{accueil.taux}">Taux de présence</p><span class="af-stat-icone"><i data-lucide="percent"></i></span></div>
-                  <p class="af-stat-value" data-compteur>94 %</p>
-                  <div class="af-barre mt-3"><span style="width: 94%"></span></div>
-                  <p class="af-stat-detail" th:text="#{accueil.semaine}">+3 pts cette semaine</p>
-                </div>
-              </div>
-              <div class="af-flot" data-z="160" style="left: -2%; top: 66%; width: 52%">
-                <div class="af-glass p-3 d-flex align-items-start gap-3">
-                  <span class="af-alerte-ico"><i data-lucide="bell"></i></span>
-                  <div class="small">
-                    <div class="fw-semibold text-white" th:text="#{accueil.seuil}">Seuil d’absence dépassé</div>
-                    <div class="text-secondary" th:text="#{accueil.seuilDetail}">Rim Saad, 3ème INFO : 4 absences</div>
-                  </div>
-                </div>
-              </div>
-              <div class="af-flot" data-z="40" style="right: 6%; top: -4%; width: 34%">
-                <div class="af-glass p-3 text-center">
-                  <div class="small text-secondary mb-1" th:text="#{accueil.appel}">Appel</div>
-                  <div class="d-flex justify-content-center gap-2">
-                    <span class="badge text-bg-success">28 P</span><span class="badge text-bg-danger-doux">2 A</span>
-                  </div>
-                </div>
-              </div>
+          <div class="dd-scene" aria-hidden="true">
+            <div class="dd-feuille" data-hero>
+              <div class="dd-feuille-titre"><span th:text="#{accueil.feuilleTitre}">Feuille d’appel</span><span>3ème INFO, 08:00</span></div>
+              <ol>
+                <li><span>1</span><span>Mariem Ben Ali</span><span class="dd-tampon p">P</span></li>
+                <li><span>2</span><span>Mohamed Jlassi</span><span class="dd-tampon p">P</span></li>
+                <li><span>3</span><span>Manar Nouira</span><span class="dd-tampon r">R</span></li>
+                <li><span>4</span><span>Rim Saad</span><span class="dd-tampon a">A</span></li>
+                <li><span>5</span><span>Ahmed Trabelsi</span><span class="dd-tampon p">P</span></li>
+              </ol>
+              <!-- etoile griffonnee dans le coin de la feuille -->
+              <svg class="dd-etoile dd-doodle" style="right:-1.6rem; top:-1.8rem; width:2.6rem" viewBox="0 0 40 40">
+                <path class="dd-dessin" pathLength="1" d="M20 4 L20 36 M6 12 L34 28 M34 12 L6 28" stroke="var(--dd-rose)" stroke-width="3.5"/>
+              </svg>
             </div>
+            <!-- fleche dessinee de la fourmi vers la feuille -->
+            <svg class="dd-fleche" style="left:5.5rem; bottom:9.5rem; width:7rem" viewBox="0 0 120 90">
+              <path class="dd-dessin" pathLength="1" d="M8 82 C 20 40, 60 14, 108 18" stroke="var(--dd-sarcelle)" stroke-width="4"/>
+              <path class="dd-dessin" pathLength="1" d="M92 6 L110 18 L94 32" stroke="var(--dd-sarcelle)" stroke-width="4"/>
+            </svg>
+            <p class="dd-note" style="left:9rem; bottom:1rem" th:utext="#{accueil.note}">Un clic,<br>c’est noté !</p>
+            <!-- Fas3a, la fourmi, dessinee au trait -->
+            <svg class="dd-mascotte" viewBox="0 0 160 170">
+              <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                <path class="dd-dessin" pathLength="1" d="M58 34 C 52 18, 44 10, 34 6 M98 34 C 104 18, 112 10, 124 8"/>
+                <circle cx="33" cy="6" r="4" fill="currentColor"/><circle cx="125" cy="8" r="4" fill="currentColor"/>
+                <path class="dd-dessin" pathLength="1" d="M78 30 C 112 28, 128 52, 126 76 C 124 104, 102 118, 78 118 C 52 118, 30 104, 30 76 C 30 50, 46 31, 78 30 Z"/>
+                <circle cx="62" cy="70" r="13"/><circle cx="96" cy="70" r="13"/>
+                <circle cx="64" cy="72" r="5" fill="currentColor"/><circle cx="98" cy="72" r="5" fill="currentColor"/>
+                <path class="dd-dessin" pathLength="1" d="M64 96 C 72 106, 88 106, 96 95"/>
+                <path class="dd-dessin" pathLength="1" d="M60 118 C 52 134, 50 150, 54 166 M100 118 C 108 134, 112 150, 108 166"/>
+                <path class="dd-dessin" pathLength="1" d="M124 84 C 136 74, 142 60, 146 46"/>
+                <path d="M146 46 l-3 -12 M146 46 l8 -8" />
+              </g>
+              <path d="M38 66 C 34 52, 44 40, 56 38" fill="none" stroke="var(--dd-sarcelle)" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+            </svg>
           </div>
         </div>
       </div>
@@ -251,8 +244,6 @@
     <!-- ===== Appel a l'action ===== -->
     <section class="py-5" data-reveal>
       <div class="af-glass af-beam af-cta">
-        <span class="af-orbe" style="width: 26rem; height: 26rem; left: -8rem; top: -10rem; background: var(--af-teal)"></span>
-        <span class="af-orbe" style="width: 20rem; height: 20rem; right: -6rem; bottom: -10rem; background: var(--af-blue)"></span>
         <img th:src="@{/images/fas3a.jpg}" th:alt="#{accueil.fourmiAlt}" class="af-mascotte af-fourmi mb-3" width="150" height="150">
         <h2 class="text-white mb-3" th:text="#{accueil.ctaTitre}">Prêt</h2>
         <p class="text-secondary mb-4" style="max-width: 32rem; margin: 0 auto" th:text="#{accueil.ctaTexte}">Connectez-vous</p>

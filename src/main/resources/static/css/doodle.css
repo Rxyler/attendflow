@@ -1,0 +1,291 @@
+/* =====================================================================
+   Fas3a "carnet de croquis" : papier et encre (clair), tableau et craie (sombre).
+   Charge apres attendflow.css : redefinit les jetons, puis habille les composants.
+   Les fonctions et les classes restent celles d'attendflow.css.
+   ===================================================================== */
+
+:root {
+  --dd-hand: 'Gochi Hand', 'Patrick Hand SC', cursive;
+  --dd-caps: 'Patrick Hand SC', 'Gochi Hand', cursive;
+  --dd-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  /* un trait a main levee : coins inegaux, comme un cadre trace au feutre */
+  --dd-trace: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  --dd-trace-2: 14px 225px 14px 255px / 255px 14px 225px 14px;
+  --af-font: var(--dd-body);
+  --af-display: var(--dd-hand);
+  --bs-body-font-family: var(--dd-body);
+  --af-r-sm: 8px; --af-r: 10px; --af-r-lg: 14px; --af-r-xl: 18px;
+}
+
+/* ---------- Papier (clair) ---------- */
+:root, [data-bs-theme="light"] {
+  --af-bg: #fbf5e8;
+  --af-ink: #1f1d1a; --af-ink-2: #34312c; --af-muted: #57524a; --af-subtle: #6e685e;
+  --dd-encre: #1f1d1a;
+  --dd-jaune: #ffd93d; --dd-rose: #ff6fa3; --dd-sarcelle: #13a89e; --dd-papier: #fffaf0;
+  --af-amber: var(--dd-jaune); --af-teal: var(--dd-sarcelle); --af-teal-ink: #0b7a72;
+  --af-success: #1f8a4c; --af-success-soft: #dff3e6; --af-success-line: #1f8a4c;
+  --af-danger: #d93b62; --af-danger-soft: #ffe1ea; --af-danger-line: #d93b62;
+  --af-warning: #c9590b; --af-warning-soft: #ffe9d2; --af-warning-line: #c9590b;
+  --af-neutral-soft: rgba(31, 29, 26, .06);
+  --af-glass-bg: var(--dd-papier); --af-glass-bg-strong: var(--dd-papier);
+  --af-glass-line: var(--dd-encre); --af-glass-line-hover: var(--dd-encre);
+  --af-input-bg: #fffdf7;
+  --dd-ombre: 3px 4px 0 var(--dd-encre);
+  --af-ring: 0 0 0 3px var(--dd-jaune), 0 0 0 5px var(--dd-encre);
+  --bs-body-bg: var(--af-bg); --bs-body-color: var(--af-ink);
+  --bs-border-color: rgba(31, 29, 26, .35);
+  --bs-link-color: #0b7a72; --bs-link-color-rgb: 11, 122, 114; --bs-link-hover-color: #075b55;
+  color-scheme: light;
+}
+
+/* ---------- Tableau a craie (sombre) ---------- */
+[data-bs-theme="dark"] {
+  --af-bg: #22302a;
+  --af-ink: #f3f1e8; --af-ink-2: #dedbd0; --af-muted: #b9c2b9; --af-subtle: #a3ada4;
+  --dd-encre: #f3f1e8;
+  --dd-jaune: #f8e27a; --dd-rose: #ff9cc3; --dd-sarcelle: #7fe0d5; --dd-papier: #2a3a33;
+  --af-amber: var(--dd-jaune); --af-teal: var(--dd-sarcelle); --af-teal-ink: #9ff0e6;
+  --af-success: #9be3a9; --af-success-soft: rgba(155, 227, 169, .14); --af-success-line: #9be3a9;
+  --af-danger: #ff9cb0; --af-danger-soft: rgba(255, 156, 176, .14); --af-danger-line: #ff9cb0;
+  --af-warning: #ffc07a; --af-warning-soft: rgba(255, 192, 122, .14); --af-warning-line: #ffc07a;
+  --af-neutral-soft: rgba(243, 241, 232, .08);
+  --af-glass-bg: var(--dd-papier); --af-glass-bg-strong: var(--dd-papier);
+  --af-glass-line: rgba(243, 241, 232, .85); --af-glass-line-hover: var(--dd-encre);
+  --af-input-bg: #26352f;
+  --dd-ombre: 3px 4px 0 rgba(0, 0, 0, .45);
+  --af-ring: 0 0 0 3px var(--dd-jaune), 0 0 0 5px #22302a;
+  --bs-body-bg: var(--af-bg); --bs-body-color: var(--af-ink);
+  --bs-border-color: rgba(243, 241, 232, .35);
+  --bs-link-color: #9ff0e6; --bs-link-color-rgb: 159, 240, 230; --bs-link-hover-color: #c9fff8;
+  color-scheme: dark;
+}
+
+/* ---------- Fond : papier pointe / poussiere de craie ---------- */
+body {
+  font-family: var(--dd-body);
+  background-color: var(--af-bg);
+  background-image: radial-gradient(rgba(31, 29, 26, .09) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+[data-bs-theme="dark"] body {
+  background-image:
+    radial-gradient(60rem 40rem at 20% 10%, rgba(255, 255, 255, .05), transparent 60%),
+    radial-gradient(50rem 40rem at 90% 80%, rgba(255, 255, 255, .04), transparent 60%),
+    radial-gradient(rgba(243, 241, 232, .07) 1px, transparent 1.2px);
+  background-size: auto, auto, 24px 24px;
+}
+/* ce monde-ci est dessine, pas eclaire : pas d'aurore, de particules, de halo ni d'orbes */
+.af-fond-shader, .af-particules, .af-voile, .af-grain, .af-curseur, .af-orbe, .af-3d { display: none !important; }
+
+/* ---------- Typographie ---------- */
+h1, h2, h3, h4, h5, h6, .h4, .h5, .h6, .af-display { font-family: var(--dd-hand); font-weight: 400; letter-spacing: .01em; }
+.h5, h1.h5 { font-size: 1.35rem; font-weight: 400 !important; }
+.h6, h2.h6, h3.h6 { font-size: 1.2rem; font-weight: 400 !important; }
+.af-header h1 { font-size: 1.75rem; }
+.fw-bold { font-weight: 700 !important; }
+.fw-bold.h5, .fw-bold.h6, h2.fw-bold, h3.fw-bold { font-weight: 400 !important; }
+.form-label, .table > thead th, .af-sidebar .nav-link, .af-sidebar .af-section, .btn, .badge, .af-pill, .af-stat .af-stat-libelle, legend, caption {
+  font-family: var(--dd-caps); letter-spacing: .02em;
+}
+::selection { background: var(--dd-jaune); color: #1f1d1a; }
+
+/* surligneur : un trait de marqueur derriere le texte */
+.dd-surligne {
+  background: linear-gradient(100deg, transparent 2%, var(--dd-jaune) 4%, var(--dd-jaune) 96%, transparent 98%) 0 70% / 100% .62em no-repeat;
+  padding: 0 .12em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.dd-surligne-rose { background-image: linear-gradient(100deg, transparent 2%, var(--dd-rose) 4%, var(--dd-rose) 96%, transparent 98%); }
+[data-bs-theme="dark"] .dd-surligne { color: #1f1d1a; }
+
+/* ---------- Feuilles et cadres traces ---------- */
+.af-glass {
+  background: var(--af-glass-bg);
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border: 2px solid var(--dd-encre);
+  border-radius: var(--dd-trace);
+  box-shadow: var(--dd-ombre);
+}
+.af-glass:nth-of-type(2n) { border-radius: var(--dd-trace-2); }
+.af-glass::before, .af-glass::after, .af-beam::after { display: none !important; }
+.af-glass:hover { border-color: var(--dd-encre); }
+a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform: translate(-1px, -2px) rotate(-.4deg); box-shadow: 5px 6px 0 var(--dd-encre); }
+[data-bs-theme="dark"] a.af-glass:hover, [data-bs-theme="dark"] .af-feature:hover { box-shadow: 5px 6px 0 rgba(0, 0, 0, .5); }
+
+/* ---------- Boutons : feutre, papier, ombre d'encre ---------- */
+.btn {
+  border: 2px solid var(--dd-encre) !important;
+  border-radius: var(--dd-trace) !important;
+  box-shadow: var(--dd-ombre);
+  font-size: 1.02rem;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .15s ease;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 5px 0 var(--dd-encre); }
+.btn:active:not(:disabled) { transform: translate(3px, 4px); box-shadow: 0 0 0 var(--dd-encre); }
+[data-bs-theme="dark"] .btn:hover { box-shadow: 4px 5px 0 rgba(0, 0, 0, .5); }
+.btn-af, .btn-af:hover, .btn-af:focus-visible, .btn-af:active {
+  background: var(--dd-jaune) !important; color: #1f1d1a !important; animation: none !important;
+}
+.btn-af::after { display: none; }
+.btn-light, .btn-outline-light { --bs-btn-bg: var(--dd-papier); --bs-btn-color: var(--af-ink); --bs-btn-hover-bg: var(--dd-papier); --bs-btn-hover-color: var(--af-ink); background-color: var(--dd-papier) !important; }
+.btn-link { border: 0 !important; box-shadow: none !important; text-decoration: underline wavy var(--dd-sarcelle) 1.5px; text-underline-offset: 5px; }
+.btn-link:hover { transform: none; }
+.btn-success { background: var(--af-success) !important; color: #fff !important; }
+[data-bs-theme="dark"] .btn-success { color: #1f1d1a !important; }
+.btn-outline-danger { background: var(--dd-papier); }
+.table td .btn-sm { box-shadow: none; border-width: 1.5px !important; }
+
+/* boutons ronds (langue, pause, theme) : cercles traces */
+.af-theme {
+  background: var(--dd-papier) !important; color: var(--af-ink) !important;
+  border: 2px solid var(--dd-encre) !important; border-radius: 52% 48% 50% 50% / 48% 52% 48% 52% !important;
+  box-shadow: 2px 3px 0 var(--dd-encre) !important;
+}
+[data-bs-theme="dark"] .af-theme { box-shadow: 2px 3px 0 rgba(0, 0, 0, .45) !important; }
+.af-theme:hover { transform: rotate(-6deg); }
+.af-langue { font-family: var(--dd-caps) !important; font-size: .9rem !important; }
+.af-deconnexion { border: 2px solid transparent; border-radius: 50%; }
+.af-deconnexion:hover { border-color: var(--af-danger); }
+
+/* ---------- Formulaires ---------- */
+.form-control, .form-select {
+  background-color: var(--af-input-bg); color: var(--af-ink);
+  border: 2px solid var(--dd-encre); border-radius: 10px 14px 9px 13px;
+}
+.form-control:focus, .form-select:focus { border-color: var(--dd-encre); box-shadow: 4px 4px 0 var(--dd-jaune); background-color: var(--af-input-bg); }
+.form-check-input { border: 2px solid var(--dd-encre); }
+.form-check-input:checked { background-color: var(--dd-sarcelle); border-color: var(--dd-encre); }
+
+/* ---------- Barre laterale : marge du carnet ---------- */
+.af-sidebar {
+  background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
+  border-right: 2px solid var(--dd-encre);
+}
+.af-sidebar .af-marque { font-family: var(--dd-hand); font-size: 1.45rem; font-weight: 400; }
+.af-sidebar .af-espace { font-family: var(--dd-caps); font-size: .85rem; color: var(--af-muted); }
+.af-sidebar .af-section {
+  color: var(--af-ink); font-size: .95rem; padding-bottom: .5rem; margin-bottom: .2rem;
+  background: linear-gradient(var(--dd-sarcelle), var(--dd-sarcelle)) .7rem 100% / 3.4rem 3px no-repeat;
+}
+.af-sidebar .nav-link { color: var(--af-ink) !important; font-size: 1.05rem; border: 2px solid transparent; border-radius: var(--dd-trace); }
+.af-sidebar .nav-link svg.lucide { color: var(--af-ink); opacity: 1; }
+.af-sidebar .nav-link:hover { background: transparent; text-decoration: underline wavy var(--dd-rose) 1.5px; text-underline-offset: 5px; }
+.af-sidebar .nav-link.active {
+  background: var(--dd-papier) !important; border-color: var(--dd-encre); box-shadow: 2px 3px 0 var(--dd-encre);
+  color: var(--af-ink) !important;
+}
+.af-sidebar .nav-link.active svg.lucide { color: var(--dd-rose); }
+.af-compte { border-top: 2px dashed var(--dd-encre); }
+.af-avatar { background: var(--dd-jaune); color: #1f1d1a; border: 2px solid var(--dd-encre); box-shadow: none; }
+.af-logo { border: 2px solid var(--dd-encre); box-shadow: none; }
+
+/* ---------- En-tete de page ---------- */
+.af-header { background: var(--af-bg); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 2px solid var(--dd-encre); }
+.af-header h1 {
+  display: inline; padding: 0 .15em;
+  background: linear-gradient(100deg, transparent 1%, var(--dd-jaune) 3%, var(--dd-jaune) 97%, transparent 99%) 0 78% / 100% .5em no-repeat;
+}
+[data-bs-theme="dark"] .af-header h1 { background-image: linear-gradient(100deg, transparent 1%, rgba(248, 226, 122, .45) 3%, rgba(248, 226, 122, .45) 97%, transparent 99%); }
+
+/* ---------- Cartes de chiffres ---------- */
+.af-stat .af-stat-value { font-family: var(--dd-hand); font-weight: 400; font-size: 2.6rem; }
+.af-stat .af-stat-libelle { font-size: 1rem; color: var(--af-ink-2); }
+
+/* ---------- Tableaux : lignes de cahier ---------- */
+.table { --bs-table-border-color: rgba(31, 29, 26, .25); }
+[data-bs-theme="dark"] .table { --bs-table-border-color: rgba(243, 241, 232, .22); }
+.table > thead th { background: transparent; color: var(--af-ink); font-size: .95rem; text-transform: none; border-bottom: 2px solid var(--dd-encre); }
+.table > tbody td { border-bottom-style: dashed; }
+
+/* ---------- Badges, alertes : pastilles et post-it ---------- */
+.badge { border: 1.5px solid currentColor; border-radius: 999px 900px 999px 950px; font-size: .85rem; font-weight: 400; box-shadow: none !important; }
+.text-bg-danger { background: var(--af-danger-soft) !important; color: var(--af-danger) !important; }
+.alert {
+  border: 2px solid var(--dd-encre); border-radius: 4px 14px 6px 12px; box-shadow: var(--dd-ombre);
+  -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--af-ink) !important;
+  transform: rotate(-.4deg);
+}
+.alert-success { background: #d9f2df; } .alert-danger { background: #ffd9e3; } .alert-warning { background: #fff1b8; }
+[data-bs-theme="dark"] .alert-success { background: #2e4a3a; } [data-bs-theme="dark"] .alert-danger { background: #4a2f37; } [data-bs-theme="dark"] .alert-warning { background: #4a4430; }
+.modal-content { background: var(--af-bg); border: 2px solid var(--dd-encre); border-radius: var(--dd-trace); box-shadow: 6px 7px 0 var(--dd-encre); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* ---------- Emploi du temps : seances en etiquettes ---------- */
+.af-seance { -webkit-backdrop-filter: none; backdrop-filter: none; border: 1.5px solid var(--dd-encre) !important; border-radius: 6px 10px 7px 9px; background: var(--dd-papier); color: var(--af-ink); box-shadow: 2px 2px 0 var(--dd-encre); }
+.af-seance.af-modifiee { background: var(--af-warning-soft); }
+.af-seance.af-annulee { background: var(--af-danger-soft); }
+.af-seance:hover { transform: rotate(-1deg) translateY(-1px); }
+
+/* ---------- Feuille d'appel : boutons de statut ---------- */
+.btn-check + .btn { box-shadow: none; border-width: 1.5px !important; }
+.btn-check:checked + .btn { box-shadow: 2px 2px 0 var(--dd-encre) !important; transform: rotate(-1deg); }
+
+/* ---------- Pastilles, jauges ---------- */
+.af-pill { background: var(--dd-papier); border: 1.5px solid var(--dd-encre); border-radius: 999px 900px 999px 950px; color: var(--af-ink); }
+.af-barre, .af-jauge { background: transparent; border: 1.5px solid var(--dd-encre); height: .7rem; }
+.af-barre > span, .af-jauge span { background: repeating-linear-gradient(-45deg, var(--dd-sarcelle) 0 6px, transparent 6px 9px); }
+.af-mascotte { filter: none !important; }
+
+/* ============================ Vitrine ============================ */
+.af-nav-vitrine {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  border-bottom: 2px solid var(--dd-encre) !important;
+}
+.af-nav-vitrine .nav-link { font-family: var(--dd-caps); font-size: 1.1rem; color: var(--af-ink); }
+.af-nav-vitrine .nav-link:hover { background: transparent; text-decoration: underline wavy var(--dd-rose) 1.5px; text-underline-offset: 6px; }
+.af-hero h1 { font-family: var(--dd-hand); font-weight: 400; text-transform: uppercase; letter-spacing: .01em; line-height: .98; font-size: clamp(2.6rem, min(6vw, 9vh), 5.4rem); }
+.af-hero h1 .af-rotatif::after { height: .62em; bottom: .08em; background: var(--dd-rose); border-radius: 3px; z-index: -1; transform: scaleX(var(--trait, 1)) skewX(-6deg) rotate(-1deg); }
+.af-hero h1 .af-rotatif { z-index: 0; isolation: isolate; }
+.af-hero .lead { color: var(--af-ink-2); text-shadow: none !important; font-size: 1.2rem; }
+.af-hero .text-secondary { color: var(--af-muted) !important; text-shadow: none !important; }
+.af-section-titre h2, .af-h2 { font-family: var(--dd-hand); font-weight: 400; }
+.af-chiffres { border: 2px solid var(--dd-encre); border-radius: var(--dd-trace); background: var(--dd-encre); box-shadow: var(--dd-ombre); gap: 2px; }
+.af-chiffres > div { background: var(--dd-papier); }
+.af-chiffres .af-grand { font-family: var(--dd-hand); font-weight: 400; }
+.af-bandeau { border-top: 2px dashed var(--dd-encre); border-bottom: 2px dashed var(--dd-encre); }
+.af-bandeau-piste span { font-family: var(--dd-caps); font-size: 1.05rem; color: var(--af-ink); }
+.af-feature .af-ico svg.lucide, .af-role svg.lucide, .af-ico-ligne { color: var(--dd-rose) !important; }
+.af-etape .af-num { font-family: var(--dd-hand); color: var(--af-ink); font-size: 1.6rem; }
+.af-roles .af-role + .af-role { border-left: 2px dashed var(--dd-encre); }
+.af-cta { text-align: center; }
+.af-pied { border-top: 2px solid var(--dd-encre); font-family: var(--dd-caps); }
+
+/* le croquis du heros : une feuille d'appel posee de biais et la mascotte qui la montre */
+.dd-scene { position: relative; min-height: 26rem; }
+.dd-feuille {
+  position: relative; max-width: 26rem; margin-left: auto; transform: rotate(2.2deg);
+  background: var(--dd-papier); border: 2px solid var(--dd-encre); border-radius: var(--dd-trace-2); box-shadow: 6px 7px 0 var(--dd-encre);
+  padding: 1.1rem 1.3rem 1rem;
+}
+[data-bs-theme="dark"] .dd-feuille { box-shadow: 6px 7px 0 rgba(0, 0, 0, .45); }
+.dd-feuille-titre { font-family: var(--dd-caps); font-size: 1.1rem; display: flex; justify-content: space-between; border-bottom: 2px solid var(--dd-encre); padding-bottom: .4rem; margin-bottom: .3rem; }
+.dd-feuille ol { list-style: none; margin: 0; padding: 0; }
+.dd-feuille li { display: grid; grid-template-columns: 1.5rem 1fr auto; align-items: center; gap: .5rem; padding: .42rem 0; border-bottom: 1.5px dashed rgba(31, 29, 26, .3); font-family: var(--dd-hand); font-size: 1.15rem; }
+[data-bs-theme="dark"] .dd-feuille li { border-bottom-color: rgba(243, 241, 232, .25); }
+.dd-feuille li > span:first-child { font-family: var(--dd-caps); color: var(--af-muted); font-size: .95rem; }
+.dd-tampon { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border: 2px solid currentColor; border-radius: 52% 48% 55% 45% / 47% 55% 45% 53%; font-family: var(--dd-caps); font-size: 1rem; transform: rotate(-8deg); }
+.dd-tampon.p { color: var(--af-success); } .dd-tampon.a { color: var(--af-danger); } .dd-tampon.r { color: var(--af-warning); }
+.dd-mascotte { position: absolute; left: 0; bottom: -1rem; width: 9.5rem; color: var(--dd-encre); }
+.dd-note { position: absolute; font-family: var(--dd-hand); color: var(--dd-rose); font-size: 1.35rem; line-height: 1.05; transform: rotate(-6deg); }
+.dd-fleche, .dd-trait, .dd-etoile { position: absolute; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.dd-trait-titre { position: relative; display: block; width: min(30rem, 100%); height: 1.1rem; margin: -.2rem 0 1.4rem; color: var(--dd-sarcelle); }
+.dd-doodle { color: var(--dd-sarcelle); }
+@media (max-width: 991.98px) {
+  .dd-scene { min-height: 0; padding-bottom: 8rem; }
+  .dd-feuille { margin: 0 auto; }
+  .dd-mascotte { left: 50%; transform: translateX(-120%); }
+  .dd-note, .dd-fleche { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .dd-feuille, .alert { transform: none; } }
+
+/* le marqueur epouse la formule affichee (la reserve de largeur ne sert que la ou le titre pourrait se reequilibrer) */
+.af-hero h1 .af-rotatif { min-width: 0 !important; }
+
+/* la barre du haut reste collee en haut : elle garde le papier sous elle, le contenu passe dessous */
+.af-nav-vitrine { background: var(--af-bg) !important; }
+
+/* la police manuscrite n%a qu%une graisse : on ne la laisse jamais simuler du gras (traits baveux) */
+h1, h2, h3, h4, h5, h6, .af-display, .af-feature h3, .af-role h3, .af-etape h3 { font-weight: 400 !important; font-synthesis: none; }
+.af-feature h3, .af-role h3, .af-etape h3 { font-size: 1.3rem; }
+/* l%en-tete est une colonne flex : le titre garde la largeur de ses mots, le marqueur aussi */
+.af-header h1 { align-self: flex-start; }

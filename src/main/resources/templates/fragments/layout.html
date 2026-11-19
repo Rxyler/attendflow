@@ -6,15 +6,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" th:content="#{meta.description}">
-  <meta name="theme-color" content="#08121c">
+  <meta name="theme-color" content="#fbf5e8">
   <title th:text="${titre} + ' · Fas3a'">Fas3a</title>
   <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Patrick+Hand+SC&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" rel="stylesheet">
   <link href="https://unpkg.com/lenis@1.1.13/dist/lenis.css" integrity="sha384-pAFowDtEJGvoq8dGiFmgKkO1h5cvbHkCysvXumyjfJBsi8qJwG429whEp2xanR+c" crossorigin="anonymous" rel="stylesheet">
   <link th:href="@{/css/attendflow.css}" rel="stylesheet">
+  <link th:href="@{/css/doodle.css}" rel="stylesheet">
   <!-- Masque le contenu jusqu'a l'animation d'entree (evite le clignotement) ; filet de securite 1,5 s -->
   <script>
     var t = 'dark'; try { t = localStorage.getItem('af-theme') || 'dark'; } catch (e) {}
@@ -43,12 +44,8 @@
 
 <body>
 <!-- Fond commun : aurora animee (canvas), grille, grain -->
-<th:block th:fragment="fond">
-  <canvas class="af-fond-shader" aria-hidden="true"></canvas>
-  <div class="af-voile" aria-hidden="true"></div>
-  <canvas class="af-particules" aria-hidden="true"></canvas>
-  <div class="af-grain" aria-hidden="true"></div>
-</th:block>
+<!-- Fond du carnet : le papier pointe est dessine en CSS (doodle.css) ; plus d'aurore ni de particules a animer -->
+<th:block th:fragment="fond"></th:block>
 
 <!-- Interrupteur clair / sombre -->
 <th:block th:fragment="theme">
