@@ -22,6 +22,11 @@ import java.util.Set;
 public class DonneesDemo implements CommandLineRunner {
 
     private static final String MDP_DEMO = "1234";
+    private static final String MDP_ADMIN_DEMO = "admin";
+
+    /** En ligne, DEMO_PASSWORD remplace les mots de passe de demonstration publics (ils sont dans ce fichier, sur GitHub). */
+    @org.springframework.beans.factory.annotation.Value("${attendflow.demo.motdepasse:}")
+    private String motDePasseDemo = "";
 
     private final UtilisateurRepository utilisateurs;
     private final ClasseRepository classes;
@@ -59,7 +64,7 @@ public class DonneesDemo implements CommandLineRunner {
         Classe res3 = classe("3ème RÉSEAUX", "Licence 3", "Rami Gharbi");
 
         if (!utilisateurs.existsByEmail("admin@univ.tn")) {
-            utilisateurs.save(new Admin("Admin", "Super", "admin@univ.tn", encoder.encode("admin")));
+            utilisateurs.save(new Admin("Admin", "Super", "admin@univ.tn", encoder.encode(mdp(MDP_ADMIN_DEMO))));
         }
         enseignant("Ben Salah", "Ahmed", "ahmed.bensalah@univ.tn", "Développement Web", devWeb, java);
         enseignant("Mansouri", "Sara", "sara.mansouri@univ.tn", "Bases de données", bdd, algo);
@@ -82,6 +87,7 @@ public class DonneesDemo implements CommandLineRunner {
 
         // Premier demarrage : importer l'emploi du temps pour avoir des seances a afficher.
         if (seances.count() == 0) synchronisation.synchroniser(null);
+        remplacerMotsDePassePublics();
     }
 
     private Matiere matiere(String intitule, String code, double coefficient) {
@@ -92,10 +98,38 @@ public class DonneesDemo implements CommandLineRunner {
         return classes.findByNom(nom).orElseGet(() -> classes.save(new Classe(nom, niveau, responsable, "2026-2027")));
     }
 
+    private boolean motDePasseDemoDefini() {
+        return motDePasseDemo != null && motDePasseDemo.length() >= 8;
+    }
+
+    /** Le mot de passe de demonstration public, ou DEMO_PASSWORD s'il est defini (8 caracteres minimum). */
+    private String mdp(String publicParDefaut) {
+        return motDePasseDemoDefini() ? motDePasseDemo : publicParDefaut;
+    }
+
+    /**
+     * Comptes deja crees avec un mot de passe public ("admin", "1234") : il est remplace par DEMO_PASSWORD.
+     * Ainsi la base en ligne, creee avant ce reglage, cesse d'accepter les mots de passe lus sur GitHub.
+     */
+    private void remplacerMotsDePassePublics() {
+        if (motDePasseDemo != null && !motDePasseDemo.isEmpty() && !motDePasseDemoDefini()) {
+            org.slf4j.LoggerFactory.getLogger(DonneesDemo.class).warn("DEMO_PASSWORD ignore : 8 caracteres minimum");
+            return;
+        }
+        if (!motDePasseDemoDefini()) return;
+        String nouveau = encoder.encode(motDePasseDemo);
+        for (var u : utilisateurs.findAll()) {
+            if (encoder.matches(MDP_DEMO, u.getMotDePasse()) || encoder.matches(MDP_ADMIN_DEMO, u.getMotDePasse())) {
+                u.setMotDePasse(nouveau);
+                utilisateurs.save(u);
+            }
+        }
+    }
+
     private void enseignant(String nom, String prenom, String email, String specialite, Matiere... ses) {
         Enseignant e = utilisateurs.findByEmail(email)
                 .map(Enseignant.class::cast)
-                .orElseGet(() -> new Enseignant(nom, prenom, email, encoder.encode(MDP_DEMO), specialite));
+                .orElseGet(() -> new Enseignant(nom, prenom, email, encoder.encode(mdp(MDP_DEMO)), specialite));
         if (e.getMatieres().isEmpty()) e.getMatieres().addAll(Set.of(ses));
         utilisateurs.save(e);
     }
@@ -103,6 +137,6 @@ public class DonneesDemo implements CommandLineRunner {
     private void etudiant(String nom, String prenom, String matricule, Classe classe) {
         String email = (prenom + "." + nom.replace(" ", "")).toLowerCase() + "@univ.tn";
         if (utilisateurs.existsByEmail(email)) return;
-        utilisateurs.save(new Etudiant(nom, prenom, email, encoder.encode(MDP_DEMO), matricule, classe));
+        utilisateurs.save(new Etudiant(nom, prenom, email, encoder.encode(mdp(MDP_DEMO)), matricule, classe));
     }
 }

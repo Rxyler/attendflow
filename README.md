@@ -68,7 +68,8 @@ On first start the app fills in demo data: 6 subjects, 4 classes, 3 teachers and
 | Teachers | `ahmed.bensalah@univ.tn`, `sara.mansouri@univ.tn`, `rami.gharbi@univ.tn` |
 | Students | `firstname.lastname@univ.tn` (e.g. `manar.nouira@univ.tn`) |
 
-Demo passwords are in [`DonneesDemo.java`](src/main/java/com/attendflow/config/DonneesDemo.java).
+Demo passwords are in [`DonneesDemo.java`](src/main/java/com/attendflow/config/DonneesDemo.java) for local use only.
+On a public deployment, set `DEMO_PASSWORD`: it replaces them, including on accounts that already exist.
 Accounts created from the interface get a random password; the user sets their own through "Mot de passe oublié".
 
 ### Emails
@@ -88,10 +89,11 @@ In production, set `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `
 ./mvnw test
 ```
 
-79 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
+82 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
 dashboards, notifications, emails, excuses, records, reports and exports, and settings.
 `SecuriteEntreesTest` focuses on hostile input: SQL injection, XSS, missing CSRF tokens, oversized or invalid values,
 brute-force lockout, and error pages that leak no technical details.
+`DeploiementTest` checks the demo password override, the security headers (Content-Security-Policy, Referrer-Policy) and the per-visitor request limit.
 `LangueTest` checks the French default, the switch to English and that every French text has an English version.
 
 ## Deployment
@@ -105,6 +107,8 @@ Environment variables:
 | `DB_USERNAME`, `DB_PASSWORD` | Database credentials |
 | `APP_URL` | Public address of the app |
 | `SHOW_SQL` | `false` |
+| `DEMO_PASSWORD` | Password for the demo accounts (8 characters minimum), replacing the public ones |
+| `RATE_LIMIT` | Optional: requests per minute per visitor (default 300, `0` to turn off) |
 
 Every push to `main` redeploys automatically.
 

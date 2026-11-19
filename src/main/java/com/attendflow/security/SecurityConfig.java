@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 /**
  * F-01 connexion email + mot de passe, F-03 redirection selon le role,
@@ -13,6 +14,15 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 public class SecurityConfig {
+
+    static final String CDN = "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com";
+    static final String CSP = "default-src 'self'; "
+            + "script-src 'self' 'unsafe-inline' " + CDN + "; "
+            + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com " + CDN + "; "
+            + "font-src 'self' https://fonts.gstatic.com; "
+            + "img-src 'self' data: blob:; "
+            + "connect-src 'self'; "
+            + "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,7 +51,14 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?deconnexion")
-                        .permitAll());
+                        .permitAll())
+                // Le navigateur ne charge que nos fichiers et ceux des 3 CDN utilises ; rien ne part vers un autre site.
+                // shortcut: 'unsafe-inline' reste necessaire (petits scripts en ligne des pages) ; passer a des nonces
+                // si la page doit resister seule a une injection de script.
+                .headers(h -> h
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(CSP))
+                        .referrerPolicy(r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .permissionsPolicyHeader(pp -> pp.policy("camera=(), microphone=(), geolocation=()")));
         return http.build();
     }
 }
