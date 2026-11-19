@@ -339,11 +339,24 @@
     try { deja = !!sessionStorage.getItem('af-charge'); sessionStorage.setItem('af-charge', '1'); } catch (e) { /* ok */ }
     if (deja || calme) charg.remove();
     else {
-      retard = 1.15;
-      gsap.timeline()
-        .from(charg.querySelector('.af-logo'), { scale: .6, autoAlpha: 0, duration: .5, ease: 'back.out(2)' })
-        .to(charg.querySelector('.af-ligne span'), { width: '100%', duration: .7, ease: 'power2.inOut' }, '-=.1')
-        .to(charg, { yPercent: -100, duration: .7, ease: 'power4.inOut', onComplete: function () { charg.remove(); } }, '+=.05');
+      retard = 2.3;
+      var q = function (s) { return charg.querySelectorAll(s); };
+      // dessin au crayon (etat de depart dans doodle.css) : chaque trait se trace, puis la couleur est posee dessous comme un feutre
+      var intro = gsap.timeline({ defaults: { ease: 'power2.inOut' } })
+        .from(q('.dd-intro-logo'), { rotation: -6, scale: .9, duration: 1.6, ease: 'power1.out', transformOrigin: '50% 50%' }, 0)
+        .to(q('.i-postit'), { strokeDashoffset: 0, duration: .55 }, 0)
+        .to(q('.i-postit'), { fillOpacity: 1, duration: .25, ease: 'none' }, .4)
+        .to(q('.dd-intro-logo .i-trait:not(.i-postit):not(.i-coche)'), { strokeDashoffset: 0, duration: .35, stagger: .1 }, .45)
+        .to(q('.i-tete'), { fillOpacity: 1, duration: .2, ease: 'none' }, .8)
+        .from(q('.i-yeux, .i-pop'), { scale: 0, transformOrigin: '50% 50%', duration: .35, stagger: .08, ease: 'back.out(3)' }, .9)
+        .to(q('.i-coche'), { strokeDashoffset: 0, duration: .25, ease: 'power3.out' }, 1.25)
+        .from(q('.dd-intro-nom span'), { y: 14, rotation: function () { return gsap.utils.random(-14, 14); }, autoAlpha: 0, duration: .3, stagger: .05, ease: 'back.out(2.5)' }, 1.15)
+        .to(q('.dd-intro-trait .i-trait'), { strokeDashoffset: 0, duration: .35 }, 1.45)
+        .to(q('.i-yeux'), { scaleY: .1, transformOrigin: '50% 75%', duration: .07, yoyo: true, repeat: 1, ease: 'none' }, 1.75)
+        .to(charg, { yPercent: -100, duration: .7, ease: 'power4.inOut', onComplete: function () { charg.remove(); if (window.afFilm) afFilm.ouvrir(lenis); } }, 2.05);
+      // un clic ou une touche accelere l'intro : on ne fait jamais attendre
+      var presser = function () { intro.timeScale(4); };
+      charg.addEventListener('pointerdown', presser); addEventListener('keydown', presser, { once: true });
     }
   }
 
