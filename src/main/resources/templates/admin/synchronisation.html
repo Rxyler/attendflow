@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Synchronisation')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.synchronisation})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -8,48 +8,46 @@
 
   <div class="flex-grow-1 d-flex flex-column">
     <header class="af-header px-4 py-3">
-      <h1 class="h5 fw-bold mb-0">Synchronisation de l’emploi du temps</h1>
+      <h1 class="h5 fw-bold mb-0" th:text="#{synchro.titre}">Synchronisation de l’emploi du temps</h1>
     </header>
     <main id="contenu" class="p-4 d-grid gap-4">
 
       <div th:if="${resultat}" class="alert mb-0" role="status"
            th:classappend="${resultat.statut.name() == 'SUCCES'} ? 'alert-success' : (${resultat.statut.name() == 'PARTIEL'} ? 'alert-warning' : 'alert-danger')">
-        Synchronisation terminée :
-        <strong th:text="${resultat.nbAjoutees}">0</strong> ajoutée(s),
-        <strong th:text="${resultat.nbModifiees}">0</strong> modifiée(s),
-        <strong th:text="${resultat.nbAnnulees}">0</strong> annulée(s).
+        [[#{synchro.resultat}]]
+        <strong th:text="${resultat.nbAjoutees}">0</strong> [[#{synchro.ajoutees}]]
+        <strong th:text="${resultat.nbModifiees}">0</strong> [[#{synchro.modifiees}]]
+        <strong th:text="${resultat.nbAnnulees}">0</strong> [[#{synchro.annulees}]]
         <span th:text="${resultat.message}">message</span>
       </div>
 
       <div class="af-glass p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div>
-          <h2 class="h6 fw-bold mb-1">Séances fournies par le projet partenaire</h2>
-          <p class="text-secondary small mb-0">
-            Lecture seule. Synchronisation automatique chaque jour ouvré à 7h00, ou à la demande.
-          </p>
+          <h2 class="h6 fw-bold mb-1" th:text="#{synchro.source}">Séances fournies par le projet partenaire</h2>
+          <p class="text-secondary small mb-0" th:text="#{synchro.sourceTexte}">Lecture seule.</p>
         </div>
         <form th:action="@{/admin/synchronisation}" method="post">
-          <button type="submit" class="btn btn-af px-4"><i data-lucide="refresh-cw" aria-hidden="true"></i>Synchroniser maintenant</button>
+          <button type="submit" class="btn btn-af px-4"><i data-lucide="refresh-cw" aria-hidden="true"></i>[[#{synchro.maintenant}]]</button>
         </form>
       </div>
 
       <div class="af-glass p-0 overflow-hidden">
         <table class="table table-hover align-middle mb-0">
-          <caption class="px-4">Les 20 dernières synchronisations</caption>
+          <caption class="px-4" th:text="#{synchro.dernieres}">Les 20 dernières synchronisations</caption>
           <thead>
           <tr>
-            <th scope="col" class="ps-4">Date</th>
-            <th scope="col">Ajoutées</th>
-            <th scope="col">Modifiées</th>
-            <th scope="col">Annulées</th>
-            <th scope="col">Statut</th>
-            <th scope="col">Déclenchée par</th>
-            <th scope="col" class="pe-4">Détail</th>
+            <th scope="col" class="ps-4" th:text="#{champ.date}">Date</th>
+            <th scope="col" th:text="#{synchro.colAjoutees}">Ajoutées</th>
+            <th scope="col" th:text="#{synchro.colModifiees}">Modifiées</th>
+            <th scope="col" th:text="#{synchro.colAnnulees}">Annulées</th>
+            <th scope="col" th:text="#{champ.statut}">Statut</th>
+            <th scope="col" th:text="#{synchro.declenchee}">Déclenchée par</th>
+            <th scope="col" class="pe-4" th:text="#{synchro.detail}">Détail</th>
           </tr>
           </thead>
           <tbody>
           <tr th:if="${#lists.isEmpty(journaux)}">
-            <td colspan="7" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucune synchronisation pour l’instant.</td>
+            <td colspan="7" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>[[#{synchro.aucune}]]</td>
           </tr>
           <tr th:each="j : ${journaux}">
             <td class="ps-4 font-monospace small" th:text="${#temporals.format(j.dateSynchro, 'dd/MM/yyyy HH:mm')}">date</td>
@@ -59,9 +57,9 @@
             <td>
               <span class="badge rounded-pill"
                     th:classappend="${j.statut.name() == 'SUCCES'} ? 'text-bg-success' : (${j.statut.name() == 'PARTIEL'} ? 'text-bg-warning' : 'text-bg-danger')"
-                    th:text="${j.statut.name() == 'SUCCES'} ? 'Succès' : (${j.statut.name() == 'PARTIEL'} ? 'Partiel' : 'Échec')">Succès</span>
+                    th:text="#{__${'synchro.' + j.statut.name()}__}">Succès</span>
             </td>
-            <td th:text="${j.declenchePar != null} ? ${j.declenchePar.nomComplet} : 'Automatique'">Automatique</td>
+            <td th:text="${j.declenchePar != null} ? ${j.declenchePar.nomComplet} : #{synchro.automatique}">Automatique</td>
             <td class="pe-4 small text-secondary" th:text="${j.message}">message</td>
           </tr>
           </tbody>

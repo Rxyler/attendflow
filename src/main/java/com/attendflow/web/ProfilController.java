@@ -1,5 +1,6 @@
 package com.attendflow.web;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Utilisateur;
 import com.attendflow.model.enums.Mascotte;
 import com.attendflow.repository.UtilisateurRepository;
@@ -36,8 +37,8 @@ public class ProfilController {
         Utilisateur u = utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
         u.setMascotte(mascotte);
         utilisateurs.save(u);
-        redirection.addFlashAttribute("succes", mascotte == null ? "Initiales rétablies."
-                : mascotte.getNom() + " est maintenant ton compagnon !");
+        redirection.addFlashAttribute("succes", mascotte == null ? t("Initiales rétablies.")
+                : t("{0} est maintenant ton compagnon !", mascotte.getNom()));
         return "redirect:/profil";
     }
 }

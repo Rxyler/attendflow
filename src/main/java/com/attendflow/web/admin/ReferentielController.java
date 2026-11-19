@@ -1,5 +1,6 @@
 package com.attendflow.web.admin;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Etudiant;
 import com.attendflow.model.Utilisateur;
 import com.attendflow.model.enums.Role;
@@ -66,14 +67,14 @@ public class ReferentielController {
                                       @RequestParam(required = false) MultipartFile photo, RedirectAttributes r) {
         return executer(r, () -> {
             referentiel.enregistrerEtudiant(id, form, photo);
-            return id == null ? "Étudiant ajouté. Il choisira son mot de passe via « Mot de passe oublié »."
-                    : "Étudiant modifié.";
+            return id == null ? t("Étudiant ajouté. Il choisira son mot de passe via « Mot de passe oublié ».")
+                    : t("Étudiant modifié.");
         }, form, id, "/admin/etudiants");
     }
 
     @PostMapping("/admin/etudiants/{id}/supprimer")
     public String supprimerEtudiant(@PathVariable Long id, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.supprimerEtudiant(id); return "Étudiant supprimé."; },
+        return executer(r, () -> { referentiel.supprimerEtudiant(id); return t("Étudiant supprimé."); },
                 null, null, "/admin/etudiants");
     }
 
@@ -82,7 +83,7 @@ public class ReferentielController {
         try {
             ResultatImport res = referentiel.importerEtudiants(fichier);
             r.addFlashAttribute(res.erreurs().isEmpty() ? "succes" : "avertissement",
-                    res.crees() + " étudiant(s) importé(s)." + (res.erreurs().isEmpty() ? "" : " Lignes ignorées :"));
+                    t("{0} étudiant(s) importé(s).", res.crees()) + (res.erreurs().isEmpty() ? "" : t(" Lignes ignorées :")));
             r.addFlashAttribute("erreursImport", res.erreurs());
         } catch (IllegalArgumentException e) {
             r.addFlashAttribute("erreur", e.getMessage());
@@ -122,13 +123,13 @@ public class ReferentielController {
 
     @PostMapping("/admin/classes")
     public String enregistrerClasse(@RequestParam(required = false) Long id, @ModelAttribute ClasseForm form, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.enregistrerClasse(id, form); return id == null ? "Classe ajoutée." : "Classe modifiée."; },
+        return executer(r, () -> { referentiel.enregistrerClasse(id, form); return id == null ? t("Classe ajoutée.") : t("Classe modifiée."); },
                 form, id, "/admin/classes");
     }
 
     @PostMapping("/admin/classes/{id}/supprimer")
     public String supprimerClasse(@PathVariable Long id, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.supprimerClasse(id); return "Classe supprimée."; }, null, null, "/admin/classes");
+        return executer(r, () -> { referentiel.supprimerClasse(id); return t("Classe supprimée."); }, null, null, "/admin/classes");
     }
 
     // ================= Matieres =================
@@ -148,13 +149,13 @@ public class ReferentielController {
 
     @PostMapping("/admin/matieres")
     public String enregistrerMatiere(@RequestParam(required = false) Long id, @ModelAttribute MatiereForm form, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.enregistrerMatiere(id, form); return id == null ? "Matière ajoutée." : "Matière modifiée."; },
+        return executer(r, () -> { referentiel.enregistrerMatiere(id, form); return id == null ? t("Matière ajoutée.") : t("Matière modifiée."); },
                 form, id, "/admin/matieres");
     }
 
     @PostMapping("/admin/matieres/{id}/supprimer")
     public String supprimerMatiere(@PathVariable Long id, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.supprimerMatiere(id); return "Matière supprimée."; }, null, null, "/admin/matieres");
+        return executer(r, () -> { referentiel.supprimerMatiere(id); return t("Matière supprimée."); }, null, null, "/admin/matieres");
     }
 
     // ================= Enseignants =================
@@ -178,13 +179,13 @@ public class ReferentielController {
     public String enregistrerEnseignant(@RequestParam(required = false) Long id, @ModelAttribute EnseignantForm form, RedirectAttributes r) {
         return executer(r, () -> {
             referentiel.enregistrerEnseignant(id, form);
-            return id == null ? "Enseignant ajouté. Il choisira son mot de passe via « Mot de passe oublié »." : "Enseignant modifié.";
+            return id == null ? t("Enseignant ajouté. Il choisira son mot de passe via « Mot de passe oublié ».") : t("Enseignant modifié.");
         }, form, id, "/admin/enseignants");
     }
 
     @PostMapping("/admin/enseignants/{id}/supprimer")
     public String supprimerEnseignant(@PathVariable Long id, RedirectAttributes r) {
-        return executer(r, () -> { referentiel.supprimerEnseignant(id); return "Enseignant supprimé."; }, null, null, "/admin/enseignants");
+        return executer(r, () -> { referentiel.supprimerEnseignant(id); return t("Enseignant supprimé."); }, null, null, "/admin/enseignants");
     }
 
     // ================= Outils =================

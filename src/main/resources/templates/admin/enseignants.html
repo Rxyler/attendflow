@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Enseignants')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.enseignants})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -8,8 +8,8 @@
 
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3">
-      <h1 class="h5 fw-bold mb-0">Gestion des enseignants</h1>
-      <p class="small text-secondary mb-0" th:text="${#lists.size(enseignants)} + ' enseignant(s)'">0</p>
+      <h1 class="h5 fw-bold mb-0" th:text="#{enseignants.titre}">Gestion des enseignants</h1>
+      <p class="small text-secondary mb-0" th:text="#{enseignants.compte(${#lists.size(enseignants)})}">0</p>
     </header>
 
     <main id="contenu" class="p-4 d-grid gap-4">
@@ -22,25 +22,25 @@
             <table class="table table-hover align-middle mb-0">
               <thead>
               <tr>
-                <th scope="col" class="ps-4">Enseignant</th>
-                <th scope="col">Contact</th>
-                <th scope="col">Spécialité</th>
-                <th scope="col">Matières</th>
-                <th scope="col" class="pe-4 text-end">Actions</th>
+                <th scope="col" class="ps-4" th:text="#{champ.enseignant}">Enseignant</th>
+                <th scope="col" th:text="#{champ.contact}">Contact</th>
+                <th scope="col" th:text="#{champ.specialite}">Spécialité</th>
+                <th scope="col" th:text="#{champ.matieres}">Matières</th>
+                <th scope="col" class="pe-4 text-end" th:text="#{commun.actions}">Actions</th>
               </tr>
               </thead>
               <tbody>
-              <tr th:if="${#lists.isEmpty(enseignants)}"><td colspan="5" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucun enseignant.</td></tr>
+              <tr th:if="${#lists.isEmpty(enseignants)}"><td colspan="5" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>[[#{enseignants.aucun}]]</td></tr>
               <tr th:each="e : ${enseignants}">
                 <td class="ps-4 fw-semibold" th:text="${e.nomComplet}">Nom</td>
                 <td class="small"><span th:text="${e.email}">email</span><br><span class="text-secondary" th:text="${e.telephone} ?: ''">tel</span></td>
                 <td class="small" th:text="${e.specialite} ?: '—'">spécialité</td>
                 <td><span th:each="m : ${e.matieres}" class="badge rounded-pill text-bg-light border me-1" th:text="${m.intitule}">matière</span></td>
                 <td class="pe-4 text-end text-nowrap">
-                  <a th:href="@{/admin/enseignants(modifier=${e.id})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>Modifier</a>
+                  <a th:href="@{/admin/enseignants(modifier=${e.id})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>[[#{commun.modifier}]]</a>
                   <form th:action="@{/admin/enseignants/{id}/supprimer(id=${e.id})}" method="post" class="d-inline"
-                        th:attr="onsubmit='return confirm(\'Supprimer ' + ${e.nomComplet} + ' ?\')'">
-                    <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>Supprimer</button>
+                        th:attr="onsubmit='return confirm(\'' + #{commun.supprimerConfirmer(${e.nomComplet})} + '\')'">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>[[#{commun.supprimer}]]</button>
                   </form>
                 </td>
               </tr>
@@ -51,35 +51,33 @@
 
         <div class="col-xl-4">
           <form th:action="@{/admin/enseignants}" method="post" class="af-glass p-4 d-grid gap-3">
-            <h2 class="h6 fw-bold mb-0" th:text="${formId != null} ? 'Modifier l’enseignant' : 'Ajouter un enseignant'">Ajouter</h2>
+            <h2 class="h6 fw-bold mb-0" th:text="${formId != null} ? #{enseignants.modifier} : #{enseignants.ajouter}">Ajouter</h2>
             <input type="hidden" name="id" th:value="${formId}">
             <div class="row g-2">
-              <div class="col-6"><label for="e-nom" class="form-label">Nom</label>
+              <div class="col-6"><label for="e-nom" class="form-label" th:text="#{champ.nom}">Nom</label>
                 <input id="e-nom" name="nom" class="form-control" th:value="${form?.nom}" required maxlength="80"></div>
-              <div class="col-6"><label for="e-prenom" class="form-label">Prénom</label>
+              <div class="col-6"><label for="e-prenom" class="form-label" th:text="#{champ.prenom}">Prénom</label>
                 <input id="e-prenom" name="prenom" class="form-control" th:value="${form?.prenom}" required maxlength="80"></div>
             </div>
-            <div><label for="e-email" class="form-label">Email</label>
+            <div><label for="e-email" class="form-label" th:text="#{champ.email}">Email</label>
               <input id="e-email" name="email" type="email" class="form-control" th:value="${form?.email}" required maxlength="150"></div>
-            <div><label for="e-tel" class="form-label">Téléphone</label>
+            <div><label for="e-tel" class="form-label" th:text="#{champ.telephone}">Téléphone</label>
               <input id="e-tel" name="telephone" type="tel" class="form-control" th:value="${form?.telephone}" maxlength="30"></div>
-            <div><label for="e-spec" class="form-label">Spécialité</label>
+            <div><label for="e-spec" class="form-label" th:text="#{champ.specialite}">Spécialité</label>
               <input id="e-spec" name="specialite" class="form-control" th:value="${form?.specialite}" maxlength="120"></div>
             <!-- F-08 : affectation aux matieres -->
             <fieldset>
-              <legend class="form-label fs-6">Matières enseignées</legend>
+              <legend class="form-label fs-6" th:text="#{enseignants.matieresEnseignees}">Matières enseignées</legend>
               <div class="form-check" th:each="m : ${matieres}">
                 <input class="form-check-input" type="checkbox" name="matiereIds" th:value="${m.id}" th:id="'m-' + ${m.id}"
                        th:checked="${form != null and form.matiereIds != null and #sets.contains(form.matiereIds, m.id)}">
                 <label class="form-check-label" th:for="'m-' + ${m.id}" th:text="${m.intitule}">Matière</label>
               </div>
             </fieldset>
-            <p class="small text-secondary mb-0" th:if="${formId == null}">
-              L’enseignant choisira son mot de passe via « Mot de passe oublié ».
-            </p>
+            <p class="small text-secondary mb-0" th:if="${formId == null}" th:text="#{enseignants.motDePasse}">L’enseignant choisira son mot de passe.</p>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-af">Enregistrer</button>
-              <a th:if="${formId != null}" th:href="@{/admin/enseignants}" class="btn btn-light border">Annuler</a>
+              <button type="submit" class="btn btn-af" th:text="#{commun.enregistrer}">Enregistrer</button>
+              <a th:if="${formId != null}" th:href="@{/admin/enseignants}" class="btn btn-light border" th:text="#{commun.annuler}">Annuler</a>
             </div>
           </form>
         </div>

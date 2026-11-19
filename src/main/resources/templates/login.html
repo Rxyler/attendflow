@@ -1,29 +1,28 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Connexion')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.connexion})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <main id="contenu" class="container-fluid">
   <div class="row min-vh-100">
 
     <section class="col-lg-6 d-none d-lg-flex af-login-hero">
-      <span class="af-orbe" style="width: 30rem; height: 30rem; left: -8rem; top: -8rem; background: #6366f1"></span>
-      <span class="af-orbe" style="width: 22rem; height: 22rem; right: -4rem; bottom: 4rem; background: #22d3ee; opacity: .35"></span>
+      <span class="af-orbe" style="width: 30rem; height: 30rem; left: -8rem; top: -8rem; background: var(--af-teal)"></span>
+      <span class="af-orbe" style="width: 22rem; height: 22rem; right: -4rem; bottom: 4rem; background: var(--af-blue); opacity: .35"></span>
       <a th:href="@{/}" class="d-flex align-items-center gap-2 text-decoration-none mb-auto">
         <span class="af-logo"></span>
         <span class="fw-semibold text-white">Fas3a</span>
       </a>
       <div class="my-5" style="max-width: 30rem; position: relative">
-        <span class="af-pill mb-4"><span class="af-point" aria-hidden="true"></span>Gestion des présences</span>
-        <h1 class="text-white mb-3" style="font-size: clamp(2.2rem, 3.8vw, 3.2rem); font-weight: 600; letter-spacing: -.04em; line-height: 1.05">
-          Chaque professeur,<br><span class="af-gradient-text">son propre espace.</span>
+        <h1 class="text-white mb-3" style="font-size: clamp(2.2rem, 3.8vw, 3.2rem); font-weight: 600; letter-spacing: -.04em; line-height: 1.05" th:utext="#{login.h1}">
+          Chaque rôle,<br>son propre espace.
         </h1>
-        <p class="mb-4" style="color: var(--af-muted)">Présences reliées à l’emploi du temps officiel. Alertes, justificatifs et rapports au même endroit.</p>
+        <p class="mb-4" style="color: var(--af-muted)" th:text="#{login.texte}">Présences</p>
         <ul class="list-unstyled d-grid mb-0">
-          <li class="af-hero-item"><i data-lucide="calendar-check"></i>Séances synchronisées chaque matin</li>
-          <li class="af-hero-item"><i data-lucide="list-checks"></i>Appel en quelques secondes, même sur téléphone</li>
-          <li class="af-hero-item"><i data-lucide="bell"></i>Alertes dès qu’un seuil d’absence est franchi</li>
-          <li class="af-hero-item"><i data-lucide="file-spreadsheet"></i>Rapports exportables en PDF et Excel</li>
+          <li class="af-hero-item"><i data-lucide="calendar-check"></i>[[#{login.point1}]]</li>
+          <li class="af-hero-item"><i data-lucide="list-checks"></i>[[#{login.point2}]]</li>
+          <li class="af-hero-item"><i data-lucide="bell"></i>[[#{login.point3}]]</li>
+          <li class="af-hero-item"><i data-lucide="file-spreadsheet"></i>[[#{login.point4}]]</li>
         </ul>
         <div class="af-trio mt-4" aria-hidden="true">
           <img th:src="@{/images/mascottes/plume.svg}" alt="" class="af-mascotte" width="68" height="68">
@@ -38,29 +37,29 @@
       <div class="af-glass af-beam af-beam-lent af-auth-card" data-tilt="3">
         <div class="position-absolute" style="top: 1rem; right: 1rem; z-index: 2"><button th:replace="~{fragments/layout :: theme}"></button></div>
         <a th:href="@{/}" class="d-flex d-lg-none align-items-center gap-2 mb-4 text-decoration-none"><span class="af-logo"></span><span class="fw-semibold text-white">Fas3a</span></a>
-        <h2 class="mb-1">Connexion</h2>
-        <p class="text-secondary mb-4">Accédez à votre espace personnel</p>
+        <h2 class="mb-1" th:text="#{login.titre}">Connexion</h2>
+        <p class="text-secondary mb-4" th:text="#{login.sousTitre}">Accédez</p>
 
-        <div th:if="${param.erreur}" class="alert alert-danger py-2" role="alert">Email ou mot de passe incorrect.</div>
-        <div th:if="${param.bloque}" class="alert alert-danger py-2" role="alert">Trop de tentatives : réessayez dans 5 minutes.</div>
-        <div th:if="${param.deconnexion}" class="alert alert-success py-2" role="status">Vous êtes déconnecté.</div>
-        <div th:if="${param.reinitialise}" class="alert alert-success py-2" role="status">Mot de passe modifié. Vous pouvez vous connecter.</div>
+        <div th:if="${param.erreur}" class="alert alert-danger py-2" role="alert" th:text="#{login.erreur}">Email ou mot de passe incorrect.</div>
+        <div th:if="${param.bloque}" class="alert alert-danger py-2" role="alert" th:text="#{login.bloque}">Trop de tentatives</div>
+        <div th:if="${param.deconnexion}" class="alert alert-success py-2" role="status" th:text="#{login.deconnecte}">Vous êtes déconnecté.</div>
+        <div th:if="${param.reinitialise}" class="alert alert-success py-2" role="status" th:text="#{login.reinitialise}">Mot de passe modifié.</div>
 
         <form th:action="@{/login}" method="post" class="d-grid gap-3">
           <div>
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label" th:text="#{champ.email}">Email</label>
             <input type="email" id="email" name="email" class="form-control" placeholder="email@univ.tn" autocomplete="username" required autofocus>
           </div>
           <div>
             <div class="d-flex justify-content-between">
-              <label for="motDePasse" class="form-label">Mot de passe</label>
-              <a th:href="@{/mot-de-passe-oublie}" class="small fw-medium text-decoration-none">Mot de passe oublié ?</a>
+              <label for="motDePasse" class="form-label" th:text="#{champ.motDePasse}">Mot de passe</label>
+              <a th:href="@{/mot-de-passe-oublie}" class="small fw-medium text-decoration-none" th:text="#{login.oublie}">Mot de passe oublié ?</a>
             </div>
             <input type="password" id="motDePasse" name="motDePasse" class="form-control" autocomplete="current-password" required>
           </div>
-          <button type="submit" class="btn btn-af py-2 mt-1" data-magnetic>Se connecter <i data-lucide="arrow-right" aria-hidden="true"></i></button>
+          <button type="submit" class="btn btn-af py-2 mt-1" data-magnetic th:text="#{login.bouton}">Se connecter</button>
         </form>
-        <a th:href="@{/}" class="d-block text-center mt-4 small text-decoration-none text-secondary">Retour à l’accueil</a>
+        <a th:href="@{/}" class="d-block text-center mt-4 small text-decoration-none text-secondary" th:text="#{commun.retourAccueil}">Retour à l’accueil</a>
       </div>
     </section>
 

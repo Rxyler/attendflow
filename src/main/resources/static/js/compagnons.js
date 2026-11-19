@@ -1,9 +1,10 @@
 /* Compagnons : reactions au clic, confettis (nouveau badge, niveau, appel complet) et un petit secret. */
 (function () {
   var calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var en = document.documentElement.lang === 'en';
   function confettis(opts) {
     if (calme || !window.confetti) return;
-    var c = ['#818cf8', '#c084fc', '#f472b6', '#fbbf24', '#34d399', '#67e8f9'];
+    var c = ['#2bc4b4', '#f4a940', '#f2766b', '#fbbf24', '#4cc38a', '#5fd8cb'];
     confetti(Object.assign({ particleCount: 120, spread: 80, origin: { y: .6 }, colors: c, disableForReducedMotion: true }, opts));
   }
   function lire(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -15,29 +16,32 @@
     t.className = 'af-toast af-glass'; t.setAttribute('role', 'status'); t.innerHTML = html;
     document.body.appendChild(t);
     requestAnimationFrame(function () { t.classList.add('visible'); });
-    setTimeout(function () { t.classList.remove('visible'); setTimeout(function () { t.remove(); }, 400); }, 3800);
+    setTimeout(function () { t.classList.remove('visible'); setTimeout(function () { t.remove(); }, 300); }, 3800);
   }
 
   var compagnon = document.querySelector('[data-compagnon]');
   if (compagnon) {
     var nom = compagnon.dataset.nom, bulle = document.querySelector('.af-bulle');
     var phrases = [
-      'Hé, ça chatouille !',
-      nom + ' a vérifié : ta prochaine séance t’attend.',
-      'Une présence par jour éloigne les rattrapages.',
-      'Astuce : un justificatif déposé tôt est validé plus vite.',
-      'Je fais la sieste entre deux cours. Toi, non !',
-      'On vise le badge suivant ensemble ?',
-      'Tu savais ? Le retard compte 5 points, la présence 10.',
-      'Bip boup… ' + nom + ' t’aime bien.'
+      // la page dit sa langue (<html lang>) : le compagnon parle la meme
+      en ? 'Hey, that tickles!' : 'Hé, ça chatouille !',
+      en ? nom + ' checked: your next class is waiting for you.' : nom + ' a vérifié : ta prochaine séance t’attend.',
+      en ? 'One class a day keeps the catch-up away.' : 'Une présence par jour éloigne les rattrapages.',
+      en ? 'Tip: a note uploaded early gets reviewed faster.' : 'Astuce : un justificatif déposé tôt est validé plus vite.',
+      en ? 'I nap between classes. You don’t!' : 'Je fais la sieste entre deux cours. Toi, non !',
+      en ? 'Shall we go for the next badge together?' : 'On vise le badge suivant ensemble ?',
+      en ? 'Did you know? Late counts 5 points, present 10.' : 'Tu savais ? Le retard compte 5 points, la présence 10.',
+      en ? 'Beep boop… ' + nom + ' likes you.' : 'Bip boup… ' + nom + ' t’aime bien.'
     ];
     var i = 0;
     compagnon.addEventListener('click', function () {
       var img = compagnon.querySelector('img');
       if (window.gsap && !calme) {
-        gsap.timeline().to(img, { y: -22, scaleX: .92, scaleY: 1.08, duration: .22, ease: 'power2.out' })
-          .to(img, { y: 0, scaleX: 1.08, scaleY: .92, duration: .18, ease: 'power2.in' })
-          .to(img, { scaleX: 1, scaleY: 1, duration: .5, ease: 'elastic.out(1, .4)' });
+        gsap.killTweensOf(compagnon);
+        gsap.timeline().set(compagnon, { transformOrigin: '50% 100%' })
+          .to(compagnon, { y: -22, scaleX: .92, scaleY: 1.08, duration: .22, ease: 'power2.out' })
+          .to(compagnon, { y: 0, scaleX: 1.08, scaleY: .92, duration: .18, ease: 'power2.in' })
+          .to(compagnon, { scaleX: 1, scaleY: 1, duration: .5, ease: 'elastic.out(1, .4)' });
       }
       if (bulle) { bulle.textContent = phrases[i++ % phrases.length]; }
       // petits coeurs qui s'envolent
@@ -52,9 +56,9 @@
     var badges = +compagnon.dataset.badges, niveau = +compagnon.dataset.niveau;
     var avantB = lire('af-badges'), avantN = lire('af-niveau');
     if (avantB !== null && badges > +avantB) {
-      setTimeout(function () { confettis(); toast('<i data-lucide="award"></i> Nouveau badge débloqué !'); window.lucide && lucide.createIcons(); }, 900);
+      setTimeout(function () { confettis(); toast('<i data-lucide="award"></i> ' + (en ? 'New badge unlocked!' : 'Nouveau badge débloqué !')); window.lucide && lucide.createIcons(); }, 900);
     } else if (avantN !== null && niveau > +avantN) {
-      setTimeout(function () { confettis({ particleCount: 160 }); toast('<i data-lucide="star"></i> Niveau ' + niveau + ' atteint !'); window.lucide && lucide.createIcons(); }, 900);
+      setTimeout(function () { confettis({ particleCount: 160 }); toast('<i data-lucide="star"></i> ' + (en ? 'Level ' + niveau + ' reached!' : 'Niveau ' + niveau + ' atteint !')); window.lucide && lucide.createIcons(); }, 900);
     }
     ecrire('af-badges', badges); ecrire('af-niveau', niveau);
   }
@@ -73,6 +77,7 @@
     if (pos < code.length) return;
     pos = 0;
     var noms = ['plume', 'tic', 'pousse', 'bulle', 'filou', 'comete'];
+    if (calme) return;
     for (var n = 0; n < 36; n++) {
       var img = document.createElement('img');
       img.src = '/images/mascottes/' + noms[n % 6] + '.svg'; img.alt = ''; img.className = 'af-pluie';

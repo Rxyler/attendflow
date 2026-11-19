@@ -1,5 +1,6 @@
 package com.attendflow.service.impl;
 
+import static com.attendflow.service.Textes.t;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,15 +36,15 @@ public class StockageFichiers {
      */
     public String enregistrer(MultipartFile fichier, Path dossier, Set<String> extensions, String formatsLisibles) {
         if (fichier == null || fichier.isEmpty()) {
-            throw new IllegalArgumentException("Ajoutez un fichier (" + formatsLisibles + ").");
+            throw new IllegalArgumentException(t("Ajoutez un fichier ({0}).", formatsLisibles));
         }
         String ext = extension(fichier.getOriginalFilename());
-        if (!extensions.contains(ext)) throw new IllegalArgumentException("Format accepté : " + formatsLisibles + ".");
+        if (!extensions.contains(ext)) throw new IllegalArgumentException(t("Format accepté : {0}.", formatsLisibles));
         byte[] signature = SIGNATURES.get(TYPES.get(ext));
         try (InputStream in = fichier.getInputStream()) {
             byte[] debut = in.readNBytes(signature.length);
             if (!Arrays.equals(debut, signature)) {
-                throw new IllegalArgumentException("Le contenu du fichier ne correspond pas au format " + ext.toUpperCase() + ".");
+                throw new IllegalArgumentException(t("Le contenu du fichier ne correspond pas au format {0}.", ext.toUpperCase()));
             }
             Files.createDirectories(dossier);
             String nom = UUID.randomUUID() + "." + ext;

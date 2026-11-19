@@ -1,5 +1,7 @@
 package com.attendflow.service.impl;
 
+import com.attendflow.config.LangueConfig;
+import static com.attendflow.service.Textes.t;
 import com.attendflow.service.NotificationService;
 import com.attendflow.model.*;
 import com.attendflow.model.enums.EtatSeance;
@@ -89,14 +91,15 @@ public class PresenceServiceImpl implements PresenceService {
         for (Etudiant etudiant : classe) {
             List<StatutPresence> historique = statutsDe(etudiant);
             if (depassaitAvant.get(etudiant.getId()) || !TauxPresence.seuilDepasse(historique, p)) continue;
-            String detail = "taux de présence " + TauxPresence.taux(historique, p) + " %, "
-                    + TauxPresence.compter(historique, StatutPresence.ABSENT) + " absence(s).";
+            Object taux = TauxPresence.taux(historique, p), nbAbsences = TauxPresence.compter(historique, StatutPresence.ABSENT);
             for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
-                notifications.notifier(new Notification(admin, TypeNotification.AVERTISSEMENT, "Seuil d'absence dépassé",
-                        etudiant.getNomComplet() + " (" + seance.getClasse().getNom() + ") : " + detail));
+                notifications.notifier(new Notification(admin, TypeNotification.AVERTISSEMENT, t(LangueConfig.de(admin), "Seuil d'absence dépassé"),
+                        t(LangueConfig.de(admin), "{0} ({1}) : {2}", etudiant.getNomComplet(), seance.getClasse().getNom(),
+                                t(LangueConfig.de(admin), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences))));
             }
-            notifications.notifier(new Notification(etudiant, TypeNotification.AVERTISSEMENT, "Seuil d'absence dépassé",
-                    "Vous avez dépassé le seuil d'absence autorisé : " + detail));
+            notifications.notifier(new Notification(etudiant, TypeNotification.AVERTISSEMENT, t(LangueConfig.de(etudiant), "Seuil d'absence dépassé"),
+                    t(LangueConfig.de(etudiant), "Vous avez dépassé le seuil d'absence autorisé : {0}",
+                            t(LangueConfig.de(etudiant), "taux de présence {0} %, {1} absence(s).", taux, nbAbsences))));
         }
         return enregistrees;
     }
@@ -125,15 +128,15 @@ public class PresenceServiceImpl implements PresenceService {
     /** null si la saisie est ouverte, sinon la raison du verrouillage. */
     private String raisonVerrou(Utilisateur utilisateur, Seance seance) {
         if (seance.getEtat() == EtatSeance.ANNULEE) {
-            return "Séance annulée dans le planning source : la prise des présences est impossible.";   // RG-10
+            return t("Séance annulée dans le planning source : la prise des présences est impossible.");   // RG-10
         }
         if (utilisateur instanceof Admin) return null;
         LocalDateTime maintenant = LocalDateTime.now();
         if (maintenant.isBefore(seance.getDate().atTime(seance.getHeureDebut()))) {
-            return "La séance n'a pas encore commencé.";   // F-23
+            return t("La séance n'a pas encore commencé.");   // F-23
         }
         if (maintenant.isAfter(limiteModification(seance))) {
-            return "Le délai de modification est dépassé. Contactez l'administration.";   // F-22
+            return t("Le délai de modification est dépassé. Contactez l'administration.");   // F-22
         }
         return null;
     }

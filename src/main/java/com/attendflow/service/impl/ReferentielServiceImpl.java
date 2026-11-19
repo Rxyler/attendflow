@@ -1,5 +1,6 @@
 package com.attendflow.service.impl;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.*;
 import com.attendflow.repository.*;
 import com.attendflow.service.JustificatifService;
@@ -86,17 +87,17 @@ public class ReferentielServiceImpl implements ReferentielService {
         String email = emailValide(f.email(), id);
         String matricule = requis(f.matricule(), "Le matricule", 30);
         if (id == null ? etudiants.existsByMatricule(matricule) : etudiants.existsByMatriculeAndIdNot(matricule, id)) {
-            throw new IllegalArgumentException("Le matricule " + matricule + " existe déjà.");   // RG-06
+            throw new IllegalArgumentException(t("Le matricule {0} existe déjà.", matricule));   // RG-06
         }
         if (f.dateNaissance() != null && f.dateNaissance().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La date de naissance ne peut pas être dans le futur.");
+            throw new IllegalArgumentException(t("La date de naissance ne peut pas être dans le futur."));
         }
         Classe classe = f.classeId() == null ? null : classes.findById(f.classeId()).orElse(null);
-        if (classe == null) throw new IllegalArgumentException("Choisissez une classe.");
+        if (classe == null) throw new IllegalArgumentException(t("Choisissez une classe."));
 
         Etudiant e = id == null
                 ? new Etudiant(null, null, email, motDePasseAleatoire(), matricule, classe)
-                : etudiants.findById(id).orElseThrow(() -> new IllegalArgumentException("Étudiant introuvable."));
+                : etudiants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Étudiant introuvable.")));
         e.setNom(requis(f.nom(), "Le nom", 80));
         e.setPrenom(requis(f.prenom(), "Le prénom", 80));
         e.setEmail(email);
@@ -105,7 +106,7 @@ public class ReferentielServiceImpl implements ReferentielService {
         e.setDateNaissance(f.dateNaissance());
         e.setClasse(classe);
         if (photo != null && !photo.isEmpty()) {
-            String nom = stockage.enregistrer(photo, dossierPhotos, FORMATS_PHOTO, "PNG ou JPG");
+            String nom = stockage.enregistrer(photo, dossierPhotos, FORMATS_PHOTO, t("PNG ou JPG"));
             stockage.supprimer(dossierPhotos, e.getPhoto());
             e.setPhoto(nom);
         }
@@ -114,10 +115,9 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public void supprimerEtudiant(Long id) {
-        Etudiant e = etudiants.findById(id).orElseThrow(() -> new IllegalArgumentException("Étudiant introuvable."));
+        Etudiant e = etudiants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Étudiant introuvable.")));
         if (presences.existsByEtudiant(e)) {
-            throw new IllegalStateException(e.getNomComplet()
-                    + " a déjà des présences enregistrées : la suppression effacerait son historique.");
+            throw new IllegalStateException(t("{0} a déjà des présences enregistrées : la suppression effacerait son historique.", e.getNomComplet()));
         }
         supprimerCompte(e);
         stockage.supprimer(dossierPhotos, e.getPhoto());
@@ -126,16 +126,16 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public ResultatImport importerEtudiants(MultipartFile fichier) {
-        if (fichier == null || fichier.isEmpty()) throw new IllegalArgumentException("Choisissez un fichier CSV ou Excel.");
+        if (fichier == null || fichier.isEmpty()) throw new IllegalArgumentException(t("Choisissez un fichier CSV ou Excel."));
         String nom = Objects.requireNonNullElse(fichier.getOriginalFilename(), "").toLowerCase(Locale.ROOT);
         List<List<String>> lignes = nom.endsWith(".xlsx") ? lireExcel(fichier) : lireCsv(fichier);
-        if (lignes.isEmpty()) throw new IllegalArgumentException("Le fichier est vide.");
+        if (lignes.isEmpty()) throw new IllegalArgumentException(t("Le fichier est vide."));
 
         List<String> colonnes = lignes.getFirst().stream()
                 .map(c -> c.replace("﻿", "").trim().toLowerCase(Locale.ROOT).replace("é", "e").replace(" ", "_")).toList();
         for (String obligatoire : List.of("nom", "prenom", "email", "matricule", "classe")) {
             if (!colonnes.contains(obligatoire)) {
-                throw new IllegalArgumentException("Colonne « " + obligatoire + " » absente de l'en-tête.");
+                throw new IllegalArgumentException(t("Colonne « {0} » absente de l'en-tête.", obligatoire));
             }
         }
 
@@ -148,12 +148,12 @@ public class ReferentielServiceImpl implements ReferentielService {
             for (int c = 0; c < colonnes.size() && c < valeurs.size(); c++) v.put(colonnes.get(c), valeurs.get(c).trim());
             try {
                 Classe classe = classes.findByNom(v.get("classe"))
-                        .orElseThrow(() -> new IllegalArgumentException("classe « " + v.get("classe") + " » inconnue"));
+                        .orElseThrow(() -> new IllegalArgumentException(t("classe « {0} » inconnue", v.get("classe"))));
                 enregistrerEtudiant(null, new EtudiantForm(v.get("nom"), v.get("prenom"), v.get("email"),
                         v.get("telephone"), v.get("matricule"), date(v.get("date_naissance")), classe.getId()), null);
                 crees++;
             } catch (IllegalArgumentException ex) {
-                erreurs.add("Ligne " + (i + 1) + " : " + ex.getMessage());
+                erreurs.add(t("Ligne {0} : {1}", i + 1, ex.getMessage()));
             }
         }
         return new ResultatImport(crees, erreurs);
@@ -187,7 +187,7 @@ public class ReferentielServiceImpl implements ReferentielService {
             }
             return lignes;
         } catch (IOException | RuntimeException e) {
-            throw new IllegalArgumentException("Fichier Excel illisible (.xlsx attendu).");
+            throw new IllegalArgumentException(t("Fichier Excel illisible (.xlsx attendu)."));
         }
     }
 
@@ -218,14 +218,14 @@ public class ReferentielServiceImpl implements ReferentielService {
     public Classe enregistrerClasse(Long id, ClasseForm f) {
         String nom = requis(f.nom(), "Le nom", 80);
         if (id == null ? classes.findByNom(nom).isPresent() : classes.existsByNomAndIdNot(nom, id)) {
-            throw new IllegalArgumentException("La classe " + nom + " existe déjà.");
+            throw new IllegalArgumentException(t("La classe {0} existe déjà.", nom));
         }
         String annee = optionnel(f.anneeUniversitaire(), 9);
         if (annee != null && !annee.matches("\\d{4}-\\d{4}")) {
-            throw new IllegalArgumentException("Année universitaire au format 2026-2027.");
+            throw new IllegalArgumentException(t("Année universitaire au format 2026-2027."));
         }
         Classe c = id == null ? new Classe()
-                : classes.findById(id).orElseThrow(() -> new IllegalArgumentException("Classe introuvable."));
+                : classes.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Classe introuvable.")));
         c.setNom(nom);
         c.setNiveau(optionnel(f.niveau(), 50));
         c.setResponsable(optionnel(f.responsable(), 120));
@@ -235,9 +235,9 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public void supprimerClasse(Long id) {
-        Classe c = classes.findById(id).orElseThrow(() -> new IllegalArgumentException("Classe introuvable."));
-        if (etudiants.existsByClasse(c)) throw new IllegalStateException("La classe " + c.getNom() + " contient des étudiants.");
-        if (seances.existsByClasse(c)) throw new IllegalStateException("La classe " + c.getNom() + " a des séances dans l'emploi du temps.");
+        Classe c = classes.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Classe introuvable.")));
+        if (etudiants.existsByClasse(c)) throw new IllegalStateException(t("La classe {0} contient des étudiants.", c.getNom()));
+        if (seances.existsByClasse(c)) throw new IllegalStateException(t("La classe {0} a des séances dans l'emploi du temps.", c.getNom()));
         classes.delete(c);
     }
 
@@ -253,13 +253,13 @@ public class ReferentielServiceImpl implements ReferentielService {
     public Matiere enregistrerMatiere(Long id, MatiereForm f) {
         String code = requis(f.code(), "Le code", 20).toUpperCase(Locale.ROOT);
         if (id == null ? matieres.findByCode(code).isPresent() : matieres.existsByCodeAndIdNot(code, id)) {
-            throw new IllegalArgumentException("Le code " + code + " existe déjà.");
+            throw new IllegalArgumentException(t("Le code {0} existe déjà.", code));
         }
         if (f.coefficient() != null && f.coefficient() <= 0) {
-            throw new IllegalArgumentException("Le coefficient doit être positif.");
+            throw new IllegalArgumentException(t("Le coefficient doit être positif."));
         }
         Matiere m = id == null ? new Matiere()
-                : matieres.findById(id).orElseThrow(() -> new IllegalArgumentException("Matière introuvable."));
+                : matieres.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Matière introuvable.")));
         m.setIntitule(requis(f.intitule(), "L'intitulé", 120));
         m.setCode(code);
         m.setCoefficient(f.coefficient());
@@ -268,8 +268,8 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public void supprimerMatiere(Long id) {
-        Matiere m = matieres.findById(id).orElseThrow(() -> new IllegalArgumentException("Matière introuvable."));
-        if (seances.existsByMatiere(m)) throw new IllegalStateException("La matière " + m.getIntitule() + " a des séances.");
+        Matiere m = matieres.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Matière introuvable.")));
+        if (seances.existsByMatiere(m)) throw new IllegalStateException(t("La matière {0} a des séances.", m.getIntitule()));
         m.getEnseignants().forEach(e -> e.getMatieres().remove(m));   // l'enseignant porte l'association
         matieres.delete(m);
     }
@@ -287,11 +287,11 @@ public class ReferentielServiceImpl implements ReferentielService {
         String email = emailValide(f.email(), id);
         List<Matiere> choisies = f.matiereIds() == null ? List.of() : matieres.findAllById(f.matiereIds());
         if (choisies.isEmpty()) {
-            throw new IllegalArgumentException("Affectez au moins une matière.");   // Enseignant "0..*" -- "1..*" Matiere
+            throw new IllegalArgumentException(t("Affectez au moins une matière."));   // Enseignant "0..*" -- "1..*" Matiere
         }
         Enseignant e = id == null
                 ? new Enseignant(null, null, email, motDePasseAleatoire(), null)
-                : enseignants.findById(id).orElseThrow(() -> new IllegalArgumentException("Enseignant introuvable."));
+                : enseignants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Enseignant introuvable.")));
         e.setNom(requis(f.nom(), "Le nom", 80));
         e.setPrenom(requis(f.prenom(), "Le prénom", 80));
         e.setEmail(email);
@@ -304,9 +304,9 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public void supprimerEnseignant(Long id) {
-        Enseignant e = enseignants.findById(id).orElseThrow(() -> new IllegalArgumentException("Enseignant introuvable."));
+        Enseignant e = enseignants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Enseignant introuvable.")));
         if (seances.existsByEnseignant(e)) {
-            throw new IllegalStateException(e.getNomComplet() + " a des séances dans l'emploi du temps.");
+            throw new IllegalStateException(t("{0} a des séances dans l'emploi du temps.", e.getNomComplet()));
         }
         supprimerCompte(e);
         enseignants.delete(e);
@@ -326,22 +326,22 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     private String emailValide(String email, Long id) {
         String e = requis(email, "L'email", 150).toLowerCase(Locale.ROOT);
-        if (!EMAIL.matcher(e).matches()) throw new IllegalArgumentException("Email invalide : " + e);
+        if (!EMAIL.matcher(e).matches()) throw new IllegalArgumentException(t("Email invalide : {0}", e));
         if (id == null ? utilisateurs.existsByEmail(e) : utilisateurs.existsByEmailAndIdNot(e, id)) {
-            throw new IllegalArgumentException("L'email " + e + " est déjà utilisé.");   // RG-06
+            throw new IllegalArgumentException(t("L'email {0} est déjà utilisé.", e));   // RG-06
         }
         return e;
     }
 
     private static String requis(String valeur, String champ, int max) {
-        if (valeur == null || valeur.isBlank()) throw new IllegalArgumentException(champ + " est obligatoire.");
-        if (valeur.trim().length() > max) throw new IllegalArgumentException(champ + " dépasse " + max + " caractères.");
+        if (valeur == null || valeur.isBlank()) throw new IllegalArgumentException(t("{0} est obligatoire.", t(champ)));
+        if (valeur.trim().length() > max) throw new IllegalArgumentException(t("{0} dépasse {1} caractères.", t(champ), max));
         return valeur.trim();
     }
 
     private static String optionnel(String valeur, int max) {
         if (valeur == null || valeur.isBlank()) return null;
-        if (valeur.trim().length() > max) throw new IllegalArgumentException("Une valeur dépasse " + max + " caractères.");
+        if (valeur.trim().length() > max) throw new IllegalArgumentException(t("Une valeur dépasse {0} caractères.", max));
         return valeur.trim();
     }
 
@@ -354,6 +354,6 @@ public class ReferentielServiceImpl implements ReferentielService {
                 // essaie le format suivant
             }
         }
-        throw new IllegalArgumentException("date « " + texte + " » invalide (AAAA-MM-JJ ou JJ/MM/AAAA)");
+        throw new IllegalArgumentException(t("date « {0} » invalide (AAAA-MM-JJ ou JJ/MM/AAAA)", texte));
     }
 }

@@ -1,5 +1,7 @@
 package com.attendflow.service.impl;
 
+import com.attendflow.config.LangueConfig;
+import static com.attendflow.service.Textes.t;
 import com.attendflow.service.NotificationService;
 import com.attendflow.integration.EmploiDuTempsProvider;
 import com.attendflow.integration.SeanceExterne;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -66,22 +69,21 @@ public class SynchronisationServiceImpl implements SynchronisationService {
             recues = source.recupererSeances();
         } catch (RuntimeException e) {
             journal.setStatut(StatutSynchronisation.ECHEC);
-            journal.setMessage(tronquer("Projet partenaire injoignable : " + e.getMessage()));
+            journal.setMessage(tronquer(t("Projet partenaire injoignable : {0}", e.getMessage())));
             return journaux.save(journal);
         }
 
         int ajoutees = 0, modifiees = 0, annulees = 0;
         List<String> erreurs = new ArrayList<>();
-        List<String> alertes = new ArrayList<>();
+        List<String[]> alertes = new ArrayList<>();   // {modele, valeur}
 
         for (SeanceExterne s : recues) {
             Classe classe = classes.findByNom(s.classe()).orElse(null);
             Matiere matiere = matieres.findByCode(s.codeMatiere()).orElse(null);
             Enseignant enseignant = enseignants.findByEmail(s.emailEnseignant()).orElse(null);
             if (classe == null || matiere == null || enseignant == null) {
-                erreurs.add(s.idExterne() + " (" + (classe == null ? "classe " + s.classe()
-                        : matiere == null ? "matière " + s.codeMatiere() : "enseignant " + s.emailEnseignant())
-                        + " inconnu)");
+                erreurs.add(s.idExterne() + " (" + (classe == null ? t("classe {0} inconnu)", s.classe())
+                        : matiere == null ? t("matière {0} inconnu)", s.codeMatiere()) : t("enseignant {0} inconnu)", s.emailEnseignant())));
                 continue;
             }
             Salle salle = salles.findByNom(s.salle()).orElseGet(() -> salles.save(new Salle(s.salle(), null)));
@@ -101,7 +103,7 @@ public class SynchronisationServiceImpl implements SynchronisationService {
                 if (seance.getEtat() != EtatSeance.ANNULEE) {
                     seance.setEtat(EtatSeance.ANNULEE);
                     annulees++;
-                    if (!seance.getPresences().isEmpty()) alertes.add("annulée : " + decrire(seance));
+                    if (!seance.getPresences().isEmpty()) alertes.add(new String[] {"annulée : {0}", decrire(seance)});
                 }
             } else if (seance.getEtat() == EtatSeance.ANNULEE || aChange(seance, s, classe, matiere, salle, enseignant)) {
                 seance.setDate(s.date());
@@ -113,7 +115,7 @@ public class SynchronisationServiceImpl implements SynchronisationService {
                 seance.setEnseignant(enseignant);
                 seance.setEtat(EtatSeance.MODIFIEE);
                 modifiees++;
-                if (!seance.getPresences().isEmpty()) alertes.add("modifiée : " + decrire(seance));
+                if (!seance.getPresences().isEmpty()) alertes.add(new String[] {"modifiée : {0}", decrire(seance)});
             }
             seance.setDateSynchro(maintenant);
         }
@@ -125,15 +127,17 @@ public class SynchronisationServiceImpl implements SynchronisationService {
                 : erreurs.size() == recues.size() ? StatutSynchronisation.ECHEC
                 : StatutSynchronisation.PARTIEL);
         journal.setMessage(tronquer(erreurs.isEmpty()
-                ? recues.size() + " séance(s) lue(s)."
-                : erreurs.size() + " séance(s) ignorée(s) : " + String.join(", ", erreurs)));
+                ? t("{0} séance(s) lue(s).", recues.size())
+                : t("{0} séance(s) ignorée(s) : {1}", erreurs.size(), String.join(", ", erreurs))));
 
         // F-16a / RG-10 : les presences deja saisies sont conservees et l'administrateur est alerte.
-        for (String alerte : alertes) {
+        // chaque alerte garde son modele et sa valeur : elle est redigee dans la langue de chaque administrateur
+        for (String[] alerte : alertes) {
             for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
+                Locale langue = LangueConfig.de(admin);
                 notifications.notifier(new Notification(admin, TypeNotification.AVERTISSEMENT,
-                        "Séance changée dans le planning source",
-                        "Séance " + alerte + ". Les présences déjà saisies sont conservées."));
+                        t(langue, "Séance changée dans le planning source"),
+                        t(langue, "Séance {0}. Les présences déjà saisies sont conservées.", t(langue, alerte[0], alerte[1]))));
             }
         }
         return journaux.save(journal);

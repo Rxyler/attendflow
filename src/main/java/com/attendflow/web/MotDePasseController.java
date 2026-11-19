@@ -1,5 +1,6 @@
 package com.attendflow.web;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.service.MotDePasseService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -47,7 +48,7 @@ public class MotDePasseController {
         model.addAttribute("token", token);
         model.addAttribute("lienValide", true);
         if (!motDePasse.equals(confirmation)) {
-            model.addAttribute("erreur", "Les deux mots de passe ne correspondent pas.");
+            model.addAttribute("erreur", t("Les deux mots de passe ne correspondent pas."));
             return "reinitialiser";
         }
         try {

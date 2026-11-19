@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 
 <!-- En-tete commun : polices, Bootstrap 5, theme, mouvement (GSAP + Lenis), icones (Lucide) -->
 <head th:fragment="head(titre)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#070b16">
+  <meta name="description" th:content="#{meta.description}">
+  <meta name="theme-color" content="#08121c">
   <title th:text="${titre} + ' · Fas3a'">Fas3a</title>
   <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://unpkg.com/lenis@1.1.13/dist/lenis.css" rel="stylesheet">
   <link th:href="@{/css/attendflow.css}" rel="stylesheet">
@@ -18,6 +19,14 @@
   <script>
     var t = 'dark'; try { t = localStorage.getItem('af-theme') || 'dark'; } catch (e) {}
     document.documentElement.setAttribute('data-bs-theme', t);
+    document.documentElement.classList.add('af-fond-attente');
+    // ?lang=en a deja ete pris en compte par le serveur : on le retire de l'adresse affichee
+    if (/[?&]lang=/.test(location.search) && history.replaceState) { var u = new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null, '', u); }
+    // une navigation rapide interrompt la transition entre pages : ce n'est pas une erreur
+    addEventListener('pagereveal', function (e) { var v = e.viewTransition; if (v) { v.ready.catch(function () {}); v.finished.catch(function () {}); } });
+    // avant le premier rendu : rideau deja vu dans la session, pause choisie par l'utilisateur
+    try { if (sessionStorage.getItem('af-charge')) document.documentElement.classList.add('af-deja');
+          if (localStorage.getItem('af-calme') === '1') document.documentElement.classList.add('af-calme'); } catch (e) {}
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.documentElement.classList.add('af-prep');
       setTimeout(function () { document.documentElement.classList.remove('af-prep'); }, 1500);
@@ -43,7 +52,12 @@
 
 <!-- Interrupteur clair / sombre -->
 <th:block th:fragment="theme">
-  <button type="button" class="af-theme" aria-label="Changer de thème" title="Thème clair / sombre">
+  <button type="button" class="af-theme af-langue" th:attr="data-lang=#{langue.autre},aria-label=#{langue.basculer},title=#{langue.basculer}" th:text="#{langue.autreCode}">EN</button>
+  <button type="button" class="af-theme af-pause" aria-pressed="false" th:attr="aria-label=#{bouton.pause},title=#{bouton.pause}">
+    <i data-lucide="pause" class="af-pause-off" aria-hidden="true"></i>
+    <i data-lucide="play" class="af-pause-on" aria-hidden="true"></i>
+  </button>
+  <button type="button" class="af-theme" th:attr="aria-label=#{bouton.theme},title=#{bouton.themeTitre}">
     <i data-lucide="sun" class="af-soleil" aria-hidden="true"></i>
     <i data-lucide="moon" class="af-lune" aria-hidden="true"></i>
   </button>
@@ -51,72 +65,72 @@
 
 <!-- Barre laterale commune -->
 <nav th:fragment="sidebar(utilisateur, actif)" class="af-sidebar d-flex flex-column px-3 py-3 flex-shrink-0"
-     aria-label="Navigation principale"
+     th:attr="aria-label=#{nav.principale}"
      th:with="role=${utilisateur.role.name()}">
-  <a href="#contenu" class="visually-hidden-focusable btn btn-light btn-sm mb-2">Aller au contenu</a>
+  <a href="#contenu" class="visually-hidden-focusable btn btn-light btn-sm mb-2" th:text="#{commun.allerContenu}">Aller au contenu</a>
 
   <a th:href="@{/}" class="af-tete d-flex align-items-center gap-2 px-2 mb-2 text-decoration-none">
     <span class="af-logo" aria-hidden="true"></span>
     <span class="d-flex flex-column">
       <span class="af-marque fw-semibold lh-sm">Fas3a</span>
       <span class="af-espace"
-            th:text="${role == 'ADMIN'} ? 'Administration' : (${role == 'ENSEIGNANT'} ? 'Espace enseignant' : 'Espace étudiant')">Espace</span>
+            th:text="${role == 'ADMIN'} ? #{espace.admin} : (${role == 'ENSEIGNANT'} ? #{espace.enseignant} : #{espace.etudiant})">Espace</span>
     </span>
   </a>
 
   <div class="af-navs">
-  <div class="af-section">Général</div>
+  <div class="af-section" th:text="#{nav.general}">Général</div>
   <ul class="nav flex-column gap-1">
     <li class="nav-item">
       <a th:href="@{/}" class="nav-link" th:classappend="${actif == 'accueil'} ? 'active'"
          th:attr="aria-current=${actif == 'accueil'} ? 'page' : null">
-        <i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Tableau de bord</span></a>
+        <i data-lucide="layout-dashboard" aria-hidden="true"></i><span th:text="#{nav.tableau}">Tableau de bord</span></a>
     </li>
     <li class="nav-item">
       <a th:href="@{/emploi-du-temps}" class="nav-link" th:classappend="${actif == 'emploi-du-temps'} ? 'active'"
          th:attr="aria-current=${actif == 'emploi-du-temps'} ? 'page' : null">
-        <i data-lucide="calendar-days" aria-hidden="true"></i><span>Emploi du temps</span></a>
+        <i data-lucide="calendar-days" aria-hidden="true"></i><span th:text="#{nav.edt}">Emploi du temps</span></a>
     </li>
     <li class="nav-item" th:if="${role != 'ETUDIANT'}">
       <a th:href="@{/rapports}" class="nav-link" th:classappend="${actif == 'rapports'} ? 'active'"
          th:attr="aria-current=${actif == 'rapports'} ? 'page' : null">
         <i data-lucide="chart-column" aria-hidden="true"></i>
-        <span th:text="${role == 'ADMIN'} ? 'Rapports' : 'Mes statistiques'">Rapports</span></a>
+        <span th:text="${role == 'ADMIN'} ? #{nav.rapports} : #{nav.statistiques}">Rapports</span></a>
     </li>
     <li class="nav-item" th:if="${role == 'ETUDIANT'}">
       <a th:href="@{/etudiant/historique}" class="nav-link" th:classappend="${actif == 'historique'} ? 'active'"
          th:attr="aria-current=${actif == 'historique'} ? 'page' : null">
-        <i data-lucide="history" aria-hidden="true"></i><span>Mon historique</span></a>
+        <i data-lucide="history" aria-hidden="true"></i><span th:text="#{nav.historique}">Mon historique</span></a>
     </li>
     <li class="nav-item" th:if="${role != 'ENSEIGNANT'}">
       <a th:href="${role == 'ADMIN'} ? @{/admin/justificatifs} : @{/etudiant/justificatifs}" class="nav-link"
          th:classappend="${actif == 'justificatifs'} ? 'active'"
          th:attr="aria-current=${actif == 'justificatifs'} ? 'page' : null">
         <i data-lucide="file-check" aria-hidden="true"></i>
-        <span th:text="${role == 'ADMIN'} ? 'Justificatifs' : 'Mes justificatifs'">Justificatifs</span></a>
+        <span th:text="${role == 'ADMIN'} ? #{nav.justificatifs} : #{nav.mesJustificatifs}">Justificatifs</span></a>
     </li>
     <li class="nav-item">
       <a th:href="@{/notifications}" class="nav-link" th:classappend="${actif == 'notifications'} ? 'active'"
          th:attr="aria-current=${actif == 'notifications'} ? 'page' : null">
-        <i data-lucide="bell" aria-hidden="true"></i><span>Notifications</span>
+        <i data-lucide="bell" aria-hidden="true"></i><span th:text="#{nav.notifications}">Notifications</span>
         <span th:if="${nbNonLues != null and nbNonLues > 0}" class="badge text-bg-danger"
-              th:text="${nbNonLues}" th:attr="aria-label=${nbNonLues} + ' non lue(s)'">2</span>
+              th:text="${nbNonLues}" th:attr="aria-label=#{nav.nonLues(${nbNonLues})}">2</span>
       </a>
     </li>
     <li class="nav-item">
       <a th:href="@{/profil}" class="nav-link" th:classappend="${actif == 'profil'} ? 'active'"
          th:attr="aria-current=${actif == 'profil'} ? 'page' : null">
-        <i data-lucide="smile" aria-hidden="true"></i><span>Mon profil</span></a>
+        <i data-lucide="smile" aria-hidden="true"></i><span th:text="#{nav.profil}">Mon profil</span></a>
     </li>
   </ul>
 
   <th:block th:if="${role == 'ADMIN'}">
-    <div class="af-section">Administration</div>
+    <div class="af-section" th:text="#{nav.administration}">Administration</div>
     <ul class="nav flex-column gap-1">
-      <li class="nav-item" th:each="lien : ${ {{'etudiants','Étudiants','graduation-cap'},{'classes','Classes','users'},{'matieres','Matières','book-open'},{'enseignants','Enseignants','user-round'},{'synchronisation','Synchronisation','refresh-cw'},{'parametres','Paramètres','sliders-horizontal'}} }">
+      <li class="nav-item" th:each="lien : ${ {{'etudiants','nav.etudiants','graduation-cap'},{'classes','nav.classes','users'},{'matieres','nav.matieres','book-open'},{'enseignants','nav.enseignants','user-round'},{'synchronisation','nav.synchronisation','refresh-cw'},{'parametres','nav.parametres','sliders-horizontal'}} }">
         <a th:href="@{/admin/{p}(p=${lien[0]})}" class="nav-link" th:classappend="${actif == lien[0]} ? 'active'"
            th:attr="aria-current=${actif == lien[0]} ? 'page' : null">
-          <i th:attr="data-lucide=${lien[2]}" aria-hidden="true"></i><span th:text="${lien[1]}">Lien</span></a>
+          <i th:attr="data-lucide=${lien[2]}" aria-hidden="true"></i><span th:text="#{__${lien[1]}__}">Lien</span></a>
       </li>
     </ul>
   </th:block>
@@ -124,7 +138,7 @@
 
   <div class="mt-auto pt-3">
     <div class="af-compte">
-      <a th:href="@{/profil}" class="af-avatar" title="Mon profil" aria-label="Mon profil">
+      <a th:href="@{/profil}" class="af-avatar" th:attr="title=#{nav.profil},aria-label=#{nav.profil}">
         <img th:if="${utilisateur.mascotte}" th:src="@{${utilisateur.mascotte.image}}" alt="">
         <th:block th:unless="${utilisateur.mascotte}"
                   th:text="${#strings.toUpperCase(#strings.substring(utilisateur.prenom, 0, 1) + #strings.substring(utilisateur.nom, 0, 1))}">SA</th:block></a>
@@ -134,7 +148,7 @@
       </span>
       <button th:replace="~{fragments/layout :: theme}"></button>
       <form th:action="@{/logout}" method="post" class="m-0">
-        <button type="submit" class="af-deconnexion" title="Déconnexion" aria-label="Déconnexion">
+        <button type="submit" class="af-deconnexion" th:attr="title=#{compte.deconnexion},aria-label=#{compte.deconnexion}">
           <i data-lucide="log-out" aria-hidden="true"></i>
         </button>
       </form>
@@ -143,19 +157,19 @@
 </nav>
 
 <!-- Carte statistique : icone et teinte deduites du libelle ; la valeur s'anime si elle est numerique -->
-<div th:fragment="carte(libelle, valeur, detail)" class="af-glass af-stat h-100" data-tilt="6"
+<div th:fragment="carte(libelle, valeur, detail)" class="af-glass af-stat h-100"
      th:with="l=${#strings.toLowerCase(libelle)},
-              icone=${#strings.contains(l, 'taux')} ? 'percent' :
+              icone=${#strings.contains(l, 'taux') or #strings.contains(l, 'rate')} ? 'percent' :
                     (${#strings.contains(l, 'absence')} ? 'user-x' :
-                    (${#strings.contains(l, 'retard')} ? 'clock' :
-                    (${#strings.contains(l, 'justifi')} ? 'file-check' :
-                    (${#strings.contains(l, 'présen')} ? 'user-check' :
-                    (${#strings.contains(l, 'séance')} ? 'calendar-check' :
-                    (${#strings.contains(l, 'étudiant')} ? 'graduation-cap' : 'activity')))))),
-              ton=${#strings.contains(l, 'taux')} ? 'bleu' :
+                    (${#strings.contains(l, 'retard') or #strings.contains(l, 'late')} ? 'clock' :
+                    (${#strings.contains(l, 'justifi') or #strings.contains(l, 'excus')} ? 'file-check' :
+                    (${#strings.contains(l, 'présen') or #strings.contains(l, 'present')} ? 'user-check' :
+                    (${#strings.contains(l, 'séance') or #strings.contains(l, 'session')} ? 'calendar-check' :
+                    (${#strings.contains(l, 'étudiant') or #strings.contains(l, 'student')} ? 'graduation-cap' : 'activity')))))),
+              ton=${#strings.contains(l, 'taux') or #strings.contains(l, 'rate')} ? 'bleu' :
                     (${#strings.contains(l, 'absence')} ? 'rouge' :
-                    (${#strings.contains(l, 'retard')} ? 'orange' :
-                    (${#strings.contains(l, 'présen')} ? 'vert' : 'neutre')))"
+                    (${#strings.contains(l, 'retard') or #strings.contains(l, 'late')} ? 'orange' :
+                    (${#strings.contains(l, 'présen') or #strings.contains(l, 'present')} ? 'vert' : 'neutre')))"
      th:attr="data-ton=${ton}">
   <div class="af-stat-tete">
     <p class="af-stat-libelle" th:text="${libelle}">Libellé</p>
@@ -169,7 +183,8 @@
 <section th:fragment="graphique(titre, sousTitre)" class="af-glass p-4 h-100" aria-labelledby="g7-titre">
   <h2 id="g7-titre" class="h6 mb-1" th:text="${titre}">Taux de présence</h2>
   <p class="small text-secondary mb-3" th:text="${sousTitre}">détail</p>
-  <canvas id="graphique-7j" height="160" role="img" th:attr="aria-label=${titre}"></canvas>
+  <p th:if="${tauxGraphique != null and #lists.isEmpty(tauxGraphique.?[#this != null])}" class="text-secondary mb-0 af-graphique-vide" th:text="#{graphique.vide}">Aucun appel saisi ces 7 derniers jours.</p>
+  <canvas id="graphique-7j" height="160" role="img" th:attr="aria-label=${titre}" th:hidden="${tauxGraphique != null and #lists.isEmpty(tauxGraphique.?[#this != null])}"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script th:src="@{/js/graphiques.js}"></script>
   <script th:inline="javascript">
@@ -177,9 +192,9 @@
       type: 'line',
       data: {
         labels: /*[[${joursGraphique}]]*/ [],
-        datasets: [{ label: 'Taux', data: /*[[${tauxGraphique}]]*/ [], borderColor: '#818cf8', borderWidth: 2,
-          backgroundColor: 'rgba(129, 140, 248, 0.16)', fill: true, tension: 0.3, spanGaps: false,
-          pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#0b1222', pointBorderWidth: 2 }]
+        datasets: [{ label: /*[[#{graphique.taux}]]*/ 'Taux', data: /*[[${tauxGraphique}]]*/ [], borderColor: '#2bc4b4', borderWidth: 2,
+          backgroundColor: 'rgba(43, 196, 180, 0.16)', fill: true, tension: 0.3, spanGaps: false,
+          pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#0a1824', pointBorderWidth: 2 }]
       },
       options: { scales: { y: { min: 0, max: 100, ticks: { callback: v => v + ' %' } } },
                  plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' %' } } } }

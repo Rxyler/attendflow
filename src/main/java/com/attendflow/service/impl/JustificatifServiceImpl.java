@@ -1,5 +1,7 @@
 package com.attendflow.service.impl;
 
+import com.attendflow.config.LangueConfig;
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.*;
 import com.attendflow.model.enums.EtatJustificatif;
 import com.attendflow.model.enums.Role;
@@ -50,19 +52,19 @@ public class JustificatifServiceImpl implements JustificatifService {
     public Justificatif deposer(Etudiant etudiant, Long presenceId, String motif, MultipartFile fichier) {
         Presence presence = presences.findById(presenceId)
                 .filter(p -> p.getEtudiant().getId().equals(etudiant.getId()))
-                .orElseThrow(() -> new IllegalArgumentException("Absence introuvable."));
+                .orElseThrow(() -> new IllegalArgumentException(t("Absence introuvable.")));
         if (presence.getStatut() != StatutPresence.ABSENT) {
-            throw new IllegalArgumentException("Seule une absence peut être justifiée.");
+            throw new IllegalArgumentException(t("Seule une absence peut être justifiée."));
         }
         if (motif == null || motif.isBlank() || motif.length() > 500) {
-            throw new IllegalArgumentException("Le motif est obligatoire (500 caractères maximum).");
+            throw new IllegalArgumentException(t("Le motif est obligatoire (500 caractères maximum)."));
         }
         Justificatif existant = presence.getJustificatif();
         if (existant != null && existant.getEtat() != EtatJustificatif.REFUSE) {
-            throw new IllegalStateException("Un justificatif est déjà en attente ou accepté pour cette absence.");
+            throw new IllegalStateException(t("Un justificatif est déjà en attente ou accepté pour cette absence."));
         }
 
-        String nomFichier = stockage.enregistrer(fichier, dossier, FORMATS, "PDF, PNG ou JPG");
+        String nomFichier = stockage.enregistrer(fichier, dossier, FORMATS, t("PDF, PNG ou JPG"));
         Justificatif j;
         if (existant != null) {   // remplace un justificatif refuse
             stockage.supprimer(dossier, existant.getFichier());
@@ -78,8 +80,8 @@ public class JustificatifServiceImpl implements JustificatifService {
             presence.setJustificatif(j);
         }
         for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
-            notifications.notifier(new Notification(admin, TypeNotification.INFORMATION, "Nouveau justificatif",
-                    etudiant.getNomComplet() + " a déposé un justificatif en attente de validation."));
+            notifications.notifier(new Notification(admin, TypeNotification.INFORMATION, t(LangueConfig.de(admin), "Nouveau justificatif"),
+                    t(LangueConfig.de(admin), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet())));
         }
         return j;
     }
@@ -105,9 +107,9 @@ public class JustificatifServiceImpl implements JustificatifService {
     @Override
     public void traiter(Admin admin, Long justificatifId, boolean accepte) {
         Justificatif j = justificatifs.findWithPresenceById(justificatifId)
-                .orElseThrow(() -> new IllegalArgumentException("Justificatif introuvable."));
+                .orElseThrow(() -> new IllegalArgumentException(t("Justificatif introuvable.")));
         if (j.getEtat() != EtatJustificatif.EN_ATTENTE) {
-            throw new IllegalStateException("Ce justificatif a déjà été traité.");
+            throw new IllegalStateException(t("Ce justificatif a déjà été traité."));
         }
         j.setEtat(accepte ? EtatJustificatif.ACCEPTE : EtatJustificatif.REFUSE);
         j.setDateTraitement(LocalDateTime.now());
@@ -120,9 +122,9 @@ public class JustificatifServiceImpl implements JustificatifService {
         }
         notifications.notifier(new Notification(presence.getEtudiant(),
                 accepte ? TypeNotification.SUCCES : TypeNotification.AVERTISSEMENT,
-                accepte ? "Justificatif accepté" : "Justificatif refusé",
-                accepte ? "Votre absence est maintenant justifiée."
-                        : "Votre justificatif a été refusé. Vous pouvez en déposer un nouveau."));
+                t(LangueConfig.de(presence.getEtudiant()), accepte ? "Justificatif accepté" : "Justificatif refusé"),
+                t(LangueConfig.de(presence.getEtudiant()), accepte ? "Votre absence est maintenant justifiée."
+                        : "Votre justificatif a été refusé. Vous pouvez en déposer un nouveau.")));
     }
 
     @Override

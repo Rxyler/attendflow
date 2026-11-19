@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Nouveau mot de passe')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.nouveauMotDePasse})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <main id="contenu" class="af-auth">
@@ -8,31 +8,31 @@
   <a th:href="@{/}" class="d-inline-flex align-items-center gap-2 mb-4 text-decoration-none fw-semibold text-white"><span class="af-logo" aria-hidden="true"></span>Fas3a</a>
   <div class="af-glass af-auth-card position-relative">
     <div class="position-absolute" style="top: 1rem; right: 1rem; z-index: 2"><button th:replace="~{fragments/layout :: theme}"></button></div>
-    <h1 class="mb-1">Nouveau mot de passe</h1>
+    <h1 class="mb-1" th:text="#{mdp.nouveauTitre}">Nouveau mot de passe</h1>
 
     <div th:unless="${lienValide}" class="alert alert-danger mt-3" role="alert">
-      Ce lien est invalide ou a expiré.
-      <a th:href="@{/mot-de-passe-oublie}" class="alert-link">Demander un nouveau lien</a>
+      [[#{mdp.lienInvalide}]]
+      <a th:href="@{/mot-de-passe-oublie}" class="alert-link" th:text="#{mdp.nouveauLien}">Demander un nouveau lien</a>
     </div>
 
     <form th:if="${lienValide}" th:action="@{/reinitialiser}" method="post" class="d-grid gap-3 mt-3">
-      <p class="text-secondary mb-0">Au moins 8 caractères.</p>
+      <p class="text-secondary mb-0" th:text="#{mdp.regle}">Au moins 8 caractères.</p>
       <div th:if="${erreur}" class="alert alert-danger py-2 mb-0" role="alert" th:text="${erreur}">Erreur</div>
       <input type="hidden" name="token" th:value="${token}">
       <div>
-        <label for="motDePasse" class="form-label fw-medium">Nouveau mot de passe</label>
+        <label for="motDePasse" class="form-label fw-medium" th:text="#{mdp.nouveau}">Nouveau mot de passe</label>
         <input type="password" id="motDePasse" name="motDePasse" class="form-control"
                minlength="8" autocomplete="new-password" required autofocus>
       </div>
       <div>
-        <label for="confirmation" class="form-label fw-medium">Confirmer le mot de passe</label>
+        <label for="confirmation" class="form-label fw-medium" th:text="#{mdp.confirmer}">Confirmer</label>
         <input type="password" id="confirmation" name="confirmation" class="form-control"
                minlength="8" autocomplete="new-password" required>
       </div>
-      <button type="submit" class="btn btn-af py-2">Enregistrer</button>
+      <button type="submit" class="btn btn-af py-2" th:text="#{commun.enregistrer}">Enregistrer</button>
     </form>
 
-    <a th:href="@{/login}" class="d-block text-center mt-4 small fw-medium text-decoration-none"><i data-lucide="arrow-left" aria-hidden="true" style="width:1rem;height:1rem;vertical-align:-3px"></i> Retour à la connexion</a>
+    <a th:href="@{/login}" class="d-block text-center mt-4 small fw-medium text-decoration-none"><i data-lucide="arrow-left" aria-hidden="true" style="width:1rem;height:1rem;vertical-align:-3px"></i> [[#{commun.retourConnexion}]]</a>
   </div>
 </div>
 </main>

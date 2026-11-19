@@ -1,5 +1,7 @@
 package com.attendflow.service.impl;
 
+import com.attendflow.config.LangueConfig;
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Enseignant;
 import com.attendflow.model.Notification;
 import com.attendflow.model.Presence;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.Locale;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,9 +53,11 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification notifier(Notification n) {
         Notification enregistree = notifications.save(n);
         String a = n.getDestinataire().getEmail();
-        String sujet = "Fas3a - " + n.getTitre();
-        String texte = "Bonjour " + n.getDestinataire().getNomComplet() + ",\n\n" + n.getMessage()
-                + "\n\nVoir vos notifications : " + urlApplication + "/notifications\n\n-- Fas3a";
+        // dans la langue du destinataire (le titre et le message de la notification le sont deja)
+        Locale langue = LangueConfig.de(n.getDestinataire());
+        String sujet = t(langue, "Fas3a - {0}", n.getTitre());
+        String texte = t(langue, "Bonjour {0},\n\n{1}\n\nVoir vos notifications : {2}/notifications\n\n-- Fas3a",
+                n.getDestinataire().getNomComplet(), n.getMessage(), urlApplication);
         // Apres le commit : pas d'email pour une operation annulee (rollback).
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -111,9 +116,9 @@ public class NotificationServiceImpl implements NotificationService {
                 })
                 .toList();
         aVenir.forEach(s -> notifier(new Notification(s.getEnseignant(), TypeNotification.INFORMATION,
-                "Séance dans 15 minutes",
-                "Votre séance de " + s.getMatiere().getIntitule() + " (" + s.getClasse().getNom() + ") commence à "
-                        + s.getHeureDebut() + ", salle " + s.getSalle().getNom() + ".")));
+                t(LangueConfig.de(s.getEnseignant()), "Séance dans 15 minutes"),
+                t(LangueConfig.de(s.getEnseignant()), "Votre séance de {0} ({1}) commence à {2}, salle {3}.",
+                        s.getMatiere().getIntitule(), s.getClasse().getNom(), s.getHeureDebut(), s.getSalle().getNom()))));
         return aVenir.size();
     }
 
@@ -124,8 +129,9 @@ public class NotificationServiceImpl implements NotificationService {
                         Collectors.mapping(Presence::getStatut, Collectors.toList())));
         parEnseignant.forEach((enseignant, statuts) -> {
             long absences = statuts.stream().filter(s -> s == StatutPresence.ABSENT).count();
-            notifier(new Notification(enseignant, TypeNotification.INFORMATION, "Absences du jour",
-                    absences + " absence(s) enregistrée(s) dans vos séances aujourd'hui (" + statuts.size() + " présence(s) saisie(s))."));
+            notifier(new Notification(enseignant, TypeNotification.INFORMATION, t(LangueConfig.de(enseignant), "Absences du jour"),
+                    t(LangueConfig.de(enseignant), "{0} absence(s) enregistrée(s) dans vos séances aujourd'hui ({1} présence(s) saisie(s)).",
+                            absences, statuts.size())));
         });
         return parEnseignant.size();
     }

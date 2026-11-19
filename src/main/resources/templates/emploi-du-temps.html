@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Emploi du temps')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.edt})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -9,7 +9,7 @@
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3">
       <h1 class="h5 fw-bold mb-0"
-          th:text="${admin} ? 'Tous les emplois du temps' : (${classeEtudiant != null} ? 'Emploi du temps — ' + ${classeEtudiant} : 'Mon emploi du temps')">Emploi du temps</h1>
+          th:text="${admin} ? #{edt.tous} : (${classeEtudiant != null} ? #{edt.deClasse(${classeEtudiant})} : #{edt.mien})">Emploi du temps</h1>
     </header>
 
     <main id="contenu" class="p-4 d-grid gap-4">
@@ -17,15 +17,15 @@
       <!-- Navigation semaine (F-13) -->
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <p class="text-secondary mb-0">
-          Semaine du <strong th:text="${#temporals.format(lundi, 'd MMMM')}">21 septembre</strong>
-          au <strong th:text="${#temporals.format(jours[4], 'd MMMM yyyy')}">25 septembre 2026</strong>
+          [[#{edt.semaineDu}]] <strong th:text="${#temporals.format(lundi, 'd MMMM')}">21 septembre</strong>
+          [[#{edt.au}]] <strong th:text="${#temporals.format(jours[4], 'd MMMM yyyy')}">25 septembre 2026</strong>
         </p>
-        <nav class="btn-group" aria-label="Changer de semaine">
-          <a class="btn btn-light border" aria-label="Semaine précédente"
+        <nav class="btn-group" th:attr="aria-label=#{edt.changerSemaine}">
+          <a class="btn btn-light border" th:attr="aria-label=#{edt.precedente}"
              th:href="@{/emploi-du-temps(semaine=${lundi.minusWeeks(1)},classe=${classeFiltre},enseignant=${enseignantFiltre})}">‹</a>
           <a class="btn btn-light border"
-             th:href="@{/emploi-du-temps(classe=${classeFiltre},enseignant=${enseignantFiltre})}">Cette semaine</a>
-          <a class="btn btn-light border" aria-label="Semaine suivante"
+             th:href="@{/emploi-du-temps(classe=${classeFiltre},enseignant=${enseignantFiltre})}" th:text="#{edt.cetteSemaine}">Cette semaine</a>
+          <a class="btn btn-light border" th:attr="aria-label=#{edt.suivante}"
              th:href="@{/emploi-du-temps(semaine=${lundi.plusWeeks(1)},classe=${classeFiltre},enseignant=${enseignantFiltre})}">›</a>
         </nav>
       </div>
@@ -34,33 +34,33 @@
       <form th:if="${admin}" th:action="@{/emploi-du-temps}" method="get" class="af-glass p-3 d-flex flex-wrap gap-3 align-items-end">
         <input type="hidden" name="semaine" th:value="${lundi}">
         <div>
-          <label for="classe" class="form-label small fw-medium mb-1">Classe</label>
+          <label for="classe" class="form-label small fw-medium mb-1" th:text="#{champ.classe}">Classe</label>
           <select id="classe" name="classe" class="form-select">
-            <option value="">Toutes les classes</option>
+            <option value="" th:text="#{champ.toutesClasses}">Toutes les classes</option>
             <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.nom}"
                     th:selected="${c.id == classeFiltre}">Classe</option>
           </select>
         </div>
         <div>
-          <label for="enseignant" class="form-label small fw-medium mb-1">Enseignant</label>
+          <label for="enseignant" class="form-label small fw-medium mb-1" th:text="#{champ.enseignant}">Enseignant</label>
           <select id="enseignant" name="enseignant" class="form-select">
-            <option value="">Tous les enseignants</option>
+            <option value="" th:text="#{champ.tousEnseignants}">Tous les enseignants</option>
             <option th:each="e : ${enseignants}" th:value="${e.id}" th:text="${e.nomComplet}"
                     th:selected="${e.id == enseignantFiltre}">Enseignant</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-af"><i data-lucide="filter" aria-hidden="true"></i>Filtrer</button>
-        <a th:href="@{/emploi-du-temps(semaine=${lundi})}" class="btn btn-link">Réinitialiser</a>
+        <button type="submit" class="btn btn-af"><i data-lucide="filter" aria-hidden="true"></i>[[#{commun.filtrer}]]</button>
+        <a th:href="@{/emploi-du-temps(semaine=${lundi})}" class="btn btn-link" th:text="#{commun.reinitialiser}">Réinitialiser</a>
       </form>
 
       <!-- Grille lundi-vendredi -->
       <div class="af-glass p-0 overflow-auto">
         <table class="table af-edt align-top mb-0">
-          <caption class="px-4">Créneaux de 2 heures, du lundi au vendredi. Cliquez sur une séance pour voir le détail.</caption>
+          <caption class="px-4" th:text="#{edt.legende}">Créneaux</caption>
           <thead>
           <tr>
-            <th scope="col" class="af-heure ps-3"><span class="visually-hidden">Horaire</span></th>
-            <th scope="col" th:each="jour : ${jours}" class="text-center text-uppercase small"
+            <th scope="col" class="af-heure ps-3"><span class="visually-hidden" th:text="#{champ.horaire}">Horaire</span></th>
+            <th scope="col" th:each="jour : ${jours}" class="text-center small"
                 th:classappend="${jour == aujourdhui} ? 'af-aujourdhui text-primary' : 'text-secondary'">
               <span th:text="${#temporals.format(jour, 'EEEE')}">lundi</span><br>
               <span class="fw-normal" th:text="${#temporals.format(jour, 'dd/MM')}">21/09</span>
@@ -80,11 +80,11 @@
                    th:classappend="${(s.etat.name() == 'MODIFIEE' ? 'af-modifiee ' : '') + (s.etat.name() == 'ANNULEE' ? 'af-annulee ' : '') + (selection != null and selection.id == s.id ? 'af-selection' : '')}"
                    th:href="@{/emploi-du-temps(semaine=${lundi},classe=${classeFiltre},enseignant=${enseignantFiltre},seance=${s.id})}">
                   <span class="af-titre fw-semibold d-block" th:text="${s.matiere.intitule}">Matière</span>
-                  <span class="d-block" th:text="${s.classe.nom} + ' · ' + ${s.salle.nom}">Classe · Salle</span>
+                  <span class="d-block" th:text="${s.classe.nom} + ', ' + ${s.salle.nom}">Classe, salle</span>
                   <span class="d-block opacity-75" th:if="${admin}" th:text="${s.enseignant.nomComplet}">Enseignant</span>
                   <span class="badge mt-1" th:if="${s.etat.name() != 'PLANIFIEE'}"
                         th:classappend="${s.etat.name() == 'ANNULEE'} ? 'text-bg-danger' : 'text-bg-warning'"
-                        th:text="${s.etat.name() == 'ANNULEE'} ? 'Annulée' : 'Modifiée'">État</span>
+                        th:text="#{__${'etat.' + s.etat.name()}__}">État</span>
                 </a>
               </div>
             </td>
@@ -93,37 +93,35 @@
         </table>
       </div>
 
-      <p th:if="${#lists.isEmpty(seances)}" class="text-secondary text-center mb-0">Aucune séance cette semaine.</p>
+      <p th:if="${#lists.isEmpty(seances)}" class="text-secondary text-center mb-0" th:text="#{edt.aucune}">Aucune séance cette semaine.</p>
 
       <!-- Detail d'une seance (F-15) -->
       <section th:if="${selection}" class="af-glass p-4" aria-labelledby="detail-titre">
         <div class="d-flex justify-content-between align-items-start gap-3">
           <div>
-            <p class="small text-uppercase text-secondary fw-semibold mb-1">Détail de la séance</p>
+            <p class="h6 mb-1" th:text="#{edt.detail}">Détail de la séance</p>
             <h2 id="detail-titre" class="h4 fw-bold mb-0"
                 th:classappend="${selection.etat.name() == 'ANNULEE'} ? 'text-decoration-line-through'"
                 th:text="${selection.matiere.intitule}">Matière</h2>
           </div>
           <a th:href="@{/emploi-du-temps(semaine=${lundi},classe=${classeFiltre},enseignant=${enseignantFiltre})}"
-             class="btn-close" aria-label="Fermer le détail"></a>
+             class="btn-close" th:attr="aria-label=#{edt.fermerDetail}"></a>
         </div>
         <dl class="row mt-3 mb-0">
-          <dt class="col-sm-3 text-secondary fw-normal">Classe</dt><dd class="col-sm-9" th:text="${selection.classe.nom}">Classe</dd>
-          <dt class="col-sm-3 text-secondary fw-normal">Enseignant</dt><dd class="col-sm-9" th:text="${selection.enseignant.nomComplet}">Enseignant</dd>
-          <dt class="col-sm-3 text-secondary fw-normal">Salle</dt><dd class="col-sm-9" th:text="${selection.salle.nom}">Salle</dd>
-          <dt class="col-sm-3 text-secondary fw-normal">Date</dt><dd class="col-sm-9" th:text="${#temporals.format(selection.date, 'EEEE d MMMM yyyy')}">Date</dd>
-          <dt class="col-sm-3 text-secondary fw-normal">Horaire</dt><dd class="col-sm-9" th:text="${selection.heureDebut} + ' — ' + ${selection.heureFin}">Horaire</dd>
-          <dt class="col-sm-3 text-secondary fw-normal">État</dt>
-          <dd class="col-sm-9" th:text="${selection.etat.name() == 'PLANIFIEE'} ? 'Planifiée' : (${selection.etat.name() == 'MODIFIEE'} ? 'Modifiée' : 'Annulée')">État</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.classe}">Classe</dt><dd class="col-sm-9" th:text="${selection.classe.nom}">Classe</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.enseignant}">Enseignant</dt><dd class="col-sm-9" th:text="${selection.enseignant.nomComplet}">Enseignant</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.salle}">Salle</dt><dd class="col-sm-9" th:text="${selection.salle.nom}">Salle</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.date}">Date</dt><dd class="col-sm-9" th:text="${#temporals.format(selection.date, 'EEEE d MMMM yyyy')}">Date</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.horaire}">Horaire</dt><dd class="col-sm-9" th:text="${selection.heureDebut} + '–' + ${selection.heureFin}">Horaire</dd>
+          <dt class="col-sm-3 text-secondary fw-normal" th:text="#{champ.etat}">État</dt>
+          <dd class="col-sm-9" th:text="#{__${'etat.' + selection.etat.name()}__}">État</dd>
         </dl>
-        <p th:if="${selection.etat.name() == 'ANNULEE'}" class="text-danger small mt-3 mb-0">
-          Cette séance est annulée : la prise des présences n’est pas possible.
-        </p>
+        <p th:if="${selection.etat.name() == 'ANNULEE'}" class="text-danger small mt-3 mb-0" th:text="#{edt.annuleeTexte}">Cette séance est annulée.</p>
         <a th:if="${selection.etat.name() != 'ANNULEE' and utilisateur.role.name() != 'ETUDIANT'}"
-           th:href="@{/seances/{id}/presences(id=${selection.id})}" class="btn btn-af mt-3"><i data-lucide="list-checks" aria-hidden="true"></i>Prendre les présences</a>
+           th:href="@{/seances/{id}/presences(id=${selection.id})}" class="btn btn-af mt-3"><i data-lucide="list-checks" aria-hidden="true"></i>[[#{tableau.prendrePresences}]]</a>
       </section>
 
-      <p class="small text-secondary mb-0">Emploi du temps fourni par le projet partenaire — lecture seule.</p>
+      <p class="small text-secondary mb-0" th:text="#{edt.source}">Emploi du temps fourni par le projet partenaire.</p>
     </main>
   </div>
 </div>

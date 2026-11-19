@@ -1,5 +1,6 @@
 package com.attendflow.web.admin;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Admin;
 import com.attendflow.model.Parametre;
 import com.attendflow.repository.UtilisateurRepository;
@@ -42,7 +43,7 @@ public class ParametreController {
                            RedirectAttributes r) {
         try {
             parametres.modifier((Admin) utilisateurs.findByEmail(compte.getUsername()).orElseThrow(), form);
-            r.addFlashAttribute("succes", "Paramètres enregistrés. Ils s’appliquent immédiatement.");
+            r.addFlashAttribute("succes", t("Paramètres enregistrés. Ils s’appliquent immédiatement."));
         } catch (IllegalArgumentException e) {
             r.addFlashAttribute("erreur", e.getMessage());
             r.addFlashAttribute("form", form);   // garde la saisie

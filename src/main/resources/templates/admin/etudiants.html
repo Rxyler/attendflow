@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Étudiants')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.etudiants})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -9,12 +9,12 @@
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
       <div>
-        <h1 class="h5 fw-bold mb-0">Gestion des étudiants</h1>
-        <p class="small text-secondary mb-0" th:text="${#lists.size(etudiants)} + ' étudiant(s)'">0</p>
+        <h1 class="h5 fw-bold mb-0" th:text="#{etudiants.titre}">Gestion des étudiants</h1>
+        <p class="small text-secondary mb-0" th:text="#{etudiants.compte(${#lists.size(etudiants)})}">0</p>
       </div>
       <div class="d-flex gap-2">
-        <button type="button" class="btn btn-light border" data-bs-toggle="modal" data-bs-target="#modale-import"><i data-lucide="upload" aria-hidden="true"></i>Importer</button>
-        <a th:href="@{/admin/etudiants(ajouter=true)}" class="btn btn-af"><i data-lucide="plus" aria-hidden="true"></i>Ajouter</a>
+        <button type="button" class="btn btn-light border" data-bs-toggle="modal" data-bs-target="#modale-import"><i data-lucide="upload" aria-hidden="true"></i>[[#{etudiants.importer}]]</button>
+        <a th:href="@{/admin/etudiants(ajouter=true)}" class="btn btn-af"><i data-lucide="plus" aria-hidden="true"></i>[[#{etudiants.ajouter}]]</a>
       </div>
     </header>
 
@@ -29,35 +29,35 @@
       <!-- F-10 : recherche et filtre -->
       <form th:action="@{/admin/etudiants}" method="get" class="af-glass p-3 d-flex flex-wrap gap-2 align-items-end">
         <div class="flex-grow-1" style="min-width: 14rem">
-          <label for="q" class="form-label small fw-medium mb-1">Rechercher</label>
-          <input type="search" id="q" name="q" th:value="${q}" class="form-control" placeholder="Nom, prénom, matricule ou email">
+          <label for="q" class="form-label small fw-medium mb-1" th:text="#{etudiants.rechercher}">Rechercher</label>
+          <input type="search" id="q" name="q" th:value="${q}" class="form-control" th:placeholder="#{etudiants.rechercherAide}">
         </div>
         <div>
-          <label for="classe" class="form-label small fw-medium mb-1">Classe</label>
+          <label for="classe" class="form-label small fw-medium mb-1" th:text="#{champ.classe}">Classe</label>
           <select id="classe" name="classe" class="form-select">
-            <option value="">Toutes les classes</option>
+            <option value="" th:text="#{champ.toutesClasses}">Toutes les classes</option>
             <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.nom}" th:selected="${c.id == classeFiltre}">Classe</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-af"><i data-lucide="filter" aria-hidden="true"></i>Filtrer</button>
-        <a th:href="@{/admin/etudiants}" class="btn btn-link">Réinitialiser</a>
+        <button type="submit" class="btn btn-af"><i data-lucide="filter" aria-hidden="true"></i>[[#{commun.filtrer}]]</button>
+        <a th:href="@{/admin/etudiants}" class="btn btn-link" th:text="#{commun.reinitialiser}">Réinitialiser</a>
       </form>
 
       <div class="af-glass p-0 overflow-auto">
         <table class="table table-hover align-middle mb-0">
           <thead>
           <tr>
-            <th scope="col" class="ps-4">Étudiant</th>
-            <th scope="col">Matricule</th>
-            <th scope="col">Classe</th>
-            <th scope="col">Email</th>
-            <th scope="col">Téléphone</th>
-            <th scope="col" class="pe-4 text-end">Actions</th>
+            <th scope="col" class="ps-4" th:text="#{champ.etudiant}">Étudiant</th>
+            <th scope="col" th:text="#{champ.matricule}">Matricule</th>
+            <th scope="col" th:text="#{champ.classe}">Classe</th>
+            <th scope="col" th:text="#{champ.email}">Email</th>
+            <th scope="col" th:text="#{champ.telephone}">Téléphone</th>
+            <th scope="col" class="pe-4 text-end" th:text="#{commun.actions}">Actions</th>
           </tr>
           </thead>
           <tbody>
           <tr th:if="${#lists.isEmpty(etudiants)}">
-            <td colspan="6" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucun étudiant ne correspond.</td>
+            <td colspan="6" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>[[#{etudiants.aucun}]]</td>
           </tr>
           <tr th:each="e : ${etudiants}">
             <td class="ps-4">
@@ -72,11 +72,11 @@
             <td class="small" th:text="${e.email}">email</td>
             <td class="small" th:text="${e.telephone} ?: '—'">tel</td>
             <td class="pe-4 text-end text-nowrap">
-              <a th:href="@{/admin/etudiants/{id}/historique(id=${e.id})}" class="btn btn-sm btn-light border"><i data-lucide="history" aria-hidden="true"></i>Historique</a>
-              <a th:href="@{/admin/etudiants(modifier=${e.id},q=${q},classe=${classeFiltre})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>Modifier</a>
+              <a th:href="@{/admin/etudiants/{id}/historique(id=${e.id})}" class="btn btn-sm btn-light border"><i data-lucide="history" aria-hidden="true"></i>[[#{etudiants.historique}]]</a>
+              <a th:href="@{/admin/etudiants(modifier=${e.id},q=${q},classe=${classeFiltre})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>[[#{commun.modifier}]]</a>
               <form th:action="@{/admin/etudiants/{id}/supprimer(id=${e.id})}" method="post" class="d-inline"
-                    th:attr="onsubmit='return confirm(\'Supprimer ' + ${e.nomComplet} + ' ?\')'">
-                <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>Supprimer</button>
+                    th:attr="onsubmit='return confirm(\'' + #{commun.supprimerConfirmer(${e.nomComplet})} + '\')'">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>[[#{commun.supprimer}]]</button>
               </form>
             </td>
           </tr>
@@ -92,38 +92,36 @@
   <div class="modal-dialog modal-lg">
     <form class="modal-content" th:action="@{/admin/etudiants}" method="post" enctype="multipart/form-data">
       <div class="modal-header">
-        <h2 class="modal-title h5" id="modale-etudiant-titre" th:text="${formId != null} ? 'Modifier l’étudiant' : 'Ajouter un étudiant'">Ajouter</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        <h2 class="modal-title h5" id="modale-etudiant-titre" th:text="${formId != null} ? #{etudiants.modifierTitre} : #{etudiants.ajouterTitre}">Ajouter</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" th:attr="aria-label=#{commun.fermer}"></button>
       </div>
       <div class="modal-body row g-3">
         <input type="hidden" name="id" th:value="${formId}">
-        <div class="col-md-6"><label for="f-nom" class="form-label">Nom</label>
+        <div class="col-md-6"><label for="f-nom" class="form-label" th:text="#{champ.nom}">Nom</label>
           <input id="f-nom" name="nom" class="form-control" th:value="${form?.nom}" required maxlength="80"></div>
-        <div class="col-md-6"><label for="f-prenom" class="form-label">Prénom</label>
+        <div class="col-md-6"><label for="f-prenom" class="form-label" th:text="#{champ.prenom}">Prénom</label>
           <input id="f-prenom" name="prenom" class="form-control" th:value="${form?.prenom}" required maxlength="80"></div>
-        <div class="col-md-6"><label for="f-email" class="form-label">Email</label>
+        <div class="col-md-6"><label for="f-email" class="form-label" th:text="#{champ.email}">Email</label>
           <input id="f-email" name="email" type="email" class="form-control" th:value="${form?.email}" required maxlength="150"></div>
-        <div class="col-md-6"><label for="f-matricule" class="form-label">Matricule</label>
+        <div class="col-md-6"><label for="f-matricule" class="form-label" th:text="#{champ.matricule}">Matricule</label>
           <input id="f-matricule" name="matricule" class="form-control" th:value="${form?.matricule}" required maxlength="30"></div>
-        <div class="col-md-4"><label for="f-classe" class="form-label">Classe</label>
+        <div class="col-md-4"><label for="f-classe" class="form-label" th:text="#{champ.classe}">Classe</label>
           <select id="f-classe" name="classeId" class="form-select" required>
-            <option value="">Choisir…</option>
+            <option value="" th:text="#{etudiants.choisir}">Choisir…</option>
             <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.nom}" th:selected="${form != null and c.id == form.classeId}">Classe</option>
           </select></div>
-        <div class="col-md-4"><label for="f-naissance" class="form-label">Date de naissance</label>
+        <div class="col-md-4"><label for="f-naissance" class="form-label" th:text="#{champ.dateNaissance}">Date de naissance</label>
           <input id="f-naissance" name="dateNaissance" type="date" class="form-control" th:value="${form?.dateNaissance}"></div>
-        <div class="col-md-4"><label for="f-tel" class="form-label">Téléphone</label>
+        <div class="col-md-4"><label for="f-tel" class="form-label" th:text="#{champ.telephone}">Téléphone</label>
           <input id="f-tel" name="telephone" type="tel" class="form-control" th:value="${form?.telephone}" maxlength="30"></div>
-        <div class="col-12"><label for="f-photo" class="form-label">Photo</label>
+        <div class="col-12"><label for="f-photo" class="form-label" th:text="#{champ.photo}">Photo</label>
           <input id="f-photo" name="photo" type="file" class="form-control" accept=".png,.jpg,.jpeg">
-          <div class="form-text">PNG ou JPG, facultatif.</div></div>
-        <p class="col-12 small text-secondary mb-0" th:if="${formId == null}">
-          Le compte est créé sans mot de passe connu : l’étudiant le choisit via « Mot de passe oublié ».
-        </p>
+          <div class="form-text" th:text="#{etudiants.photoAide}">PNG ou JPG, facultatif.</div></div>
+        <p class="col-12 small text-secondary mb-0" th:if="${formId == null}" th:text="#{etudiants.motDePasse}">Le compte est créé sans mot de passe connu.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-af">Enregistrer</button>
+        <button type="button" class="btn btn-light border" data-bs-dismiss="modal" th:text="#{commun.annuler}">Annuler</button>
+        <button type="submit" class="btn btn-af" th:text="#{commun.enregistrer}">Enregistrer</button>
       </div>
     </form>
   </div>
@@ -134,19 +132,19 @@
   <div class="modal-dialog">
     <form class="modal-content" th:action="@{/admin/etudiants/import}" method="post" enctype="multipart/form-data">
       <div class="modal-header">
-        <h2 class="modal-title h5" id="modale-import-titre">Importer des étudiants</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        <h2 class="modal-title h5" id="modale-import-titre" th:text="#{etudiants.importTitre}">Importer des étudiants</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" th:attr="aria-label=#{commun.fermer}"></button>
       </div>
       <div class="modal-body">
-        <p class="small">Fichier Excel (.xlsx) ou CSV (séparateur <code>;</code> ou <code>,</code>) avec cette première ligne :</p>
+        <p class="small" th:utext="#{etudiants.importTexte}">Fichier Excel ou CSV avec cette première ligne :</p>
         <pre class="small bg-light border rounded p-2">nom;prenom;email;matricule;classe;date_naissance;telephone</pre>
-        <p class="small text-secondary">La classe doit exister (ex. « 3ème INFO »). Date et téléphone sont facultatifs.</p>
-        <label for="fichier-csv" class="form-label">Fichier</label>
+        <p class="small text-secondary" th:text="#{etudiants.importAide}">La classe doit exister.</p>
+        <label for="fichier-csv" class="form-label" th:text="#{champ.fichier}">Fichier</label>
         <input id="fichier-csv" name="fichier" type="file" accept=".csv,.xlsx,text/csv" class="form-control" required>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-af">Importer</button>
+        <button type="button" class="btn btn-light border" data-bs-dismiss="modal" th:text="#{commun.annuler}">Annuler</button>
+        <button type="submit" class="btn btn-af" th:text="#{etudiants.importer}">Importer</button>
       </div>
     </form>
   </div>

@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Classes')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.classes})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -8,8 +8,8 @@
 
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3">
-      <h1 class="h5 fw-bold mb-0">Gestion des classes</h1>
-      <p class="small text-secondary mb-0" th:text="${#lists.size(classes)} + ' classe(s)'">0</p>
+      <h1 class="h5 fw-bold mb-0" th:text="#{classes.titre}">Gestion des classes</h1>
+      <p class="small text-secondary mb-0" th:text="#{classes.compte(${#lists.size(classes)})}">0</p>
     </header>
 
     <main id="contenu" class="p-4 d-grid gap-4">
@@ -22,27 +22,27 @@
             <table class="table table-hover align-middle mb-0">
               <thead>
               <tr>
-                <th scope="col" class="ps-4">Classe</th>
-                <th scope="col">Niveau</th>
-                <th scope="col">Responsable</th>
-                <th scope="col">Année</th>
-                <th scope="col">Effectif</th>
-                <th scope="col" class="pe-4 text-end">Actions</th>
+                <th scope="col" class="ps-4" th:text="#{champ.classe}">Classe</th>
+                <th scope="col" th:text="#{champ.niveau}">Niveau</th>
+                <th scope="col" th:text="#{champ.responsable}">Responsable</th>
+                <th scope="col" th:text="#{champ.annee}">Année</th>
+                <th scope="col" th:text="#{champ.effectif}">Effectif</th>
+                <th scope="col" class="pe-4 text-end" th:text="#{commun.actions}">Actions</th>
               </tr>
               </thead>
               <tbody>
-              <tr th:if="${#lists.isEmpty(classes)}"><td colspan="6" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>Aucune classe.</td></tr>
+              <tr th:if="${#lists.isEmpty(classes)}"><td colspan="6" class="text-center text-secondary py-4"><i data-lucide="inbox" aria-hidden="true" class="d-block mx-auto mb-2 opacity-50"></i>[[#{classes.aucune}]]</td></tr>
               <tr th:each="c : ${classes}">
                 <td class="ps-4 fw-semibold" th:text="${c.nom}">Classe</td>
                 <td th:text="${c.niveau} ?: '—'">niveau</td>
                 <td th:text="${c.responsable} ?: '—'">responsable</td>
                 <td class="font-monospace small" th:text="${c.anneeUniversitaire} ?: '—'">année</td>
-                <td><a th:href="@{/admin/etudiants(classe=${c.id})}" th:text="${effectifs[c.id] ?: 0} + ' étudiant(s)'">0</a></td>
+                <td><a th:href="@{/admin/etudiants(classe=${c.id})}" th:text="#{classes.effectif(${effectifs[c.id] ?: 0})}">0</a></td>
                 <td class="pe-4 text-end text-nowrap">
-                  <a th:href="@{/admin/classes(modifier=${c.id})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>Modifier</a>
+                  <a th:href="@{/admin/classes(modifier=${c.id})}" class="btn btn-sm btn-light border"><i data-lucide="pencil" aria-hidden="true"></i>[[#{commun.modifier}]]</a>
                   <form th:action="@{/admin/classes/{id}/supprimer(id=${c.id})}" method="post" class="d-inline"
-                        th:attr="onsubmit='return confirm(\'Supprimer la classe ' + ${c.nom} + ' ?\')'">
-                    <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>Supprimer</button>
+                        th:attr="onsubmit='return confirm(\'' + #{classes.supprimerConfirmer(${c.nom})} + '\')'">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="trash-2" aria-hidden="true"></i>[[#{commun.supprimer}]]</button>
                   </form>
                 </td>
               </tr>
@@ -53,20 +53,20 @@
 
         <div class="col-xl-4">
           <form th:action="@{/admin/classes}" method="post" class="af-glass p-4 d-grid gap-3">
-            <h2 class="h6 fw-bold mb-0" th:text="${formId != null} ? 'Modifier la classe' : 'Ajouter une classe'">Ajouter</h2>
+            <h2 class="h6 fw-bold mb-0" th:text="${formId != null} ? #{classes.modifier} : #{classes.ajouter}">Ajouter</h2>
             <input type="hidden" name="id" th:value="${formId}">
-            <div><label for="c-nom" class="form-label">Nom</label>
+            <div><label for="c-nom" class="form-label" th:text="#{champ.nom}">Nom</label>
               <input id="c-nom" name="nom" class="form-control" th:value="${form?.nom}" required maxlength="80" placeholder="3ème INFO"></div>
-            <div><label for="c-niveau" class="form-label">Niveau</label>
+            <div><label for="c-niveau" class="form-label" th:text="#{champ.niveau}">Niveau</label>
               <input id="c-niveau" name="niveau" class="form-control" th:value="${form?.niveau}" maxlength="50" placeholder="Licence 3"></div>
-            <div><label for="c-resp" class="form-label">Responsable</label>
+            <div><label for="c-resp" class="form-label" th:text="#{champ.responsable}">Responsable</label>
               <input id="c-resp" name="responsable" class="form-control" th:value="${form?.responsable}" maxlength="120"></div>
-            <div><label for="c-annee" class="form-label">Année universitaire</label>
+            <div><label for="c-annee" class="form-label" th:text="#{champ.anneeUniversitaire}">Année universitaire</label>
               <input id="c-annee" name="anneeUniversitaire" class="form-control" th:value="${form?.anneeUniversitaire}"
                      pattern="\d{4}-\d{4}" placeholder="2026-2027"></div>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-af">Enregistrer</button>
-              <a th:if="${formId != null}" th:href="@{/admin/classes}" class="btn btn-light border">Annuler</a>
+              <button type="submit" class="btn btn-af" th:text="#{commun.enregistrer}">Enregistrer</button>
+              <a th:if="${formId != null}" th:href="@{/admin/classes}" class="btn btn-light border" th:text="#{commun.annuler}">Annuler</a>
             </div>
           </form>
         </div>

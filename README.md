@@ -19,7 +19,7 @@
 </p>
 
 > The live demo runs on a free plan: the first visit after a period of inactivity can take 1 to 2 minutes to wake up.
-> The interface is in French.
+> The interface is in French and English: use the FR / EN button next to the theme switch.
 
 ## Features
 
@@ -88,10 +88,11 @@ In production, set `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `
 ./mvnw test
 ```
 
-76 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
+79 tests run against an in-memory H2 database, with no setup. They cover security, timetable sync, attendance,
 dashboards, notifications, emails, excuses, records, reports and exports, and settings.
 `SecuriteEntreesTest` focuses on hostile input: SQL injection, XSS, missing CSRF tokens, oversized or invalid values,
 brute-force lockout, and error pages that leak no technical details.
+`LangueTest` checks the French default, the switch to English and that every French text has an English version.
 
 ## Deployment
 

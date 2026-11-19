@@ -1,5 +1,6 @@
 package com.attendflow.service.impl;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Admin;
 import com.attendflow.model.Parametre;
 import com.attendflow.repository.ParametreRepository;
@@ -43,6 +44,6 @@ public class ParametreServiceImpl implements ParametreService {
     }
 
     private static void verifier(boolean ok, String message) {
-        if (!ok) throw new IllegalArgumentException(message);
+        if (!ok) throw new IllegalArgumentException(t(message));
     }
 }

@@ -1,5 +1,6 @@
 package com.attendflow.service.impl;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.service.ExportService;
 import com.attendflow.service.RapportService.LigneSeance;
 import com.attendflow.service.RapportService.ParClasse;
@@ -55,32 +56,32 @@ public class ExportServiceImpl implements ExportService {
         Font sousTitre = new Font(Font.HELVETICA, 12, Font.BOLD);
         Font petit = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.DARK_GRAY);
 
-        doc.add(new Paragraph("Fas3a — Rapport des présences", titre));
+        doc.add(new Paragraph(t("Fas3a — Rapport des présences"), titre));
         doc.add(new Paragraph(r.description(), petit));
-        doc.add(new Paragraph("Généré le " + LocalDateTime.now().format(HORODATAGE), petit));
+        doc.add(new Paragraph(t("Généré le {0}", LocalDateTime.now().format(HORODATAGE)), petit));
 
-        section(doc, "Synthèse", sousTitre);
+        section(doc, t("Synthèse"), sousTitre);
         List<Object[]> synthese = List.<Object[]>of(
                 new Object[]{r.nbSeances(), pourcent(r.taux()), r.presents(), r.absents(), r.retards(), r.justifies()});
-        table(doc, new String[]{"Séances saisies", "Taux de présence", "Présents", "Absents", "Retards", "Justifiés"},
+        table(doc, new String[]{t("Séances saisies"), t("Taux de présence"), t("Présents"), t("Absents"), t("Retards"), t("Justifiés")},
                 synthese, ligne -> ligne);
 
-        section(doc, "Taux de présence par classe", sousTitre);
-        table(doc, new String[]{"Classe", "Présences saisies", "Taux de présence"}, r.parClasse(),
+        section(doc, t("Taux de présence par classe"), sousTitre);
+        table(doc, new String[]{t("Classe"), t("Présences saisies"), t("Taux de présence")}, r.parClasse(),
                 (ParClasse c) -> new Object[]{c.classe(), c.presences(), pourcent(c.taux())});
 
-        section(doc, "Absences par matière", sousTitre);
-        table(doc, new String[]{"Matière", "Absences", "Taux de présence"}, r.parMatiere(),
+        section(doc, t("Absences par matière"), sousTitre);
+        table(doc, new String[]{t("Matière"), t("Absences"), t("Taux de présence")}, r.parMatiere(),
                 (ParMatiere m) -> new Object[]{m.matiere(), m.absences(), pourcent(m.taux())});
 
-        section(doc, "Étudiants à absences fréquentes", sousTitre);
-        if (r.aRisque().isEmpty()) doc.add(new Paragraph("Aucun étudiant au-delà du seuil sur cette période.", petit));
-        else table(doc, new String[]{"Étudiant", "Matricule", "Classe", "Absences", "Taux de présence"}, r.aRisque(),
+        section(doc, t("Étudiants à absences fréquentes"), sousTitre);
+        if (r.aRisque().isEmpty()) doc.add(new Paragraph(t("Aucun étudiant au-delà du seuil sur cette période."), petit));
+        else table(doc, new String[]{t("Étudiant"), t("Matricule"), t("Classe"), t("Absences"), t("Taux de présence")}, r.aRisque(),
                 (EtudiantARisque e) -> new Object[]{e.etudiant().getNomComplet(), e.etudiant().getMatricule(),
                         e.etudiant().getClasse().getNom(), e.absences(), pourcent(e.taux())});
 
-        section(doc, "Détail des séances", sousTitre);
-        table(doc, COLONNES_SEANCES, r.seances(), this::ligneSeance);
+        section(doc, t("Détail des séances"), sousTitre);
+        table(doc, traduits(COLONNES_SEANCES), r.seances(), this::ligneSeance);
 
         doc.close();
         return sortie.toByteArray();
@@ -113,7 +114,7 @@ public class ExportServiceImpl implements ExportService {
             }
         }
         if (lignes.isEmpty()) {
-            PdfPCell vide = new PdfPCell(new Phrase("Aucune donnée", cellule));
+            PdfPCell vide = new PdfPCell(new Phrase(t("Aucune donnée"), cellule));
             vide.setColspan(entetes.length);
             t.addCell(vide);
         }
@@ -130,19 +131,19 @@ public class ExportServiceImpl implements ExportService {
             gras.setBold(true);
             entete.setFont(gras);
 
-            Sheet synthese = wb.createSheet("Synthèse");
-            ligne(synthese, 0, null, "Fas3a — Rapport des présences");
+            Sheet synthese = wb.createSheet(t("Synthèse"));
+            ligne(synthese, 0, null, t("Fas3a — Rapport des présences"));
             ligne(synthese, 1, null, r.description());
-            ligne(synthese, 2, null, "Généré le " + LocalDateTime.now().format(HORODATAGE));
-            ligne(synthese, 4, entete, "Séances saisies", "Taux de présence (%)", "Présents", "Absents", "Retards", "Justifiés");
+            ligne(synthese, 2, null, t("Généré le {0}", LocalDateTime.now().format(HORODATAGE)));
+            ligne(synthese, 4, entete, t("Séances saisies"), t("Taux de présence (%)"), t("Présents"), t("Absents"), t("Retards"), t("Justifiés"));
             ligne(synthese, 5, null, r.nbSeances(), r.taux(), r.presents(), r.absents(), r.retards(), r.justifies());
 
-            feuille(wb, "Séances", entete, COLONNES_SEANCES, r.seances(), this::ligneSeance);
-            feuille(wb, "Par classe", entete, new String[]{"Classe", "Présences saisies", "Taux (%)"}, r.parClasse(),
+            feuille(wb, t("Séances"), entete, traduits(COLONNES_SEANCES), r.seances(), this::ligneSeance);
+            feuille(wb, t("Par classe"), entete, new String[]{t("Classe"), t("Présences saisies"), t("Taux (%)")}, r.parClasse(),
                     (ParClasse c) -> new Object[]{c.classe(), c.presences(), c.taux()});
-            feuille(wb, "Par matière", entete, new String[]{"Matière", "Absences", "Taux (%)"}, r.parMatiere(),
+            feuille(wb, t("Par matière"), entete, new String[]{t("Matière"), t("Absences"), t("Taux (%)")}, r.parMatiere(),
                     (ParMatiere m) -> new Object[]{m.matiere(), m.absences(), m.taux()});
-            feuille(wb, "Étudiants à risque", entete, new String[]{"Nom", "Prénom", "Matricule", "Classe", "Absences", "Taux (%)"},
+            feuille(wb, t("Étudiants à risque"), entete, new String[]{t("Nom"), t("Prénom"), t("Matricule"), t("Classe"), t("Absences"), t("Taux (%)")},
                     r.aRisque(), (EtudiantARisque e) -> new Object[]{e.etudiant().getNom(), e.etudiant().getPrenom(),
                             e.etudiant().getMatricule(), e.etudiant().getClasse().getNom(), e.absences(), e.taux()});
 
@@ -180,6 +181,10 @@ public class ExportServiceImpl implements ExportService {
         return new Object[]{l.seance().getDate().format(JOUR), l.seance().getHeureDebut() + " - " + l.seance().getHeureFin(),
                 l.seance().getMatiere().getIntitule(), l.seance().getClasse().getNom(),
                 l.seance().getEnseignant().getNomComplet(), l.presents(), l.absents(), l.retards(), l.justifies(), l.taux()};
+    }
+
+    private static String[] traduits(String[] francais) {
+        return java.util.Arrays.stream(francais).map(com.attendflow.service.Textes::t).toArray(String[]::new);
     }
 
     private static String pourcent(Integer taux) {

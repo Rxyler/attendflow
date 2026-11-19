@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Mon profil')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.profil})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -8,14 +8,14 @@
 
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3">
-      <h1 class="h5 fw-bold mb-0">Mon profil</h1>
+      <h1 class="h5 fw-bold mb-0" th:text="#{titre.profil}">Mon profil</h1>
       <p class="small text-secondary mb-0" th:text="${utilisateur.email}">email</p>
     </header>
 
     <main id="contenu" class="p-4 d-grid gap-4" style="max-width: 60rem">
       <div th:if="${succes}" class="alert alert-success mb-0" role="status" th:text="${succes}">ok</div>
 
-      <section class="af-glass p-4 d-flex align-items-center gap-4 flex-wrap" aria-label="Identité">
+      <section class="af-glass p-4 d-flex align-items-center gap-4 flex-wrap" th:attr="aria-label=#{profil.identite}">
         <span class="af-avatar af-avatar-xl" aria-hidden="true">
           <img th:if="${utilisateur.mascotte}" th:src="@{${utilisateur.mascotte.image}}" alt="">
           <th:block th:unless="${utilisateur.mascotte}"
@@ -24,23 +24,23 @@
         <div class="min-w-0">
           <h2 class="h4 fw-bold mb-1" th:text="${utilisateur.nomComplet}">Nom</h2>
           <p class="text-secondary mb-0"
-             th:text="${utilisateur.role.name() == 'ADMIN'} ? 'Administrateur' : (${utilisateur.role.name() == 'ENSEIGNANT'} ? 'Enseignant' : 'Étudiant')">rôle</p>
+             th:text="#{__${'role.' + utilisateur.role.name()}__}">rôle</p>
           <p class="small mb-0 mt-2" th:if="${utilisateur.mascotte}" style="color: var(--af-muted)"
-             th:text="${utilisateur.mascotte.nom} + ' — ' + ${utilisateur.mascotte.phrase}">phrase</p>
+             th:text="${utilisateur.mascotte.nom} + ' : ' + #{__${'mascotte.' + utilisateur.mascotte.name()}__}">phrase</p>
         </div>
       </section>
 
       <form th:action="@{/profil/mascotte}" method="post" class="af-glass p-4">
         <fieldset>
-          <legend class="h5 fw-bold mb-1">Choisis ton compagnon</legend>
-          <p class="small text-secondary mb-4">Il remplace tes initiales partout dans l’application et t’encourage sur ton tableau de bord.</p>
+          <legend class="h5 fw-bold mb-1" th:text="#{profil.choisir}">Choisis ton compagnon</legend>
+          <p class="small text-secondary mb-4" th:text="#{profil.choisirTexte}">Il remplace tes initiales.</p>
           <div class="af-choix-mascottes">
             <label class="af-choix" th:each="m : ${mascottes}">
               <input type="radio" name="mascotte" th:value="${m.name()}" th:checked="${utilisateur.mascotte == m}" class="visually-hidden">
               <span class="af-glass af-choix-carte" data-tilt="8">
                 <img th:src="@{${m.image}}" alt="" class="af-mascotte" width="96" height="96">
                 <strong th:text="${m.nom}">Nom</strong>
-                <span class="small" th:text="${m.phrase}">phrase</span>
+                <span class="small" th:text="#{__${'mascotte.' + m.name()}__}">phrase</span>
               </span>
             </label>
             <label class="af-choix">
@@ -48,13 +48,13 @@
               <span class="af-glass af-choix-carte">
                 <span class="af-avatar af-avatar-xl" aria-hidden="true"
                       th:text="${#strings.toUpperCase(#strings.substring(utilisateur.prenom, 0, 1) + #strings.substring(utilisateur.nom, 0, 1))}">SA</span>
-                <strong>Mes initiales</strong>
-                <span class="small">Sobre et efficace.</span>
+                <strong th:text="#{profil.initiales}">Mes initiales</strong>
+                <span class="small" th:text="#{profil.sobre}">Sobre et efficace.</span>
               </span>
             </label>
           </div>
         </fieldset>
-        <button type="submit" class="btn btn-af mt-4" data-magnetic><i data-lucide="check" aria-hidden="true"></i> Enregistrer</button>
+        <button type="submit" class="btn btn-af mt-4" data-magnetic><i data-lucide="check" aria-hidden="true"></i> [[#{commun.enregistrer}]]</button>
       </form>
     </main>
   </div>

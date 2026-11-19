@@ -1,5 +1,6 @@
 package com.attendflow.web;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Utilisateur;
 import com.attendflow.model.enums.StatutPresence;
 import com.attendflow.repository.UtilisateurRepository;
@@ -52,9 +53,9 @@ public class PresenceController {
                 }
             });
             int n = presenceService.enregistrer(utilisateur, id, statuts);
-            redirect.addFlashAttribute("succes", n + " présence(s) enregistrée(s) avec succès.");   // F-21
+            redirect.addFlashAttribute("succes", t("{0} présence(s) enregistrée(s) avec succès.", n));   // F-21
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("erreur", "Statut invalide : rien n'a été enregistré.");
+            redirect.addFlashAttribute("erreur", t("Statut invalide : rien n'a été enregistré."));
         } catch (IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
         }

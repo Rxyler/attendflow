@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Justificatifs')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.justificatifs})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <div class="d-flex min-vh-100">
@@ -8,8 +8,8 @@
 
   <div class="flex-grow-1 d-flex flex-column min-w-0">
     <header class="af-header px-4 py-3">
-      <h1 class="h5 fw-bold mb-0">Justificatifs</h1>
-      <p class="small text-secondary mb-0" th:text="${#lists.size(enAttente)} + ' demande(s) en attente de traitement'">0 en attente</p>
+      <h1 class="h5 fw-bold mb-0" th:text="#{titre.justificatifs}">Justificatifs</h1>
+      <p class="small text-secondary mb-0" th:text="#{justif.enAttenteCompte(${#lists.size(enAttente)})}">0 en attente</p>
     </header>
 
     <main id="contenu" class="p-4 d-grid gap-4">
@@ -18,29 +18,26 @@
 
       <!-- F-25 : a traiter -->
       <section aria-labelledby="attente-titre" class="d-grid gap-3">
-        <h2 id="attente-titre" class="h6 fw-bold mb-0">En attente</h2>
-        <p th:if="${#lists.isEmpty(enAttente)}" class="af-glass p-4 text-secondary mb-0">Aucun justificatif en attente.</p>
+        <h2 id="attente-titre" class="h6 fw-bold mb-0" th:text="#{justif.enAttente}">En attente</h2>
+        <p th:if="${#lists.isEmpty(enAttente)}" class="af-glass p-4 text-secondary mb-0" th:text="#{justif.aucunEnAttente}">Aucun justificatif en attente.</p>
         <article th:each="j : ${enAttente}" class="af-glass p-3 d-flex flex-wrap gap-3 align-items-center"
                  th:with="p=${j.presence}">
           <div class="flex-grow-1">
             <p class="fw-bold mb-0">
               <a th:href="@{/admin/etudiants/{id}/historique(id=${p.etudiant.id})}" th:text="${p.etudiant.nomComplet}">Nom</a>
-              <span class="small text-secondary fw-normal" th:text="' · ' + ${p.etudiant.classe.nom}">classe</span>
+              <span class="small text-secondary fw-normal" th:text="', ' + ${p.etudiant.classe.nom}">classe</span>
             </p>
             <p class="small mb-1"
-               th:text="'Absence du ' + ${#temporals.format(p.seance.date, 'dd/MM/yyyy')} + ' · ' + ${p.seance.heureDebut} + ' · ' + ${p.seance.matiere.intitule}">absence</p>
-            <p class="small text-secondary mb-0">
-              Motif : <span th:text="${j.motif}">motif</span> ·
-              déposé le <span th:text="${#temporals.format(j.dateDepot, 'dd/MM/yyyy HH:mm')}">date</span>
-            </p>
+               th:text="#{justif.absenceDu(${#temporals.format(p.seance.date, 'dd/MM/yyyy')}, ${p.seance.heureDebut}, ${p.seance.matiere.intitule})}">absence</p>
+            <p class="small text-secondary mb-0" th:text="#{justif.motifDepose(${j.motif}, ${#temporals.format(j.dateDepot, 'dd/MM/yyyy HH:mm')})}">motif</p>
           </div>
           <a th:href="@{/justificatifs/{id}/fichier(id=${j.id})}" target="_blank" rel="noopener"
-             class="btn btn-sm btn-light border"><i data-lucide="eye" aria-hidden="true"></i>Voir le document</a>
+             class="btn btn-sm btn-light border"><i data-lucide="eye" aria-hidden="true"></i>[[#{justif.voirDocument}]]</a>
           <form th:action="@{/admin/justificatifs/{id}/refuser(id=${j.id})}" method="post">
-            <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="x" aria-hidden="true"></i>Refuser</button>
+            <button type="submit" class="btn btn-sm btn-outline-danger"><i data-lucide="x" aria-hidden="true"></i>[[#{justif.refuser}]]</button>
           </form>
           <form th:action="@{/admin/justificatifs/{id}/accepter(id=${j.id})}" method="post">
-            <button type="submit" class="btn btn-sm btn-success"><i data-lucide="check" aria-hidden="true"></i>Accepter</button>
+            <button type="submit" class="btn btn-sm btn-success"><i data-lucide="check" aria-hidden="true"></i>[[#{justif.accepter}]]</button>
           </form>
         </article>
       </section>
@@ -48,23 +45,23 @@
       <!-- Historique des decisions -->
       <div class="af-glass p-0 overflow-hidden" th:unless="${#lists.isEmpty(traites)}">
         <table class="table align-middle mb-0">
-          <caption class="px-4">20 dernières décisions</caption>
+          <caption class="px-4" th:text="#{justif.dernieresDecisions}">20 dernières décisions</caption>
           <thead>
           <tr>
-            <th scope="col" class="ps-4">Étudiant</th>
-            <th scope="col">Absence</th>
-            <th scope="col">Décision</th>
-            <th scope="col">Par</th>
-            <th scope="col" class="pe-4">Le</th>
+            <th scope="col" class="ps-4" th:text="#{champ.etudiant}">Étudiant</th>
+            <th scope="col" th:text="#{justif.absence}">Absence</th>
+            <th scope="col" th:text="#{justif.decision}">Décision</th>
+            <th scope="col" th:text="#{justif.par}">Par</th>
+            <th scope="col" class="pe-4" th:text="#{justif.le}">Le</th>
           </tr>
           </thead>
           <tbody>
           <tr th:each="j : ${traites}">
             <td class="ps-4" th:text="${j.presence.etudiant.nomComplet}">Nom</td>
-            <td class="small" th:text="${#temporals.format(j.presence.seance.date, 'dd/MM/yyyy')} + ' · ' + ${j.presence.seance.matiere.intitule}">absence</td>
+            <td class="small" th:text="${#temporals.format(j.presence.seance.date, 'dd/MM/yyyy')} + ', ' + ${j.presence.seance.matiere.intitule}">absence</td>
             <td>
               <span class="badge rounded-pill" th:classappend="${j.etat.name() == 'ACCEPTE'} ? 'text-bg-success' : 'text-bg-danger'"
-                    th:text="${j.etat.name() == 'ACCEPTE'} ? 'Accepté' : 'Refusé'">Décision</span>
+                    th:text="#{__${'justif.' + j.etat.name()}__}">Décision</span>
             </td>
             <td class="small" th:text="${j.traitePar != null} ? ${j.traitePar.nomComplet} : '—'">admin</td>
             <td class="pe-4 small font-monospace" th:text="${#temporals.format(j.dateTraitement, 'dd/MM/yyyy HH:mm')}">date</td>

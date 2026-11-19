@@ -1,5 +1,7 @@
 package com.attendflow.service.impl;
 
+import com.attendflow.config.LangueConfig;
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.TokenReinitialisation;
 import com.attendflow.repository.TokenReinitialisationRepository;
 import com.attendflow.repository.UtilisateurRepository;
@@ -37,11 +39,11 @@ public class MotDePasseServiceImpl implements MotDePasseService {
         utilisateurs.findByEmail(email.trim().toLowerCase(java.util.Locale.ROOT)).ifPresent(u -> {
             String token = UUID.randomUUID().toString();
             tokens.save(new TokenReinitialisation(u, token, LocalDateTime.now().plusMinutes(DUREE_VALIDITE_MINUTES)));
-            this.email.envoyer(u.getEmail(), "Fas3a - Réinitialisation de votre mot de passe",
-                    "Bonjour " + u.getNomComplet() + ",\n\n"
-                    + "Pour choisir un nouveau mot de passe, ouvrez ce lien (valable " + DUREE_VALIDITE_MINUTES + " minutes, une seule fois) :\n"
-                    + urlDeBase + "/reinitialiser?token=" + token + "\n\n"
-                    + "Si vous n'avez rien demandé, ignorez cet email : votre mot de passe reste inchangé.\n\n-- Fas3a");
+            // l'email part dans la langue choisie par le destinataire
+            this.email.envoyer(u.getEmail(), t(LangueConfig.de(u), "Fas3a - Réinitialisation de votre mot de passe"),
+                    t(LangueConfig.de(u), "Bonjour {0},\n\nPour choisir un nouveau mot de passe, ouvrez ce lien (valable {1} minutes, une seule fois) :\n{2}\n\n"
+                            + "Si vous n'avez rien demandé, ignorez cet email : votre mot de passe reste inchangé.\n\n-- Fas3a",
+                            u.getNomComplet(), DUREE_VALIDITE_MINUTES, urlDeBase + "/reinitialiser?token=" + token));
         });
     }
 
@@ -56,12 +58,12 @@ public class MotDePasseServiceImpl implements MotDePasseService {
     public void reinitialiser(String token, String nouveauMotDePasse) {
         TokenReinitialisation t = tokens.findByToken(token)
                 .filter(TokenReinitialisation::isValide)
-                .orElseThrow(() -> new IllegalArgumentException("Ce lien est invalide ou a expiré."));
+                .orElseThrow(() -> new IllegalArgumentException(t("Ce lien est invalide ou a expiré.")));
         if (nouveauMotDePasse == null || nouveauMotDePasse.length() < LONGUEUR_MIN) {
-            throw new IllegalArgumentException("Le mot de passe doit contenir au moins " + LONGUEUR_MIN + " caractères.");
+            throw new IllegalArgumentException(t("Le mot de passe doit contenir au moins {0} caractères.", LONGUEUR_MIN));
         }
         if (nouveauMotDePasse.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {   // limite de BCrypt
-            throw new IllegalArgumentException("Le mot de passe est trop long (72 caractères maximum).");
+            throw new IllegalArgumentException(t("Le mot de passe est trop long (72 caractères maximum)."));
         }
         t.getUtilisateur().setMotDePasse(encoder.encode(nouveauMotDePasse));
         t.setUtilise(true);

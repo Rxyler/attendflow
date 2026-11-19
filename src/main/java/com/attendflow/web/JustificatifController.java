@@ -1,5 +1,6 @@
 package com.attendflow.web;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.Admin;
 import com.attendflow.model.Etudiant;
 import com.attendflow.model.Presence;
@@ -65,7 +66,7 @@ public class JustificatifController {
         Etudiant etudiant = etudiants.findWithClasseByEmail(compte.getUsername()).orElseThrow();
         try {
             justificatifService.deposer(etudiant, presence, motif, fichier);
-            redirect.addFlashAttribute("succes", "Justificatif envoyé : il est en attente de validation.");
+            redirect.addFlashAttribute("succes", t("Justificatif envoyé : il est en attente de validation."));
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
             return "redirect:/etudiant/justificatifs?presence=" + presence;
@@ -91,8 +92,8 @@ public class JustificatifController {
         try {
             justificatifService.traiter(admin, id, accepte);
             redirect.addFlashAttribute("succes", accepte
-                    ? "Justificatif accepté : l'absence est maintenant justifiée."
-                    : "Justificatif refusé : l'étudiant a été prévenu.");
+                    ? t("Justificatif accepté : l'absence est maintenant justifiée.")
+                    : t("Justificatif refusé : l'étudiant a été prévenu."));
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
         }

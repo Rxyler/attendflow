@@ -1,18 +1,15 @@
 <!doctype html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Erreur')}"></head>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(#{titre.erreur})}"></head>
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 <main id="contenu" class="af-auth" th:with="code=${status ?: 500}">
   <div class="af-glass af-auth-card text-center" style="max-width: 28rem">
     <img th:src="@{/images/mascottes/filou.svg}" alt="" class="af-mascotte mx-auto mb-3" width="96" height="96">
-    <p class="small text-secondary mb-1" th:text="'Erreur ' + ${code}">Erreur 404</p>
-    <h1 class="h4 mb-2" th:text="${code == 404} ? 'Page introuvable' : (${code == 403} ? 'Accès refusé' : (${code == 400} ? 'Demande invalide' : 'Un problème est survenu'))">Page introuvable</h1>
-    <p class="text-secondary mb-4" th:text="${code == 404} ? 'Cette page n’existe pas ou a été déplacée.'
-        : (${code == 403} ? 'Cette page n’est pas accessible avec votre compte.'
-        : (${code == 400} ? 'Une valeur envoyée n’est pas valide. Revenez en arrière et vérifiez la saisie.'
-        : 'Réessayez dans un instant. Si le problème continue, prévenez l’administration.'))">message</p>
-    <a th:href="@{/}" class="btn btn-af"><i data-lucide="house" aria-hidden="true"></i>Retour à l’accueil</a>
+    <p class="small text-secondary mb-1" th:text="#{erreur.code(${code})}">Erreur 404</p>
+    <h1 class="h4 mb-2" th:text="${code == 404} ? #{erreur.404} : (${code == 403} ? #{erreur.403} : (${code == 400} ? #{erreur.400} : #{erreur.autre}))">Page introuvable</h1>
+    <p class="text-secondary mb-4" th:text="${code == 404} ? #{erreur.404Texte} : (${code == 403} ? #{erreur.403Texte} : (${code == 400} ? #{erreur.400Texte} : #{erreur.autreTexte}))">message</p>
+    <a th:href="@{/}" class="btn btn-af"><i data-lucide="house" aria-hidden="true"></i>[[#{commun.retourAccueil}]]</a>
   </div>
 </main>
 </body>

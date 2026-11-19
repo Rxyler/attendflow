@@ -1,5 +1,6 @@
 package com.attendflow.service.impl;
 
+import static com.attendflow.service.Textes.t;
 import com.attendflow.model.*;
 import com.attendflow.model.enums.StatutPresence;
 import com.attendflow.repository.*;
@@ -92,11 +93,10 @@ public class RapportServiceImpl implements RapportService {
     }
 
     private String description(Filtres f) {
-        String classe = f.classeId() == null ? "toutes" : classes.findById(f.classeId()).map(Classe::getNom).orElse("?");
-        String matiere = f.matiereId() == null ? "toutes" : matieres.findById(f.matiereId()).map(Matiere::getIntitule).orElse("?");
-        String enseignant = f.enseignantId() == null ? "tous" : enseignants.findById(f.enseignantId()).map(Utilisateur::getNomComplet).orElse("?");
-        return "Du " + f.du().format(JOUR) + " au " + f.au().format(JOUR) + " · Classe : " + classe
-                + " · Matière : " + matiere + " · Enseignant : " + enseignant;
+        String classe = f.classeId() == null ? t("toutes") : classes.findById(f.classeId()).map(Classe::getNom).orElse("?");
+        String matiere = f.matiereId() == null ? t("toutes") : matieres.findById(f.matiereId()).map(Matiere::getIntitule).orElse("?");
+        String enseignant = f.enseignantId() == null ? t("tous") : enseignants.findById(f.enseignantId()).map(Utilisateur::getNomComplet).orElse("?");
+        return t("Du {0} au {1} · Classe : {2} · Matière : {3} · Enseignant : {4}", f.du().format(JOUR), f.au().format(JOUR), classe, matiere, enseignant);
     }
 
     private static List<StatutPresence> statuts(List<Presence> lignes) {

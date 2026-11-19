@@ -50,6 +50,10 @@ public abstract class Utilisateur {
     @Column(length = 20)
     private Mascotte mascotte;
 
+    /** Langue choisie (fr ou en) : sert aux emails et notifications ; null = francais. */
+    @Column(length = 5)
+    private String langue;
+
     protected Utilisateur(String nom, String prenom, String email, String motDePasse, Role role) {
         this.nom = nom;
         this.prenom = prenom;

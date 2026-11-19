@@ -6,15 +6,15 @@
   function palette() {
     var clair = document.documentElement.getAttribute('data-bs-theme') === 'light';
     return clair
-      ? { texte: '#5a6478', grille: 'rgba(15,23,42,.08)', bulle: 'rgba(255,255,255,.96)', bulleTexte: '#0b1022', bord: 'rgba(15,23,42,.1)', arc: '#eef1fb' }
-      : { texte: '#9aa5bd', grille: 'rgba(255,255,255,.08)', bulle: 'rgba(13,19,36,.95)', bulleTexte: '#eef2ff', bord: 'rgba(255,255,255,.12)', arc: '#0b1222' };
+      ? { texte: '#4f6070', grille: 'rgba(15,23,42,.08)', bulle: 'rgba(255,255,255,.96)', bulleTexte: '#0d1b26', bord: 'rgba(15,23,42,.1)', arc: '#eef3f6' }
+      : { texte: '#8fa1b0', grille: 'rgba(255,255,255,.08)', bulle: 'rgba(13,19,36,.95)', bulleTexte: '#eaf1f6', bord: 'rgba(255,255,255,.12)', arc: '#0a1824' };
   }
   function appliquer(p) {
     d.color = p.texte; d.borderColor = p.grille;
     d.plugins.tooltip.backgroundColor = p.bulle; d.plugins.tooltip.borderColor = p.bord; d.plugins.tooltip.titleColor = p.bulleTexte; d.plugins.tooltip.bodyColor = p.bulleTexte;
     d.elements.arc.borderColor = p.arc;
   }
-  d.font.family = "'Geist', ui-sans-serif, system-ui, sans-serif";
+  d.font.family = "'Manrope', ui-sans-serif, system-ui, sans-serif";
   d.font.size = 12;
   d.animation = calme ? false : { duration: 700, easing: 'easeOutCubic' };
   d.plugins.tooltip.borderWidth = 1;
