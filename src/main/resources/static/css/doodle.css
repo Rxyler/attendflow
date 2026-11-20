@@ -425,13 +425,19 @@ td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose
 .dd-film #f-mascotte { animation: dd-frissonner .5s steps(1) infinite; }
 /* etat de depart : tout est cache ou pas encore trace, la timeline le fait apparaitre */
 .dd-film .f-trait { stroke-dasharray: 1 3; stroke-dashoffset: 2; }
-.dd-film :is(#f-feuille, #f-crayon, #f-horloge, #f-mascotte, #f-nom, #f-carte, #f-justif, #f-tampon, #f-stats, #f-cloche, #f-etoiles > *) { opacity: 0; visibility: hidden; }
+.dd-film :is(#f-feuille, #f-crayon, #f-horloge, #f-boule, #f-poubelle, #f-mascotte, #f-nom, #f-carte, #f-justif, #f-tampon, #f-stats, #f-cloche, .f-tete, #f-messager, #f-etoiles > *) { opacity: 0; visibility: hidden; }
 .dd-film-legendes { position: relative; height: 3.6rem; border-top: 2px dashed color-mix(in srgb, var(--dd-encre) 35%, transparent); }
 .dd-film-legendes p { position: absolute; inset: 0; margin: 0; padding: 0 1rem; display: grid; place-items: center; text-align: center;
   font-family: var(--dd-hand); font-size: clamp(1.05rem, 2.3vw, 1.75rem); line-height: 1.1; opacity: 0; visibility: hidden; }
 .dd-film-barre { display: flex; align-items: center; gap: .6rem; padding: .3rem .9rem .8rem; }
 .dd-film-progres { flex: 1; height: 8px; border: 2px solid var(--dd-encre); border-radius: 99px; overflow: hidden; }
 .dd-film-progres span { display: block; height: 100%; background: var(--dd-rose); transform-origin: left; transform: scaleX(0); }
+.dd-film-legendes .mot { display: inline-block; }
+/* *mot* des sous-titres : un coup de surligneur balaye sous le mot */
+.dd-film-legendes .marque { --marque: color-mix(in srgb, var(--dd-jaune) 80%, transparent);
+  background: linear-gradient(transparent 52%, var(--marque) 52%, var(--marque) 88%, transparent 88%) no-repeat 0 0 / 0% 100%;
+  padding: 0 .12em; margin: 0 -.12em; border-radius: 3px; }
+[data-bs-theme="dark"] .dd-film-legendes .marque { --marque: color-mix(in srgb, var(--dd-rose) 45%, transparent); }
 .dd-film-btn { flex: none; width: 2.5rem; height: 2.5rem; padding: 0; display: grid; place-items: center; color: var(--dd-encre);
   background: var(--dd-papier); border: 2px solid var(--dd-encre); border-radius: 50%; box-shadow: 2px 3px 0 var(--dd-encre);
   transition: transform .15s, box-shadow .15s; }

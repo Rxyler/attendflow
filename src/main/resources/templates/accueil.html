@@ -34,59 +34,77 @@
     <button type="button" class="dd-film-btn dd-film-fermer" th:attr="aria-label=#{commun.fermer}"><i data-lucide="x"></i></button>
     <div class="dd-film-scene" th:attr="aria-label=#{film.pause}" role="button" tabindex="0">
       <svg viewBox="0 0 960 540" aria-hidden="true">
+        <g id="f-camera">
         <g fill="none" stroke="var(--dd-encre)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <!-- 1. la feuille d'appel papier, griffonnee et raturee -->
+          <!-- 1. la feuille d'appel papier, griffonnee, froissee, jetee -->
           <g id="f-feuille">
             <path d="M302 74 C 400 66, 520 70, 618 78 C 624 200, 622 340, 614 466 C 510 474, 400 472, 296 462 C 292 330, 294 200, 302 74 Z" fill="var(--dd-papier)"/>
             <path class="f-trait" pathLength="1" d="M330 114 C 380 104, 430 118, 500 108" stroke="var(--dd-rose)" stroke-width="6"/>
-            <g class="f-ligne"><path d="M336 160 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 174 c 20 -10, 40 8, 60 0 s 40 -8, 80 2"/></g>
-            <g class="f-ligne"><path d="M336 225 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 239 c 24 -8, 44 8, 70 -2 s 30 -6, 60 4"/><path class="f-trait" pathLength="1" d="M338 226 l20 22 m0 -22 l-20 22" stroke="var(--dd-rose)"/></g>
-            <g class="f-ligne"><path d="M336 290 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 304 c 16 -8, 36 8, 56 0 s 50 -8, 90 2"/></g>
-            <g class="f-ligne"><path d="M336 355 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 369 c 22 -10, 40 8, 64 0 s 36 -8, 66 2"/><path class="f-trait" pathLength="1" d="M376 360 C 420 380, 470 350, 520 372 C 470 362, 430 384, 384 366" stroke="var(--dd-rose)"/></g>
+            <path d="M336 160 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 174 c 20 -10, 40 8, 60 0 s 40 -8, 80 2"/>
+            <path d="M336 225 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 239 c 24 -8, 44 8, 70 -2 s 30 -6, 60 4"/><path class="f-trait" pathLength="1" d="M338 226 l20 22 m0 -22 l-20 22" stroke="var(--dd-rose)"/>
+            <path d="M336 290 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 304 c 16 -8, 36 8, 56 0 s 50 -8, 90 2"/>
+            <path d="M336 355 h24 v24 h-24 Z"/><path class="f-trait" pathLength="1" d="M380 369 c 22 -10, 40 8, 64 0 s 36 -8, 66 2"/><path class="f-trait" pathLength="1" d="M376 360 C 420 380, 470 350, 520 372 C 470 362, 430 384, 384 366" stroke="var(--dd-rose)"/>
             <path class="f-trait" pathLength="1" d="M520 410 c 10 -30, 40 -30, 30 0 c -10 30, 40 30, 50 -6" stroke="var(--dd-rose)"/>
           </g>
           <g id="f-crayon"><g transform="translate(560 120) scale(2.4)"><path d="M10 38 L32 8 L40 14 L18 44 Z" fill="var(--dd-jaune)"/><path d="M32 8 L36 3 L44 9 L40 14" fill="var(--dd-rose)"/><path d="M10 38 L8 46 L18 44"/></g></g>
-          <g id="f-horloge"><circle cx="780" cy="190" r="62" fill="var(--dd-papier)"/><path d="M780 140 v8 M830 190 h-8 M780 240 v-8 M730 190 h8"/><path class="f-aiguille" d="M780 190 v-40" stroke-width="5"/><path class="f-aiguille2" d="M780 190 h28" stroke-width="5"/></g>
+          <g id="f-horloge"><circle cx="780" cy="190" r="62" fill="var(--dd-papier)"/><path d="M780 140 v8 M830 190 h-8 M780 240 v-8 M730 190 h8"/><path class="f-aiguille" d="M780 190 v-40" stroke-width="5"/><path class="f-aiguille2" d="M780 190 h28" stroke-width="5"/><path d="M732 136 l-14 -14 M828 136 l14 -14" stroke-width="5"/></g>
+          <path id="f-boule" d="M430 248 L452 236 L470 244 L490 238 L496 262 L488 284 L494 300 L470 304 L452 296 L432 302 L426 280 L434 266 Z M446 256 l14 12 l-6 16 M472 258 l-8 18 l14 8" fill="var(--dd-papier)"/>
+          <g id="f-poubelle">
+            <path d="M805 392 h90 l-10 88 h-70 Z" fill="var(--dd-papier)"/><path d="M828 405 l4 64 M850 405 v64 M872 405 l-4 64"/>
+            <g id="f-couvercle"><path d="M798 384 h104 c 2 -10, -2 -12, -6 -12 h-92 c -6 0, -8 4, -6 12 Z" fill="var(--dd-sarcelle)"/><path d="M838 372 c 0 -10, 24 -10, 24 0"/></g>
+          </g>
 
-          <!-- 3. la feuille Fas3a : les cases se cochent -->
+          <!-- 3. la feuille Fas3a : les cases se cochent, une absence, un justificatif tamponne -->
           <g id="f-carte">
             <path d="M262 64 C 420 58, 560 60, 714 68 C 720 200, 718 330, 712 474 C 560 480, 410 480, 256 472 C 250 340, 252 200, 262 64 Z" fill="var(--dd-encre)" transform="translate(8 10)" stroke="none"/>
             <path d="M262 64 C 420 58, 560 60, 714 68 C 720 200, 718 330, 712 474 C 560 480, 410 480, 256 472 C 250 340, 252 200, 262 64 Z" fill="var(--dd-papier)"/>
             <path d="M296 104 C 340 98, 390 108, 440 100" stroke="var(--dd-sarcelle)" stroke-width="7"/>
             <g class="f-rang"><circle cx="312" cy="168" r="18" fill="var(--dd-jaune)"/><path d="M346 168 c 30 -8, 60 8, 90 0 s 40 -6, 70 2"/><path class="f-puce" d="M590 148 h86 c 8 0, 8 40, 0 40 h-86 c -8 0, -8 -40, 0 -40 Z" fill="var(--dd-papier)"/><path class="f-coche f-trait" pathLength="1" d="M616 168 l12 12 l24 -26" stroke="var(--dd-sarcelle)" stroke-width="6"/></g>
             <g class="f-rang"><circle cx="312" cy="248" r="18" fill="var(--dd-rose)"/><path d="M346 248 c 26 -8, 50 8, 80 0 s 50 -6, 90 2"/><path class="f-puce" d="M590 228 h86 c 8 0, 8 40, 0 40 h-86 c -8 0, -8 -40, 0 -40 Z" fill="var(--dd-papier)"/><path class="f-coche f-trait" pathLength="1" d="M616 248 l12 12 l24 -26" stroke="var(--dd-sarcelle)" stroke-width="6"/></g>
-            <g class="f-rang"><circle cx="312" cy="328" r="18" fill="var(--dd-sarcelle)"/><path d="M346 328 c 30 -8, 56 8, 84 0 s 30 -6, 56 2"/><path class="f-puce" id="f-puce-absent" d="M590 308 h86 c 8 0, 8 40, 0 40 h-86 c -8 0, -8 -40, 0 -40 Z" fill="var(--dd-papier)"/><path id="f-croix" class="f-trait" pathLength="1" d="M620 316 l24 24 m0 -24 l-24 24" stroke="var(--dd-rose)" stroke-width="6"/><path id="f-ok" class="f-trait" pathLength="1" d="M616 328 l12 12 l24 -26" stroke-width="6"/></g>
+            <g class="f-rang" id="f-rang-absent"><circle cx="312" cy="328" r="18" fill="var(--dd-sarcelle)"/><path d="M346 328 c 30 -8, 56 8, 84 0 s 30 -6, 56 2"/><path class="f-puce" id="f-puce-absent" d="M590 308 h86 c 8 0, 8 40, 0 40 h-86 c -8 0, -8 -40, 0 -40 Z" fill="var(--dd-papier)"/><path id="f-croix" class="f-trait" pathLength="1" d="M620 316 l24 24 m0 -24 l-24 24" stroke="var(--dd-rose)" stroke-width="6"/><path id="f-ok" class="f-trait" pathLength="1" d="M616 328 l12 12 l24 -26" stroke-width="6"/></g>
             <g class="f-rang"><circle cx="312" cy="408" r="18" fill="var(--dd-papier)"/><path d="M346 408 c 24 -8, 46 8, 76 0 s 44 -6, 80 2"/><path class="f-puce" d="M590 388 h86 c 8 0, 8 40, 0 40 h-86 c -8 0, -8 -40, 0 -40 Z" fill="var(--dd-papier)"/><path class="f-coche f-trait" pathLength="1" d="M616 408 l12 12 l24 -26" stroke="var(--dd-sarcelle)" stroke-width="6"/></g>
             <g id="f-justif"><path d="M760 280 h46 l14 14 v60 h-60 Z" fill="var(--dd-papier)"/><path d="M806 280 v14 h14 M772 306 h30 M772 320 h36 M772 334 h24"/><path d="M770 272 v26 c 0 8, 12 8, 12 0 v-22" stroke="var(--dd-sarcelle)"/></g>
             <circle id="f-tampon" cx="633" cy="328" r="34" stroke="var(--dd-jaune)" stroke-width="6" stroke-dasharray="10 6"/>
           </g>
 
-          <!-- 4. les chiffres, la cloche des notifications -->
+          <!-- 4. les chiffres, et tout le monde dans la boucle -->
           <g id="f-stats">
             <path d="M170 110 V 440 H 540"/>
             <g fill="var(--dd-sarcelle)"><path class="f-barre" d="M200 440 V 300 h40 V 440"/><path class="f-barre" d="M270 440 V 240 h40 V 440"/><path class="f-barre" d="M340 440 V 270 h40 V 440"/><path class="f-barre" d="M410 440 V 190 h40 V 440" fill="var(--dd-jaune)"/><path class="f-barre" d="M480 440 V 210 h40 V 440"/></g>
-            <text id="f-pct" x="740" y="270" text-anchor="middle" class="f-texte" font-size="120" fill="var(--dd-encre)" stroke="none">0%</text>
-            <path class="f-trait" pathLength="1" d="M630 300 C 690 290, 780 296, 850 288" stroke="var(--dd-rose)" stroke-width="6"/>
-            <g id="f-cloche"><g transform="translate(740 400)"><path d="M-30 18 C -30 -18, -20 -40, 0 -40 C 20 -40, 30 -18, 30 18 L 40 30 L -40 30 Z" fill="var(--dd-jaune)"/><circle cx="0" cy="38" r="7" fill="var(--dd-encre)"/><g id="f-badge"><circle cx="30" cy="-34" r="15" fill="var(--dd-rose)"/><text x="30" y="-27" text-anchor="middle" class="f-texte" font-size="22" fill="#fff" stroke="none">1</text></g></g></g>
+            <text id="f-pct" x="740" y="215" text-anchor="middle" font-size="96" fill="var(--dd-encre)" stroke="none">0%</text>
+            <path class="f-trait" id="f-souligne" pathLength="1" d="M652 240 C 700 232, 790 238, 830 230" stroke="var(--dd-rose)" stroke-width="6"/>
+            <path class="f-trait" id="f-boucle" pathLength="1" d="M740 305 A 85 85 0 1 1 739.9 305" stroke="var(--dd-sarcelle)" stroke-width="4"/>
+            <g id="f-messager"><circle cx="740" cy="305" r="7" fill="var(--dd-rose)"/></g>
+            <g class="f-tete"><circle cx="740" cy="305" r="21" fill="var(--dd-jaune)"/><circle cx="733" cy="303" r="5"/><circle cx="747" cy="303" r="5"/><path d="M738 303 h4 M734 313 c 3 3, 9 3, 12 0"/></g>
+            <g class="f-tete"><circle cx="814" cy="432" r="21" fill="var(--dd-rose)"/><path d="M794 416 l20 -9 l20 9 l-20 9 Z" fill="var(--dd-encre)"/><circle cx="808" cy="432" r="2" fill="var(--dd-encre)"/><circle cx="820" cy="432" r="2" fill="var(--dd-encre)"/><path d="M808 440 c 3 3, 9 3, 12 0"/></g>
+            <g class="f-tete"><circle cx="666" cy="432" r="21" fill="var(--dd-sarcelle)"/><circle cx="660" cy="429" r="2" fill="var(--dd-encre)"/><circle cx="672" cy="429" r="2" fill="var(--dd-encre)"/><path d="M660 437 c 3 3, 9 3, 12 0"/><path d="M656 458 l10 -5 v10 Z M676 458 l-10 -5 v10 Z" fill="var(--dd-rose)"/></g>
+            <g id="f-cloche"><g transform="translate(740 392) scale(.62)"><path d="M-30 18 C -30 -18, -20 -40, 0 -40 C 20 -40, 30 -18, 30 18 L 40 30 L -40 30 Z" fill="var(--dd-jaune)"/><circle cx="0" cy="38" r="7" fill="var(--dd-encre)"/><g id="f-badge"><circle cx="30" cy="-34" r="16" fill="var(--dd-rose)"/><text x="30" y="-26" text-anchor="middle" font-size="24" fill="#fff" stroke="none">1</text></g></g></g>
           </g>
         </g>
 
         <!-- 2 et 5. la mascotte -->
         <g id="f-mascotte"><g transform="translate(371 120) scale(3.4)">
           <path d="M7.5 6.5 C 21 3.8, 42 4.6, 57 6.8 C 59.6 20, 60.4 41, 58.2 56.6 C 43 59.8, 21.5 60.6, 6.4 58 C 4.2 42.5, 3.6 21.5, 7.5 6.5 Z" fill="#ffd93d" stroke="#1f1d1a" stroke-width="3" stroke-linejoin="round"/>
-          <g fill="none" stroke="#1f1d1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M26 21.5 C 23 15, 19 12, 14.5 11.5 M38.5 21.5 C 41.5 15, 45.5 12.2, 50 12.5"/><path d="M32.5 20 C 43.5 19.4, 50 27, 49.2 37 C 48.4 46.8, 41.5 52.2, 32 52 C 22.5 51.8, 15.4 46.6, 15.6 37 C 15.8 27.6, 21.6 20.6, 32.5 20 Z" fill="#fffaf0"/><path d="M27 44.2 C 30 47.4, 35 47.4, 38 44"/></g>
-          <circle cx="14.5" cy="11.5" r="2.8" fill="#1f1d1a"/><circle cx="50" cy="12.5" r="2.8" fill="#1f1d1a"/>
-          <g id="f-yeux"><circle cx="26" cy="35" r="4.6" fill="#fff" stroke="#1f1d1a" stroke-width="2.4"/><circle cx="38.6" cy="35" r="4.6" fill="#fff" stroke="#1f1d1a" stroke-width="2.4"/><circle cx="27" cy="36" r="2.1" fill="#1f1d1a"/><circle cx="39.6" cy="36" r="2.1" fill="#1f1d1a"/></g>
+          <g id="f-antennes"><path d="M26 21.5 C 23 15, 19 12, 14.5 11.5 M38.5 21.5 C 41.5 15, 45.5 12.2, 50 12.5" fill="none" stroke="#1f1d1a" stroke-width="3" stroke-linecap="round"/><circle cx="14.5" cy="11.5" r="2.8" fill="#1f1d1a"/><circle cx="50" cy="12.5" r="2.8" fill="#1f1d1a"/></g>
+          <g fill="none" stroke="#1f1d1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32.5 20 C 43.5 19.4, 50 27, 49.2 37 C 48.4 46.8, 41.5 52.2, 32 52 C 22.5 51.8, 15.4 46.6, 15.6 37 C 15.8 27.6, 21.6 20.6, 32.5 20 Z" fill="#fffaf0"/><path d="M27 44.2 C 30 47.4, 35 47.4, 38 44"/></g>
+          <g id="f-oeil-g"><circle cx="26" cy="35" r="4.6" fill="#fff" stroke="#1f1d1a" stroke-width="2.4"/><circle class="f-pupille" cx="27" cy="36" r="2.1" fill="#1f1d1a"/></g>
+          <g id="f-oeil-d"><circle cx="38.6" cy="35" r="4.6" fill="#fff" stroke="#1f1d1a" stroke-width="2.4"/><circle class="f-pupille" cx="39.6" cy="36" r="2.1" fill="#1f1d1a"/></g>
           <ellipse cx="20.5" cy="43" rx="2.6" ry="1.7" fill="#ff6fa3" opacity=".85"/><ellipse cx="44.2" cy="43" rx="2.6" ry="1.7" fill="#ff6fa3" opacity=".85"/>
           <path d="M45 54.5 l3.6 3.6 l8.2 -10.4" fill="none" stroke="#13a89e" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
         </g></g>
-        <text id="f-nom" x="480" y="410" text-anchor="middle" class="f-texte" font-size="72" fill="var(--dd-encre)">Fas3a</text>
+        <text id="f-nom" x="480" y="410" text-anchor="middle" font-size="72" fill="var(--dd-encre)">Fas3a</text>
         <g id="f-etoiles" stroke="var(--dd-encre)" stroke-width="2.5" stroke-linejoin="round">
           <path d="M300 150 l6 14 h15 l-12 9 l5 15 l-14 -9 l-14 9 l5 -15 l-12 -9 h15 Z" fill="var(--dd-jaune)"/>
           <path d="M660 120 l5 11 h12 l-10 7 l4 12 l-11 -7 l-11 7 l4 -12 l-10 -7 h12 Z" fill="var(--dd-rose)"/>
           <path d="M680 360 l6 14 h15 l-12 9 l5 15 l-14 -9 l-14 9 l5 -15 l-12 -9 h15 Z" fill="var(--dd-sarcelle)"/>
           <path d="M270 380 c 10 -10, 20 10, 30 0" fill="none" stroke="var(--dd-rose)" stroke-width="4"/>
+          <path d="M700 230 c 8 -8, 16 8, 24 0" fill="none" stroke="var(--dd-sarcelle)" stroke-width="4"/>
+          <path d="M250 260 l4 9 h10 l-8 6 l3 10 l-9 -6 l-9 6 l3 -10 l-8 -6 h10 Z" fill="var(--dd-papier)"/>
         </g>
+        <g id="f-confettis"></g>
+        </g>
+        <!-- transition : un grand coup de feutre balaie l'image -->
+        <path id="f-balai" class="f-trait" pathLength="1" d="M-80 -20 L1040 60 L-80 140 L1040 220 L-80 300 L1040 380 L-80 460 L1040 540 L-80 620" fill="none" stroke="var(--dd-jaune)" stroke-width="150" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="dd-film-pause" aria-hidden="true"><i data-lucide="play"></i></span>
     </div>

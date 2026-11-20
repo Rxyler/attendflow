@@ -342,7 +342,7 @@
       retard = 2.3;
       var q = function (s) { return charg.querySelectorAll(s); };
       // dessin au crayon (etat de depart dans doodle.css) : chaque trait se trace, puis la couleur est posee dessous comme un feutre
-      var intro = gsap.timeline({ defaults: { ease: 'power2.inOut' } })
+      var intro = gsap.timeline({ defaults: { ease: 'power2.inOut', autoRound: false } })   // sans arrondi : les traits se dessinent au lieu de sauter
         .from(q('.dd-intro-logo'), { rotation: -6, scale: .9, duration: 1.6, ease: 'power1.out', transformOrigin: '50% 50%' }, 0)
         .to(q('.i-postit'), { strokeDashoffset: 0, duration: .55 }, 0)
         .to(q('.i-postit'), { fillOpacity: 1, duration: .25, ease: 'none' }, .4)
