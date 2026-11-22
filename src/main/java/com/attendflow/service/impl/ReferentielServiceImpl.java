@@ -38,6 +38,12 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     private static final Set<String> FORMATS_PHOTO = Set.of("png", "jpg", "jpeg");
+    /** Nom de personne : lettres (accents compris), separees par un espace, un tiret ou une apostrophe. "Ben Ali", "N'Diaye". */
+    private static final Pattern NOM_PERSONNE = Pattern.compile("\\p{L}[\\p{L}\\p{M}]*([ '’-]\\p{L}[\\p{L}\\p{M}]*)*");
+    private static final Pattern MATRICULE = Pattern.compile("[A-Za-z0-9-]{2,30}");
+    private static final Pattern TELEPHONE = Pattern.compile("\\+?[0-9 ]{8,20}");
+    private static final int AGE_MIN = 15, AGE_MAX = 100;
+    private static final double COEFFICIENT_MAX = 20;
 
     private final EtudiantRepository etudiants;
     private final EnseignantRepository enseignants;
@@ -86,11 +92,18 @@ public class ReferentielServiceImpl implements ReferentielService {
     public Etudiant enregistrerEtudiant(Long id, EtudiantForm f, MultipartFile photo) {
         String email = emailValide(f.email(), id);
         String matricule = requis(f.matricule(), "Le matricule", 30);
+        if (!MATRICULE.matcher(matricule).matches()) {
+            throw new IllegalArgumentException(t("Le matricule ne contient que des lettres, des chiffres ou des tirets (2 à 30)."));
+        }
         if (id == null ? etudiants.existsByMatricule(matricule) : etudiants.existsByMatriculeAndIdNot(matricule, id)) {
             throw new IllegalArgumentException(t("Le matricule {0} existe déjà.", matricule));   // RG-06
         }
         if (f.dateNaissance() != null && f.dateNaissance().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException(t("La date de naissance ne peut pas être dans le futur."));
+        }
+        if (f.dateNaissance() != null && (f.dateNaissance().isAfter(LocalDate.now().minusYears(AGE_MIN))
+                || f.dateNaissance().isBefore(LocalDate.now().minusYears(AGE_MAX)))) {
+            throw new IllegalArgumentException(t("Date de naissance invalide : l'étudiant doit avoir entre {0} et {1} ans.", AGE_MIN, AGE_MAX));
         }
         Classe classe = f.classeId() == null ? null : classes.findById(f.classeId()).orElse(null);
         if (classe == null) throw new IllegalArgumentException(t("Choisissez une classe."));
@@ -98,10 +111,10 @@ public class ReferentielServiceImpl implements ReferentielService {
         Etudiant e = id == null
                 ? new Etudiant(null, null, email, motDePasseAleatoire(), matricule, classe)
                 : etudiants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Étudiant introuvable.")));
-        e.setNom(requis(f.nom(), "Le nom", 80));
-        e.setPrenom(requis(f.prenom(), "Le prénom", 80));
+        e.setNom(nomPersonne(f.nom(), "Le nom"));
+        e.setPrenom(nomPersonne(f.prenom(), "Le prénom"));
         e.setEmail(email);
-        e.setTelephone(optionnel(f.telephone(), 30));
+        e.setTelephone(telephone(f.telephone()));
         e.setMatricule(matricule);
         e.setDateNaissance(f.dateNaissance());
         e.setClasse(classe);
@@ -216,19 +229,21 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     @Override
     public Classe enregistrerClasse(Long id, ClasseForm f) {
-        String nom = requis(f.nom(), "Le nom", 80);
+        String nom = avecLettre(requis(f.nom(), "Le nom", 80), "Le nom");
         if (id == null ? classes.findByNom(nom).isPresent() : classes.existsByNomAndIdNot(nom, id)) {
             throw new IllegalArgumentException(t("La classe {0} existe déjà.", nom));
         }
         String annee = optionnel(f.anneeUniversitaire(), 9);
-        if (annee != null && !annee.matches("\\d{4}-\\d{4}")) {
+        if (annee != null && (!annee.matches("\\d{4}-\\d{4}")
+                || Integer.parseInt(annee.substring(5)) != Integer.parseInt(annee.substring(0, 4)) + 1)) {
             throw new IllegalArgumentException(t("Année universitaire au format 2026-2027."));
         }
         Classe c = id == null ? new Classe()
                 : classes.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Classe introuvable.")));
         c.setNom(nom);
         c.setNiveau(optionnel(f.niveau(), 50));
-        c.setResponsable(optionnel(f.responsable(), 120));
+        String responsable = optionnel(f.responsable(), 120);
+        c.setResponsable(responsable == null ? null : nomPersonne(responsable, "Le responsable"));
         c.setAnneeUniversitaire(annee);
         return classes.save(c);
     }
@@ -255,12 +270,12 @@ public class ReferentielServiceImpl implements ReferentielService {
         if (id == null ? matieres.findByCode(code).isPresent() : matieres.existsByCodeAndIdNot(code, id)) {
             throw new IllegalArgumentException(t("Le code {0} existe déjà.", code));
         }
-        if (f.coefficient() != null && f.coefficient() <= 0) {
-            throw new IllegalArgumentException(t("Le coefficient doit être positif."));
+        if (f.coefficient() != null && !(f.coefficient() > 0 && f.coefficient() <= COEFFICIENT_MAX)) {   // NaN aussi refuse
+            throw new IllegalArgumentException(t("Le coefficient doit être compris entre 0 et {0}.", (int) COEFFICIENT_MAX));
         }
         Matiere m = id == null ? new Matiere()
                 : matieres.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Matière introuvable.")));
-        m.setIntitule(requis(f.intitule(), "L'intitulé", 120));
+        m.setIntitule(avecLettre(requis(f.intitule(), "L'intitulé", 120), "L'intitulé"));
         m.setCode(code);
         m.setCoefficient(f.coefficient());
         return matieres.save(m);
@@ -292,11 +307,12 @@ public class ReferentielServiceImpl implements ReferentielService {
         Enseignant e = id == null
                 ? new Enseignant(null, null, email, motDePasseAleatoire(), null)
                 : enseignants.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Enseignant introuvable.")));
-        e.setNom(requis(f.nom(), "Le nom", 80));
-        e.setPrenom(requis(f.prenom(), "Le prénom", 80));
+        e.setNom(nomPersonne(f.nom(), "Le nom"));
+        e.setPrenom(nomPersonne(f.prenom(), "Le prénom"));
         e.setEmail(email);
-        e.setTelephone(optionnel(f.telephone(), 30));
-        e.setSpecialite(optionnel(f.specialite(), 120));
+        e.setTelephone(telephone(f.telephone()));
+        String specialite = optionnel(f.specialite(), 120);
+        e.setSpecialite(specialite == null ? null : avecLettre(specialite, "La spécialité"));
         e.getMatieres().clear();
         e.getMatieres().addAll(choisies);
         return enseignants.save(e);
@@ -337,6 +353,34 @@ public class ReferentielServiceImpl implements ReferentielService {
         if (valeur == null || valeur.isBlank()) throw new IllegalArgumentException(t("{0} est obligatoire.", t(champ)));
         if (valeur.trim().length() > max) throw new IllegalArgumentException(t("{0} dépasse {1} caractères.", t(champ), max));
         return valeur.trim();
+    }
+
+    /** Nom ou prenom reel : pas de chiffres ni de symboles ; les espaces multiples sont ramenes a un seul. */
+    private static String nomPersonne(String valeur, String champ) {
+        String nom = requis(valeur, champ, 80).replaceAll("\\s+", " ");
+        if (!NOM_PERSONNE.matcher(nom).matches()) {
+            throw new IllegalArgumentException(t("{0} ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.", t(champ)));
+        }
+        return nom;
+    }
+
+    /** Un intitule fait uniquement de chiffres ou de symboles ("1234", "!!!") n'a pas de sens. */
+    private static String avecLettre(String valeur, String champ) {
+        if (valeur.codePoints().noneMatch(Character::isLetter)) {
+            throw new IllegalArgumentException(t("{0} doit contenir au moins une lettre.", t(champ)));
+        }
+        return valeur;
+    }
+
+    /** Facultatif ; 8 a 15 chiffres, "+" international et espaces permis ("+216 20 123 456"). */
+    private static String telephone(String valeur) {
+        String tel = optionnel(valeur, 30);
+        if (tel == null) return null;
+        long chiffres = tel.chars().filter(Character::isDigit).count();
+        if (!TELEPHONE.matcher(tel).matches() || chiffres < 8 || chiffres > 15) {
+            throw new IllegalArgumentException(t("Numéro de téléphone invalide : 8 à 15 chiffres, par exemple +216 20 123 456."));
+        }
+        return tel;
     }
 
     private static String optionnel(String valeur, int max) {

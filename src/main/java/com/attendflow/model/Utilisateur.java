@@ -63,6 +63,6 @@ public abstract class Utilisateur {
     }
 
     public String getNomComplet() {
-        return prenom + " " + nom;
+        return prenom.equalsIgnoreCase(nom) ? nom : prenom + " " + nom;   // "Admin Admin" s'affiche "Admin"
     }
 }

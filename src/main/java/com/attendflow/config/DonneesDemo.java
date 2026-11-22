@@ -69,8 +69,11 @@ public class DonneesDemo implements CommandLineRunner {
         Classe res3 = classe("3ème RÉSEAUX", "Licence 3", "Rami Gharbi");
 
         if (!utilisateurs.existsByEmail("admin@univ.tn")) {
-            utilisateurs.save(new Admin("Admin", "Super", "admin@univ.tn", encoder.encode(mdp(MDP_ADMIN_DEMO))));
+            utilisateurs.save(new Admin("Admin", "Admin", "admin@univ.tn", encoder.encode(mdp(MDP_ADMIN_DEMO))));
         }
+        // l'ancien "Super Admin" de la base en ligne s'appelle desormais "Admin"
+        utilisateurs.findByEmail("admin@univ.tn").filter(u -> "Super".equals(u.getPrenom()))
+                .ifPresent(u -> { u.setPrenom("Admin"); utilisateurs.save(u); });
         enseignant("Ben Salah", "Ahmed", "ahmed.bensalah@univ.tn", "Développement Web", devWeb, java);
         enseignant("Mansouri", "Sara", "sara.mansouri@univ.tn", "Bases de données", bdd, algo);
         enseignant("Gharbi", "Rami", "rami.gharbi@univ.tn", "Réseaux et systèmes", res, sys);

@@ -49,6 +49,24 @@ class ParametreTest {
         assertThat(p.getModifiePar().getEmail()).isEqualTo("admin@univ.tn");
     }
 
+    /** Comme en ligne : sans transaction de test, la page relue apres un enregistrement ne doit pas planter (erreur 500). */
+    @Test
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    void pageRelueApresEnregistrementSansTransaction() throws Exception {
+        Parametre avant = courant();
+        try {
+            mvc.perform(post("/admin/parametres").with(csrf()).with(ADMIN)
+                            .param("seuilAbsence", "20").param("nbMaxAbsencesNonJustifiees", "8")
+                            .param("delaiModificationHeures", "48").param("retardCommePresent", "true")
+                            .param("justifieCommePresent", "true"))
+                    .andExpect(flash().attributeExists("succes"));
+            mvc.perform(get("/admin/parametres").with(ADMIN)).andExpect(status().isOk());
+        } finally {
+            avant.setModifiePar(null);
+            parametres.save(avant);
+        }
+    }
+
     @Test
     void refuseValeursHorsLimites() throws Exception {
         double avant = courant().getSeuilAbsence();

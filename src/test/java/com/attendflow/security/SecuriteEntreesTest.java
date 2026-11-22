@@ -48,13 +48,11 @@ class SecuriteEntreesTest {
 
     @Test
     void codeHtmlSaisiEstAfficheCommeDuTexte() throws Exception {
-        Long classe = classes.findAll().getFirst().getId();
-        mvc.perform(post("/admin/etudiants").with(csrf()).with(ADMIN)
-                        .param("nom", "<script>alert(1)</script>").param("prenom", "\"><img src=x onerror=alert(2)>")
-                        .param("email", "xss@univ.tn").param("matricule", "=HYPERLINK(\"http://x\")")
-                        .param("classeId", classe.toString()))
+        // Les noms de personnes refusent deja ces caracteres ; le nom et le niveau d'une classe restent du texte libre.
+        mvc.perform(post("/admin/classes").with(csrf()).with(ADMIN)
+                        .param("nom", "<script>alert(1)</script>").param("niveau", "\"><img src=x onerror=alert(2)>"))
                 .andExpect(flash().attributeExists("succes"));
-        mvc.perform(get("/admin/etudiants").with(ADMIN))
+        mvc.perform(get("/admin/classes").with(ADMIN))
                 .andExpect(content().string(not(containsString("<script>alert(1)"))))
                 .andExpect(content().string(not(containsString("<img src=x"))))
                 .andExpect(content().string(containsString("&lt;script&gt;alert(1)&lt;/script&gt;")));

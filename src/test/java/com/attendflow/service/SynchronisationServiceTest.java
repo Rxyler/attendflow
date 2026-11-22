@@ -142,7 +142,8 @@ class SynchronisationServiceTest {
                 .andExpect(redirectedUrl("/admin/synchronisation"));
         mvc.perform(get("/admin/synchronisation").with(user("admin@univ.tn").roles("ADMIN")))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Super Admin")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Admin")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("Super Admin"))));
         mvc.perform(get("/admin/synchronisation").with(user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT")))
                 .andExpect(status().isForbidden());
     }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface ParametreRepository extends JpaRepository<Parametre, Long> {
 
-    /** Une seule ligne de parametres pour toute la plateforme. */
+    /** Une seule ligne de parametres pour toute la plateforme ; l'admin est charge avec (affiche hors transaction). */
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "modifiePar")
     Optional<Parametre> findFirstByOrderByIdAsc();
 }
