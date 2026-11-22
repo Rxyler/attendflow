@@ -216,7 +216,40 @@
       }).join('');
     document.body.appendChild(defs);
   }
-  if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 1.75 } });
+  // les icones Lucide sont redessinees au crayon par rough.js (double trait tremble) ; le dernier trait sert d'accent colore
+  function chemin(el) {
+    var a = function (n) { return parseFloat(el.getAttribute(n)) || 0; };
+    switch (el.tagName) {
+      case 'path': return el.getAttribute('d');
+      case 'line': return 'M' + a('x1') + ' ' + a('y1') + 'L' + a('x2') + ' ' + a('y2');
+      case 'polyline': case 'polygon': return 'M' + el.getAttribute('points').trim() + (el.tagName === 'polygon' ? 'Z' : '');
+      case 'circle': case 'ellipse':
+        var rx = a('r') || a('rx'), ry = a('r') || a('ry'), cx = a('cx'), cy = a('cy');
+        return 'M' + (cx - rx) + ' ' + cy + 'a' + rx + ' ' + ry + ' 0 1 0 ' + 2 * rx + ' 0a' + rx + ' ' + ry + ' 0 1 0 ' + -2 * rx + ' 0';
+      case 'rect':
+        var x = a('x'), y = a('y'), w = a('width'), h = a('height'), r = Math.min(a('rx'), w / 2, h / 2);
+        return 'M' + (x + r) + ' ' + y + 'h' + (w - 2 * r) + 'q' + r + ' 0 ' + r + ' ' + r + 'v' + (h - 2 * r) + 'q0 ' + r + ' ' + -r + ' ' + r
+          + 'h' + (2 * r - w) + 'q' + -r + ' 0 ' + -r + ' ' + -r + 'v' + (2 * r - h) + 'q0 ' + -r + ' ' + r + ' ' + -r + 'Z';
+    }
+  }
+  function crayonner() {
+    if (!window.rough) return;
+    document.querySelectorAll('svg.lucide:not([data-crayon])').forEach(function (svg) {
+      svg.setAttribute('data-crayon', '');
+      var rc = rough.svg(svg), formes = svg.querySelectorAll('path, line, polyline, polygon, circle, ellipse, rect');
+      var graine = 0; for (var k = 0; k < svg.classList.value.length; k++) graine = (graine * 31 + svg.classList.value.charCodeAt(k)) % 99991;
+      formes.forEach(function (el, i) {
+        var g = rc.path(chemin(el), { roughness: .9, bowing: 1, maxRandomnessOffset: .8, stroke: 'currentColor', strokeWidth: 1.4, seed: graine + i + 1 });
+        if (formes.length > 1 && i === formes.length - 1) g.setAttribute('class', 'dd-accent');
+        el.replaceWith(g);
+      });
+    });
+  }
+  if (window.lucide) {
+    var creerIcones = lucide.createIcons;
+    lucide.createIcons = function (o) { creerIcones(o || { attrs: { 'stroke-width': 1.75 } }); crayonner(); };
+    lucide.createIcons();
+  }
 
   /* ================= Reflet du verre ================= */
   if (!tactile && !calme) document.addEventListener('pointermove', function (e) {

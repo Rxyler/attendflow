@@ -246,7 +246,8 @@ a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 .af-chiffres .af-grand { font-family: var(--dd-hand); font-weight: 400; }
 .af-bandeau { border-top: 2px dashed var(--dd-encre); border-bottom: 2px dashed var(--dd-encre); }
 .af-bandeau-piste span { font-family: var(--dd-caps); font-size: 1.05rem; color: var(--af-ink); }
-.af-feature .af-ico svg.lucide, .af-role svg.lucide, .af-ico-ligne { color: var(--dd-rose) !important; }
+.af-ico-ligne { color: var(--dd-rose) !important; }
+.af-feature .af-ico svg.lucide, .af-role svg.lucide { color: var(--af-ink) !important; width: 2.1rem; height: 2.1rem; }
 .af-etape .af-num { font-family: var(--dd-hand); color: var(--af-ink); font-size: 1.6rem; }
 .af-roles .af-role + .af-role { border-left: 2px dashed var(--dd-encre); }
 .af-cta { text-align: center; }
@@ -294,7 +295,10 @@ h1, h2, h3, h4, h5, h6, .af-display, .af-feature h3, .af-role h3, .af-etape h3 {
 
 /* ---------- Finitions : crayon, grain du papier, gestes ---------- */
 /* les icones passent par le filtre "crayon" (injecte une fois par attendflow.js) : traits a main levee */
-svg.lucide { filter: url(#dd-crayon); }
+svg.lucide:not([data-crayon]) { filter: url(#dd-crayon); }
+/* icones redessinees au crayon (rough.js) : un trait d'accent rose, sauf la ou l'icone porte deja une couleur */
+svg.lucide .dd-accent { color: var(--dd-rose); }
+:is(.btn, .alert, .af-toast, .af-badge, .nav-link.active, .af-theme) svg.lucide .dd-accent, :is(.lucide-x, .lucide-arrow-left) .dd-accent { color: inherit; }
 /* grain du papier par-dessus les points (fixe : peint une fois, ne bouge pas au defilement) */
 body {
   background-image:
