@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Classe (groupe d'etudiants) pour une annee universitaire. */
 @Entity
 @Table(name = "classe")
 @Getter
@@ -29,7 +28,6 @@ public class Classe {
     @Column(length = 120)
     private String responsable;
 
-    /** RG-07 : ex. "2026-2027". */
     @Column(name = "annee_universitaire", length = 9)
     private String anneeUniversitaire;
 
@@ -43,7 +41,6 @@ public class Classe {
         this.anneeUniversitaire = anneeUniversitaire;
     }
 
-    /** Attribut derive /effectif (F-06) : calcule, pas stocke en base. */
     @Transient
     public int getEffectif() {
         return etudiants.size();

@@ -26,7 +26,6 @@
         <ul class="mb-0 small"><li th:each="e : ${erreursImport}" th:text="${e}">ligne</li></ul>
       </div>
 
-      <!-- F-10 : recherche et filtre -->
       <form th:action="@{/admin/etudiants}" method="get" class="af-glass p-3 d-flex flex-wrap gap-2 align-items-end">
         <div class="flex-grow-1" style="min-width: 14rem">
           <label for="q" class="form-label small fw-medium mb-1" th:text="#{etudiants.rechercher}">Rechercher</label>
@@ -87,7 +86,6 @@
   </div>
 </div>
 
-<!-- Modale d'ajout / modification (ecran 6) -->
 <div class="modal fade" id="modale-etudiant" tabindex="-1" aria-labelledby="modale-etudiant-titre" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <form class="modal-content" th:action="@{/admin/etudiants}" method="post" enctype="multipart/form-data">
@@ -104,7 +102,9 @@
         <div class="col-md-6"><label for="f-email" class="form-label" th:text="#{champ.email}">Email</label>
           <input id="f-email" name="email" type="email" class="form-control" th:value="${form?.email}" required maxlength="150"></div>
         <div class="col-md-6"><label for="f-matricule" class="form-label" th:text="#{champ.matricule}">Matricule</label>
-          <input id="f-matricule" name="matricule" class="form-control" th:value="${form?.matricule}" required maxlength="30"></div>
+          <input id="f-matricule" name="matricule" class="form-control" th:value="${form?.matricule}" required
+                 minlength="8" maxlength="8" pattern="[0-9]{8}" inputmode="numeric" placeholder="20260001"
+                 th:title="#{champ.matriculeAide}"></div>
         <div class="col-md-4"><label for="f-classe" class="form-label" th:text="#{champ.classe}">Classe</label>
           <select id="f-classe" name="classeId" class="form-select" required>
             <option value="" th:text="#{etudiants.choisir}">Choisir…</option>
@@ -127,7 +127,6 @@
   </div>
 </div>
 
-<!-- Modale d'import CSV (F-09) -->
 <div class="modal fade" id="modale-import" tabindex="-1" aria-labelledby="modale-import-titre" aria-hidden="true">
   <div class="modal-dialog">
     <form class="modal-content" th:action="@{/admin/etudiants/import}" method="post" enctype="multipart/form-data">
@@ -152,7 +151,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script th:inline="javascript">
-  // Rouvre la modale en modification ou apres une erreur de saisie
   if (/*[[${formId != null or ouvrir == true or param.ajouter != null}]]*/ false) {
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modale-etudiant')).show();
   }

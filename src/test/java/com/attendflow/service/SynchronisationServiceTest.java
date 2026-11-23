@@ -25,16 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Utilise les donnees de demo (classes, matieres, enseignants) et une source partenaire
- * controlee par le test. Tout est annule apres chaque test (@Transactional).
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -135,15 +133,14 @@ class SynchronisationServiceTest {
 
     @Test
     void demoImporteeAuDemarrageEtPageAdmin() throws Exception {
-        // DonneesDemo a importe le planning fictif au demarrage
         assertThat(seances.count()).isGreaterThan(0);
 
         mvc.perform(post("/admin/synchronisation").with(csrf()).with(user("admin@univ.tn").roles("ADMIN")))
                 .andExpect(redirectedUrl("/admin/synchronisation"));
         mvc.perform(get("/admin/synchronisation").with(user("admin@univ.tn").roles("ADMIN")))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Admin")))
-                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("Super Admin"))));
+                .andExpect(content().string(containsString("Admin")))
+                .andExpect(content().string(not(containsString("Super Admin"))));
         mvc.perform(get("/admin/synchronisation").with(user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT")))
                 .andExpect(status().isForbidden());
     }

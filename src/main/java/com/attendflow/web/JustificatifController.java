@@ -26,7 +26,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/** F-24 / F-25 : justificatifs d'absence. */
 @Controller
 public class JustificatifController {
 
@@ -43,13 +42,10 @@ public class JustificatifController {
         this.utilisateurs = utilisateurs;
     }
 
-    // ----- Etudiant (F-24) -----
-
     @GetMapping("/etudiant/justificatifs")
     public String mesJustificatifs(@AuthenticationPrincipal UserDetails compte,
                                    @RequestParam(required = false) Long presence, Model model) {
         Etudiant etudiant = etudiants.findWithClasseByEmail(compte.getUsername()).orElseThrow();
-        // Absences encore justifiables : sans justificatif, ou dont le justificatif a ete refuse
         List<Presence> justifiables = statistiques.historique(etudiant).lignes().stream()
                 .filter(p -> p.getStatut() == StatutPresence.ABSENT)
                 .filter(p -> p.getJustificatif() == null || p.getJustificatif().getEtat() == EtatJustificatif.REFUSE)
@@ -74,9 +70,6 @@ public class JustificatifController {
         }
         return "redirect:/etudiant/justificatifs";
     }
-
-    // ----- Administrateur, ou enseignant pour ses propres seances (F-25) -----
-    // meme page aux deux adresses ; /admin/** et /enseignant/** sont reserves a leur role par SecurityConfig
 
     @GetMapping({"/admin/justificatifs", "/enseignant/justificatifs"})
     public String aTraiter(@AuthenticationPrincipal UserDetails compte, Model model) {
@@ -107,8 +100,6 @@ public class JustificatifController {
     private static String base(Utilisateur u) {
         return u instanceof Admin ? "/admin/justificatifs" : "/enseignant/justificatifs";
     }
-
-    // ----- Fichier (admin ou etudiant concerne) -----
 
     @GetMapping("/justificatifs/{id}/fichier")
     public ResponseEntity<Resource> fichier(@PathVariable Long id, @AuthenticationPrincipal UserDetails compte) {

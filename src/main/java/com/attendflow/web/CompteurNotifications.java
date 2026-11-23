@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-/** Ajoute le nombre de notifications non lues a chaque page, pour le badge de la barre laterale. */
 @ControllerAdvice
 public class CompteurNotifications {
 

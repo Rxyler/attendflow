@@ -16,11 +16,11 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Utilise les donnees de demo et le planning fictif importes au demarrage (semaine en cours). */
 @SpringBootTest
 @AutoConfigureMockMvc
 class EmploiDuTempsTest {
@@ -89,7 +89,7 @@ class EmploiDuTempsTest {
                 .filter(s -> !s.isOuvertePourPresences()).findFirst().orElseThrow().getId();
         mvc.perform(get("/emploi-du-temps").param("seance", annulee.toString())
                         .param("semaine", seances.findById(annulee).orElseThrow().getDate().toString()).with(ADMIN))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("la prise des présences n’est pas possible")));
+                .andExpect(content().string(containsString("la prise des présences n’est pas possible")));
     }
 
     @Test

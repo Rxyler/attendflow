@@ -14,11 +14,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Limite de requetes par visiteur : au-dela de N requetes par minute, reponse 429 jusqu'a la minute suivante.
- * Protege l'application d'un visiteur qui la martele ; les grosses attaques reseau sont absorbees par Cloudflare (Render).
- * shortcut: compteur en memoire, une seule instance ; passer a Redis ou a une regle Cloudflare si l'application est repliquee.
- */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class LimiteRequetes extends OncePerRequestFilter {
@@ -36,7 +31,6 @@ public class LimiteRequetes extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
-        // 0 = desactive (tests) ; les fichiers statiques ne comptent pas
         String uri = req.getRequestURI();
         return maxParMinute <= 0 || uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/images/");
     }
@@ -44,7 +38,7 @@ public class LimiteRequetes extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse rep, FilterChain chaine)
             throws ServletException, IOException {
-        if (fenetres.size() > 50_000) fenetres.clear();   // borne la memoire face a une rafale d'adresses
+        if (fenetres.size() > 50_000) fenetres.clear();
         long maintenant = System.currentTimeMillis();
         Fenetre f = fenetres.compute(visiteur(req), (k, v) ->
                 v == null || maintenant - v.debut() >= MINUTE_MS ? new Fenetre(maintenant, 1) : new Fenetre(v.debut(), v.nombre() + 1));
@@ -59,7 +53,6 @@ public class LimiteRequetes extends OncePerRequestFilter {
         chaine.doFilter(req, rep);
     }
 
-    /** Cloudflare (devant Render) donne la vraie adresse du visiteur et ecrase toute valeur envoyee par le client. */
     static String visiteur(HttpServletRequest req) {
         String cf = req.getHeader("CF-Connecting-IP");
         return cf != null && !cf.isBlank() ? cf.trim() : req.getRemoteAddr();

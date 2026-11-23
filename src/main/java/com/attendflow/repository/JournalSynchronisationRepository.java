@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface JournalSynchronisationRepository extends JpaRepository<JournalSynchronisation, Long> {
 
-    /** Charge aussi l'admin declencheur : la page l'affiche apres la fermeture de la transaction. */
     @EntityGraph(attributePaths = "declenchePar")
     List<JournalSynchronisation> findTop20ByOrderByDateSynchroDesc();
 }

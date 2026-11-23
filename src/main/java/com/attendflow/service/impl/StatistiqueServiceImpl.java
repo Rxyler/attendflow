@@ -46,7 +46,6 @@ public class StatistiqueServiceImpl implements StatistiqueService {
         List<Presence> lignes = presences.findByEtudiantOrderBySeanceDateDesc(etudiant);
         List<StatutPresence> statuts = lignes.stream().map(Presence::getStatut).toList();
 
-        // Taux cumule a la fin de chaque jour, du plus ancien au plus recent.
         List<LocalDate> jours = lignes.stream().map(pr -> pr.getSeance().getDate()).distinct().sorted().toList();
         List<Point> evolution = jours.stream().map(jour -> new Point(jour, TauxPresence.taux(lignes.stream()
                 .filter(pr -> !pr.getSeance().getDate().isAfter(jour)).map(Presence::getStatut).toList(), p))).toList();
@@ -88,7 +87,6 @@ public class StatistiqueServiceImpl implements StatistiqueService {
                 .filter(pr -> pr.getStatut() == StatutPresence.ABSENT).limit(5).toList();
         Integer taux = TauxPresence.taux(statuts, parametres());
 
-        // Defi de la semaine : etre present (ou en retard) a toutes les seances de la semaine
         LocalDate lundi = maintenant.toLocalDate().with(DayOfWeek.MONDAY);
         int defiTotal = (int) seances.findByClasseAndDateBetweenOrderByDateAscHeureDebutAsc(
                         etudiant.getClasse(), lundi, lundi.plusDays(6)).stream()
@@ -104,7 +102,6 @@ public class StatistiqueServiceImpl implements StatistiqueService {
                 defiFaites, defiTotal, calendrier(historique, lundi));
     }
 
-    /** 12 semaines, du lundi le plus ancien a dimanche de cette semaine ; un jour prend le pire statut de ses seances. */
     static List<Jour> calendrier(List<Presence> historique, LocalDate lundi) {
         LocalDate debut = lundi.minusWeeks(11);
         Map<LocalDate, StatutPresence> pire = new HashMap<>();
@@ -127,7 +124,6 @@ public class StatistiqueServiceImpl implements StatistiqueService {
         List<Presence> semaine = presences.findBySeanceDateBetween(aujourdhui.minusDays(6), aujourdhui);
         List<StatutPresence> statuts = semaine.stream().map(Presence::getStatut).toList();
 
-        // shortcut: charge toutes les presences en memoire, suffisant pour un etablissement ; passer a une requete GROUP BY au-dela de ~100 000 lignes
         List<EtudiantARisque> aRisque = presences.findAllBy().stream()
                 .collect(Collectors.groupingBy(Presence::getEtudiant,
                         Collectors.mapping(Presence::getStatut, Collectors.toList())))

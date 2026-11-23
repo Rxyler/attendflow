@@ -51,7 +51,6 @@ public class SynchronisationServiceImpl implements SynchronisationService {
         this.notifications = notifications;
     }
 
-    /** F-12 : synchronisation periodique, chaque jour ouvre a 7h (modifiable dans application.properties). */
     @Scheduled(cron = "${attendflow.synchro.cron:0 0 7 * * MON-FRI}")
     public void synchroniserAutomatiquement() {
         synchroniser(null);
@@ -75,7 +74,7 @@ public class SynchronisationServiceImpl implements SynchronisationService {
 
         int ajoutees = 0, modifiees = 0, annulees = 0;
         List<String> erreurs = new ArrayList<>();
-        List<String[]> alertes = new ArrayList<>();   // {modele, valeur}
+        List<String[]> alertes = new ArrayList<>();
 
         for (SeanceExterne s : recues) {
             Classe classe = classes.findByNom(s.classe()).orElse(null);
@@ -130,8 +129,6 @@ public class SynchronisationServiceImpl implements SynchronisationService {
                 ? t("{0} séance(s) lue(s).", recues.size())
                 : t("{0} séance(s) ignorée(s) : {1}", erreurs.size(), String.join(", ", erreurs))));
 
-        // F-16a / RG-10 : les presences deja saisies sont conservees et l'administrateur est alerte.
-        // chaque alerte garde son modele et sa valeur : elle est redigee dans la langue de chaque administrateur
         for (String[] alerte : alertes) {
             for (Utilisateur admin : utilisateurs.findByRole(Role.ADMIN)) {
                 Locale langue = LangueConfig.de(admin);

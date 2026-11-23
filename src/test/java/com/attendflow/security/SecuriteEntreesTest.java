@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Entrees hostiles : injection SQL, XSS, CSRF, force brute, valeurs absurdes, pages d'erreur. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -40,7 +39,6 @@ class SecuriteEntreesTest {
     void injectionSqlALaConnexionEtDansLaRecherche() throws Exception {
         mvc.perform(formLogin().user("email", "admin@univ.tn' OR '1'='1").password("motDePasse", "' OR '1'='1"))
                 .andExpect(redirectedUrl("/login?erreur"));
-        // La recherche est parametree : le texte est cherche tel quel, aucune ligne ne correspond.
         mvc.perform(get("/admin/etudiants").with(ADMIN).param("q", "' OR 1=1 --"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("etudiants", empty()));
@@ -48,7 +46,6 @@ class SecuriteEntreesTest {
 
     @Test
     void codeHtmlSaisiEstAfficheCommeDuTexte() throws Exception {
-        // Les noms de personnes refusent deja ces caracteres ; le nom et le niveau d'une classe restent du texte libre.
         mvc.perform(post("/admin/classes").with(csrf()).with(ADMIN)
                         .param("nom", "<script>alert(1)</script>").param("niveau", "\"><img src=x onerror=alert(2)>"))
                 .andExpect(flash().attributeExists("succes"));
@@ -69,16 +66,15 @@ class SecuriteEntreesTest {
     void valeursAbsurdesRefusees() throws Exception {
         Long classe = classes.findAll().getFirst().getId();
         mvc.perform(post("/admin/etudiants").with(csrf()).with(ADMIN).param("nom", "a".repeat(5000))
-                        .param("prenom", "x").param("email", "x@univ.tn").param("matricule", "M1")
+                        .param("prenom", "x").param("email", "x@univ.tn").param("matricule", "20267001")
                         .param("classeId", classe.toString()))
                 .andExpect(flash().attribute("erreur", containsString("dépasse")));
         mvc.perform(post("/admin/etudiants").with(csrf()).with(ADMIN).param("nom", "a").param("prenom", "x")
-                        .param("email", "pas-un-email").param("matricule", "M2").param("classeId", classe.toString()))
+                        .param("email", "pas-un-email").param("matricule", "20267002").param("classeId", classe.toString()))
                 .andExpect(flash().attribute("erreur", containsString("Email invalide")));
         mvc.perform(post("/admin/etudiants").with(csrf()).with(ADMIN).param("nom", "  ").param("prenom", "x")
-                        .param("email", "y@univ.tn").param("matricule", "M3").param("classeId", classe.toString()))
+                        .param("email", "y@univ.tn").param("matricule", "20267003").param("classeId", classe.toString()))
                 .andExpect(flash().attribute("erreur", containsString("obligatoire")));
-        // Types impossibles a convertir : 400, pas d'erreur 500
         mvc.perform(get("/rapports").with(ADMIN).param("du", "abc")).andExpect(status().isBadRequest());
         mvc.perform(get("/seances/abc/presences").with(ADMIN)).andExpect(status().isBadRequest());
     }
@@ -91,16 +87,13 @@ class SecuriteEntreesTest {
         }
         mvc.perform(formLogin().user("email", "sara.mansouri@univ.tn").password("motDePasse", "faux"))
                 .andExpect(redirectedUrl("/login?bloque"));
-        // Meme le bon mot de passe est refuse pendant le blocage
         mvc.perform(formLogin().user("email", "sara.mansouri@univ.tn").password("motDePasse", "1234"))
                 .andExpect(redirectedUrl("/login?bloque"));
-        // Un email inconnu se bloque pareil : on ne revele pas quels comptes existent
         for (int i = 0; i < TentativesConnexion.MAX_ECHECS; i++) {
             mvc.perform(formLogin().user("email", "personne@univ.tn").password("motDePasse", "x"));
         }
         mvc.perform(formLogin().user("email", "personne@univ.tn").password("motDePasse", "x"))
                 .andExpect(redirectedUrl("/login?bloque"));
-        // Les autres comptes ne sont pas touches
         mvc.perform(formLogin().user("email", "ahmed.bensalah@univ.tn").password("motDePasse", "1234"))
                 .andExpect(redirectedUrl("/"));
     }

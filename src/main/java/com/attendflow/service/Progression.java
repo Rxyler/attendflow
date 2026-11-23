@@ -5,10 +5,6 @@ import com.attendflow.model.enums.StatutPresence;
 
 import java.util.List;
 
-/**
- * Progression ludique d'un etudiant, recalculee a chaque affichage a partir de ses presences
- * (rien n'est stocke : elle suit toujours les corrections de l'enseignant).
- */
 public record Progression(int points, int niveau, String titre, int pourcentNiveau,
                           int serie, int record, List<Badge> badges) {
 
@@ -17,10 +13,8 @@ public record Progression(int points, int niveau, String titre, int pourcentNive
 
     public record Badge(String nom, String icone, String description, boolean obtenu) {}
 
-    /** @param statuts du plus recent au plus ancien ; @param taux taux de presence (null si aucune seance) */
     public static Progression de(List<StatutPresence> statuts, Integer taux) {
         int points = 0, record = 0, courante = 0, presents = 0;
-        // parcours chronologique : du plus ancien au plus recent
         for (StatutPresence s : statuts.reversed()) {
             points += switch (s) { case PRESENT -> 10; case RETARD -> 5; case JUSTIFIE -> 2; case ABSENT -> 0; };
             if (s == StatutPresence.PRESENT || s == StatutPresence.RETARD) {
@@ -28,7 +22,7 @@ public record Progression(int points, int niveau, String titre, int pourcentNive
                 record = Math.max(record, ++courante);
             } else if (s == StatutPresence.ABSENT) {
                 courante = 0;
-            } // une absence justifiee ne casse pas la serie
+            }
         }
         int serie = courante;
         int niveau = points / POINTS_PAR_NIVEAU + 1;
@@ -49,7 +43,6 @@ public record Progression(int points, int niveau, String titre, int pourcentNive
         return badges.stream().filter(Badge::obtenu).count();
     }
 
-    /** Ce que dit le compagnon sur le tableau de bord. */
     public String message(String compagnon) {
         if (record == 0 && points == 0) return t("{0} t’attend à ta première séance.", compagnon);
         if (serie >= 5) return t("{0} est fier de toi : {1} séances d’affilée !", compagnon, serie);

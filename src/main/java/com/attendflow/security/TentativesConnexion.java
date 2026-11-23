@@ -11,11 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Anti force brute : apres 5 mots de passe faux pour un email, connexion bloquee 5 minutes.
- * Compte aussi les emails inconnus, pour ne pas reveler quels comptes existent.
- * shortcut: compteur en memoire, perdu au redemarrage et propre a une instance ; passer en base si plusieurs instances.
- */
 @Component
 public class TentativesConnexion {
 
@@ -28,7 +23,7 @@ public class TentativesConnexion {
 
     @EventListener
     public void echec(AuthenticationFailureBadCredentialsEvent e) {
-        if (etats.size() > 10_000) etats.clear();   // borne la memoire face a un balayage d'emails
+        if (etats.size() > 10_000) etats.clear();
         etats.merge(cle(e.getAuthentication().getName()), new Etat(1, Instant.now()),
                 (avant, nouveau) -> expire(avant) ? nouveau : new Etat(avant.echecs() + 1, nouveau.dernier()));
     }

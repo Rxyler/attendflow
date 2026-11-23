@@ -1,5 +1,3 @@
-/* AttendFlow : theme clair/sombre, fond shader + particules, curseur lumineux, verre reactif,
-   profondeur 3D, prechargement, defilement doux et mouvement d'entree. */
 (function () {
   'use strict';
 
@@ -7,23 +5,20 @@
   var tactile = window.matchMedia('(pointer: coarse)').matches;
   var $$ = function (sel, racine) { return Array.prototype.slice.call((racine || document).querySelectorAll(sel)); };
   var racine = document.documentElement;
-  /* Pause des animations (WCAG 2.2.2) : tout ce qui bouge plus de 5 s peut etre arrete, choix memorise */
   var ambiance = [];
   function enPause() { return racine.classList.contains('af-calme'); }
   function appliquerPause(oui) {
     racine.classList.toggle('af-calme', oui);
-    try { localStorage.setItem('af-calme', oui ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
-    // bouton bascule : libelle fixe, l'etat passe par aria-pressed
+    try { localStorage.setItem('af-calme', oui ? '1' : '0'); } catch (e) {}
     Array.prototype.forEach.call(document.querySelectorAll('.af-pause'), function (b) { b.setAttribute('aria-pressed', oui ? 'true' : 'false'); });
     ambiance.forEach(function (t) { oui ? t.pause() : t.resume(); });
     document.dispatchEvent(new CustomEvent('af:pause', { detail: oui }));
   }
-  try { if (localStorage.getItem('af-calme') === '1') racine.classList.add('af-calme'); } catch (e) { /* ok */ }
+  try { if (localStorage.getItem('af-calme') === '1') racine.classList.add('af-calme'); } catch (e) {}
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.af-pause');
     if (b) appliquerPause(!enPause());
   });
-  // en pause, une image figee est redessinee une fois si la fenetre change de taille ou de theme
   var versionImage = 0;
   window.addEventListener('resize', function () { versionImage++; });
   document.addEventListener('af:theme', function () { versionImage++; });
@@ -32,7 +27,6 @@
     cibleSouris.x = e.clientX / window.innerWidth; cibleSouris.y = e.clientY / window.innerHeight;
   }, { passive: true });
 
-  /* ================= Langue : le serveur retient le choix (cookie, et compte si connecte) ================= */
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.af-langue');
     if (!b) return;
@@ -41,11 +35,10 @@
     location.href = u.toString();
   });
 
-  /* ================= Theme clair / sombre ================= */
   function theme() { return racine.getAttribute('data-bs-theme') || 'dark'; }
   function appliquerTheme(t) {
     racine.setAttribute('data-bs-theme', t);
-    try { localStorage.setItem('af-theme', t); } catch (e) { /* stockage indisponible */ }
+    try { localStorage.setItem('af-theme', t); } catch (e) {}
     document.querySelector('meta[name=theme-color]') && document.querySelector('meta[name=theme-color]').setAttribute('content', t === 'light' ? '#fbf5e8' : '#22302a');
     document.dispatchEvent(new CustomEvent('af:theme', { detail: t }));
   }
@@ -53,27 +46,24 @@
     var b = e.target.closest && e.target.closest('.af-theme:not(.af-pause):not(.af-langue)');
     if (!b) return;
     var suivant = theme() === 'dark' ? 'light' : 'dark';
-    // Transition circulaire depuis le bouton quand le navigateur sait le faire
     if (document.startViewTransition && !calme) {
       var r = b.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
       var rayon = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-      // pendant le cercle : une seule image, pas de fondus parasites ni de groupes nommes qui basculent avant lui
       racine.classList.add('af-vt-theme');
       var vt = document.startViewTransition(function () { appliquerTheme(suivant); });
       vt.finished.catch(function () {}).finally(function () { racine.classList.remove('af-vt-theme'); });
       vt.ready.then(function () {
         racine.animate({ clipPath: ['circle(0 at ' + x + 'px ' + y + 'px)', 'circle(' + rayon + 'px at ' + x + 'px ' + y + 'px)'] },
           { duration: 600, easing: 'cubic-bezier(.2,.8,.2,1)', pseudoElement: '::view-transition-new(root)' });
-      }).catch(function () { /* transition interrompue (double clic, navigation) : le theme est deja applique */ });
+      }).catch(function () {});
     } else appliquerTheme(suivant);
   });
 
-  /* ================= Fond : shader WebGL (aurora fluide) ================= */
   function shader() {
     var c = document.querySelector('canvas.af-fond-shader');
     if (!c || calme) return;
     var gl = c.getContext('webgl', { antialias: false, depth: false, alpha: false, powerPreference: 'low-power' });
-    if (!gl) return;                                  // le degrade CSS de secours reste visible
+    if (!gl) return;
     var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
     var fs = 'precision highp float;uniform vec2 uRes;uniform float uTime;uniform vec2 uMouse;uniform float uLight;' +
       'vec2 h(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return -1.+2.*fract(sin(p)*43758.5453123);}' +
@@ -100,7 +90,6 @@
         uMouse = gl.getUniformLocation(prog, 'uMouse'), uLight = gl.getUniformLocation(prog, 'uLight');
     var clair = theme() === 'light' ? 1 : 0, clairCible = clair;
     document.addEventListener('af:theme', function (e) { clairCible = e.detail === 'light' ? 1 : 0; if (racine.classList.contains('af-vt-theme')) clair = clairCible; });
-    // espace connecte : fond plafonne a ~30 images/s, la vitrine garde la pleine cadence
     var pas = document.querySelector('.af-sidebar') ? 33 : 0;
     function taille() { c.width = Math.max(2, Math.floor(window.innerWidth * .5)); c.height = Math.max(2, Math.floor(window.innerHeight * .5)); gl.viewport(0, 0, c.width, c.height); }
     taille(); window.addEventListener('resize', taille);
@@ -108,7 +97,7 @@
     var debut = performance.now();
     (function trame(now) {
       requestAnimationFrame(trame);
-      if (!visible || (enPause() && trame.v === versionImage)) return;   // en pause : la derniere image reste affichee
+      if (!visible || (enPause() && trame.v === versionImage)) return;
       if (now - (trame.t || 0) < pas) return; trame.t = now;
       trame.v = versionImage;
       souris.x += (cibleSouris.x - souris.x) * .04; souris.y += (cibleSouris.y - souris.y) * .04;
@@ -122,7 +111,6 @@
     })(debut);
   }
 
-  /* ================= Particules (etoiles qui derivent, reliees quand proches) ================= */
   function particules() {
     var c = document.querySelector('canvas.af-particules');
     if (!c || calme) return;
@@ -137,7 +125,7 @@
     var visible = true; document.addEventListener('visibilitychange', function () { visible = !document.hidden; });
     (function trame(t) {
       requestAnimationFrame(trame);
-      if (!visible || (enPause() && trame.v === versionImage)) return;   // en pause : la derniere image reste affichee
+      if (!visible || (enPause() && trame.v === versionImage)) return;
       trame.v = versionImage;
       ctx.clearRect(0, 0, W, H);
       var dx = (souris.x - .5) * 40, dy = (souris.y - .5) * 40;
@@ -161,8 +149,6 @@
     })(0);
   }
 
-  /* Le fond anime demarre juste apres le premier affichage (et entre en fondu) : il ne rivalise plus
-     avec le chargement de la page, ou chaque surface en verre doit deja etre floutee une premiere fois */
   var fondLance = false;
   function demarrerFond() {
     if (fondLance) return; fondLance = true;
@@ -173,7 +159,6 @@
   if (document.readyState === 'complete') setTimeout(demarrerFond, 120);
   else { addEventListener('load', function () { setTimeout(demarrerFond, 120); }); setTimeout(demarrerFond, 1500); }
 
-  /* ================= Curseur lumineux ================= */
   if (!tactile && !calme && window.gsap) {
     var cur = document.createElement('div'); cur.className = 'af-curseur'; document.body.appendChild(cur);
     var cx = gsap.quickTo(cur, 'x', { duration: .9, ease: 'power3.out' }), cy = gsap.quickTo(cur, 'y', { duration: .9, ease: 'power3.out' });
@@ -181,7 +166,6 @@
     document.addEventListener('pointermove', function (e) { cx(e.clientX); cy(e.clientY); }, { passive: true });
   }
 
-  /* ================= Alertes ================= */
   var ICONES_ALERTE = { 'alert-success': 'circle-check', 'alert-danger': 'circle-alert', 'alert-warning': 'triangle-alert' };
   $$('.alert').forEach(function (a) {
     if (a.querySelector('.af-alert-texte')) return;
@@ -196,8 +180,6 @@
   });
   function masquer(a) { if (!a.isConnected) return; a.classList.add('af-sortie'); setTimeout(function () { a.hidden = true; }, calme ? 0 : 260); }
 
-  /* ================= Icones : tracees au crayon ================= */
-  // un filtre SVG unique deforme tres legerement les traits, comme dessines a main levee
   if (!document.getElementById('dd-crayon')) {
     var defs = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     defs.setAttribute('width', '0'); defs.setAttribute('height', '0'); defs.setAttribute('aria-hidden', 'true');
@@ -205,8 +187,6 @@
     defs.innerHTML = '<filter id="dd-crayon" x="-10%" y="-10%" width="120%" height="120%">'
       + '<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="bruit"/>'
       + '<feDisplacementMap in="SourceGraphic" in2="bruit" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>'
-      // trait qui "bout" : trois tremblements differents, alternes par doodle.css comme un dessin image par image
-      // dd-bout : fort (doodles) ; dd-frisson : leger (logo, soulignes), pour garder le texte lisible
       + [['bout', 5], ['frisson', 2.2]].map(function (f) {
         return [1, 2, 3].map(function (i) {
           return '<filter id="dd-' + f[0] + '-' + i + '" x="-15%" y="-15%" width="130%" height="130%">'
@@ -216,7 +196,6 @@
       }).join('');
     document.body.appendChild(defs);
   }
-  // les icones Lucide sont redessinees au crayon par rough.js (double trait tremble) ; le dernier trait sert d'accent colore
   function chemin(el) {
     var a = function (n) { return parseFloat(el.getAttribute(n)) || 0; };
     switch (el.tagName) {
@@ -251,7 +230,6 @@
     lucide.createIcons();
   }
 
-  /* ================= Reflet du verre ================= */
   if (!tactile && !calme) document.addEventListener('pointermove', function (e) {
     var carte = e.target.closest ? e.target.closest('.af-glass') : null;
     if (!carte) return;
@@ -260,7 +238,6 @@
     carte.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(2) + '%');
   }, { passive: true });
 
-  /* ================= Formulaires : envoi en cours ================= */
   document.addEventListener('submit', function (e) {
     var form = e.target;
     if (e.defaultPrevented || (form.getAttribute('method') || 'get').toLowerCase() === 'get') return;
@@ -272,7 +249,6 @@
     if (e.persisted) $$('.is-loading').forEach(function (b) { b.classList.remove('is-loading'); b.removeAttribute('aria-busy'); });
   });
 
-  /* ================= Defilement doux ================= */
   var lenis = null;
   if (!calme && window.Lenis) {
     $$('.modal, .overflow-auto, .table-responsive, .af-sidebar, textarea, pre').forEach(function (el) { el.setAttribute('data-lenis-prevent', ''); });
@@ -293,13 +269,11 @@
     });
   }
 
-  // emploi du temps : la seance choisie recharge la page, on descend jusqu'a son detail
   var detail = document.getElementById('detail-seance');
   if (detail) {
     var titreDetail = document.getElementById('detail-titre');
     titreDetail.setAttribute('tabindex', '-1');
-    titreDetail.focus({ preventScroll: true });   // lecteurs d'ecran et clavier arrivent sur le detail
-    // grille plus large que l'ecran (telephone) : la seance choisie est ramenee au centre de sa ligne
+    titreDetail.focus({ preventScroll: true });
     var choisie = document.querySelector('.af-seance.af-selection'), boite = choisie && choisie.closest('.overflow-auto');
     if (boite) {
       var rc = choisie.getBoundingClientRect(), rb = boite.getBoundingClientRect();
@@ -311,8 +285,6 @@
     }, calme ? 0 : 350);
   }
 
-  /* ================= Annotations au feutre (Rough Notation) ================= */
-  // soulignes, cercles et crochets traces a la main, dessines quand l'element arrive a l'ecran
   (function annoter() {
     if (!window.RoughNotation || !window.IntersectionObserver) return;
     var couleur = function (v) { return getComputedStyle(racine).getPropertyValue(v).trim(); };
@@ -320,7 +292,6 @@
     var noter = function (el, type, jeton, o) {
       o = o || {};
       o.type = type; o.color = couleur(jeton); o.animate = !calme; o.animationDuration = 850;
-      // un titre est un bloc pleine largeur : on annote une enveloppe en ligne pour que le trait suive le texte
       var cible = el;
       if (o.texte) {
         cible = document.createElement('span');
@@ -335,7 +306,6 @@
     $$('.af-cta h2').forEach(function (el) { noter(el, 'bracket', '--dd-rose', { texte: true, brackets: ['left', 'right'], strokeWidth: 3, padding: [4, 10] }); });
     $$('.af-login-hero h1').forEach(function (el) { noter(el, 'underline', '--dd-sarcelle', { texte: true, strokeWidth: 3, padding: 4, multiline: true }); });
     if (!notes.length) return;
-    // apres l'entree de la section (elle glisse de 30 px), sinon le trait se poserait a l'ancienne place
     var io = new IntersectionObserver(function (vus) {
       vus.forEach(function (v) {
         if (!v.isIntersecting) return;
@@ -344,38 +314,32 @@
       });
     }, { threshold: .6 });
     notes.forEach(function (n) { io.observe(n.el); });
-    // le theme change : les traits prennent la couleur de la craie ou du feutre
     document.addEventListener('af:theme', function () {
       setTimeout(function () { notes.forEach(function (n) { n.a.color = couleur(n.jeton); }); }, 60);
     });
   })();
 
-  /* ================= Mouvement (GSAP) ================= */
   if (!window.gsap) {
-    // sans GSAP : rien ne reste masque, le rideau de chargement s'en va
     racine.classList.remove('af-prep');
     var rideau = document.querySelector('.af-chargement'); if (rideau) rideau.remove();
     appliquerPause(enPause());
     return;
   }
-  // une entree ne se rejoue jamais sur un contenu deja montre par le filet de securite du <head>
   var entreeAJouer = racine.classList.contains('af-prep');
   if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
   gsap.defaults({ ease: 'power3.out', duration: .6 });
   var vitrine = document.querySelector('.af-vitrine');
 
-  /* Prechargement de la vitrine : une fois par session */
   var charg = document.querySelector('.af-chargement');
   var retard = 0;
   if (charg) {
     var deja = false;
-    try { deja = !!sessionStorage.getItem('af-charge'); sessionStorage.setItem('af-charge', '1'); } catch (e) { /* ok */ }
+    try { deja = !!sessionStorage.getItem('af-charge'); sessionStorage.setItem('af-charge', '1'); } catch (e) {}
     if (deja || calme) charg.remove();
     else {
       retard = 2.3;
       var q = function (s) { return charg.querySelectorAll(s); };
-      // dessin au crayon (etat de depart dans doodle.css) : chaque trait se trace, puis la couleur est posee dessous comme un feutre
-      var intro = gsap.timeline({ defaults: { ease: 'power2.inOut', autoRound: false } })   // sans arrondi : les traits se dessinent au lieu de sauter
+      var intro = gsap.timeline({ defaults: { ease: 'power2.inOut', autoRound: false } })
         .from(q('.dd-intro-logo'), { rotation: -6, scale: .9, duration: 1.6, ease: 'power1.out', transformOrigin: '50% 50%' }, 0)
         .to(q('.i-postit'), { strokeDashoffset: 0, duration: .55 }, 0)
         .to(q('.i-postit'), { fillOpacity: 1, duration: .25, ease: 'none' }, .4)
@@ -387,14 +351,11 @@
         .to(q('.dd-intro-trait .i-trait'), { strokeDashoffset: 0, duration: .35 }, 1.45)
         .to(q('.i-yeux'), { scaleY: .1, transformOrigin: '50% 75%', duration: .07, yoyo: true, repeat: 1, ease: 'none' }, 1.75)
         .to(charg, { yPercent: -100, duration: .7, ease: 'power4.inOut', onComplete: function () { charg.remove(); if (window.afFilm) afFilm.ouvrir(lenis); } }, 2.05);
-      // un clic ou une touche accelere l'intro : on ne fait jamais attendre
       var presser = function () { intro.timeScale(4); };
       charg.addEventListener('pointerdown', presser); addEventListener('keydown', presser, { once: true });
     }
   }
 
-  /* Filet de securite : si les images ne defilent pas (onglet en arriere-plan, appareil a la peine),
-     l'entree saute a son etat final ; le contenu ne reste jamais cache */
   var entrees = [];
   setTimeout(function () {
     entrees.forEach(function (t) { if (t.progress() < 1) t.progress(1); });
@@ -405,7 +366,6 @@
 
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', function () {
 
-    /* Inclinaison 3D : [data-tilt] */
     if (!tactile) $$('[data-tilt]').forEach(function (el) {
       var force = parseFloat(el.getAttribute('data-tilt')) || 8;
       var rx = gsap.quickTo(el, 'rotationX', { duration: .6, ease: 'power3.out' }), ry = gsap.quickTo(el, 'rotationY', { duration: .6, ease: 'power3.out' });
@@ -414,17 +374,14 @@
       el.addEventListener('pointerleave', function () { rx(0); ry(0); });
     });
 
-    /* Boutons magnetiques */
     if (!tactile) $$('[data-magnetic]').forEach(function (el) {
       var x = gsap.quickTo(el, 'x', { duration: .5, ease: 'power3.out' }), y = gsap.quickTo(el, 'y', { duration: .5, ease: 'power3.out' });
-      // le leger soulevement du survol et l'appui passent par GSAP, sinon la transform en ligne les annule
       el.addEventListener('pointermove', function (e) { var r = el.getBoundingClientRect(); x((e.clientX - r.left - r.width / 2) * .28); y((e.clientY - r.top - r.height / 2) * .4 - 2); });
       el.addEventListener('pointerleave', function () { x(0); y(0); gsap.to(el, { scale: 1, duration: .2 }); });
       el.addEventListener('pointerdown', function () { gsap.to(el, { scale: .97, duration: .1 }); });
       el.addEventListener('pointerup', function () { gsap.to(el, { scale: 1, duration: .2 }); });
     });
 
-    /* Orbes */
     var orbes = $$('.af-orbe');
     orbes.forEach(function (o, i) { ambiance.push(gsap.to(o, { y: '+=' + (30 + i * 12), x: '+=' + (i % 2 ? -22 : 22), duration: 7 + i * 1.5, yoyo: true, repeat: -1, ease: 'sine.inOut' })); });
     if (!tactile && orbes.length) {
@@ -432,7 +389,6 @@
       document.addEventListener('pointermove', function (e) { var dx = e.clientX / innerWidth - .5, dy = e.clientY / innerHeight - .5; orbes.forEach(function (o, i) { var k = (i + 1) * 6; px[i](dx * k); py[i](dy * k); }); }, { passive: true });
     }
 
-    /* Vitrine : scene 3D, objet Three.js, titre, mot tournant, chiffres, reveals */
     var scene = document.querySelector('.af-scene-inner');
     if (scene) {
       var srx = gsap.quickTo(scene, 'rotationX', { duration: 1 }), sry = gsap.quickTo(scene, 'rotationY', { duration: 1 });
@@ -444,13 +400,10 @@
       if (window.ScrollTrigger) gsap.to('.af-scene', { yPercent: 18, ease: 'none', scrollTrigger: { trigger: '.af-hero', start: 'top top', end: 'bottom top', scrub: true } });
       objet3D();
     }
-    /* Croquis : chaque trait (soulignement, fleche, etoile, fourmi) se dessine comme au feutre.
-       Visible par defaut ; seule l'animation le cache au depart (pathLength="1" : longueur 0 a 1). */
     var traits = $$('.dd-dessin');
     if (traits.length) {
       entrees.push(gsap.fromTo(traits, { strokeDasharray: 1, strokeDashoffset: 1 },
         { strokeDashoffset: 0, duration: .7, ease: 'power2.inOut', stagger: .12, delay: retard + .5 }));
-      // les tampons P / A / R tombent sur la feuille un par un, comme a l'appel
       entrees.push(gsap.from('.dd-tampon', { scale: 2.2, autoAlpha: 0, rotation: -30, duration: .35, ease: 'back.out(2.2)', stagger: .18, delay: retard + 1 }));
     }
     var yeux = document.querySelector('.dd-yeux'), antennes = document.querySelector('.dd-antennes');
@@ -470,23 +423,19 @@
       var rot = titre.querySelector('.af-rotatif');
       if (rot && rot.getAttribute('data-mots')) {
         var mots = rot.getAttribute('data-mots').split('|'), idx = 0, cycle = null, actif = true;
-        // le trait se dessine apres l'arrivee des mots (et apres le rideau), pas en dessous de lui
         entrees.push(gsap.fromTo(rot, { '--trait': 0 }, { '--trait': 1, duration: .6, ease: 'power3.out', delay: retard + .8 }));
-        // la largeur de la plus longue formule est reservee : le titre ne se reequilibre pas a chaque changement
         if (document.fonts) document.fonts.ready.then(function () {
           var t = rot.cloneNode(); t.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap'; rot.parentNode.appendChild(t);
           var large = Math.max.apply(null, mots.map(function (m) { t.textContent = m; return t.offsetWidth; }));
           rot.style.minWidth = (large / parseFloat(getComputedStyle(rot).fontSize)) + 'em'; t.remove();
         });
         var majCycle = function () { if (cycle) (actif && !enPause()) ? cycle.resume() : cycle.pause(); };
-        // un cycle = une timeline : sortie rapide, echange, entree, puis le trait ambre se redessine
         var changer = function () {
           idx = (idx + 1) % mots.length;
           gsap.timeline({ defaults: { overwrite: true } })
             .to(rot.children, { yPercent: -100, autoAlpha: 0, duration: .3, ease: 'power3.in', stagger: .03 })
             .to(rot, { '--trait': 0, duration: .3, ease: 'power2.in' }, '<')
             .call(function () {
-              // les nouveaux mots n'existent qu'apres l'echange : leur entree est une seconde timeline
               rot.innerHTML = mots[idx].split(' ').map(function (w) { return '<span class="af-mot">' + w + '</span>'; }).join(' ');
               gsap.timeline({ onComplete: function () { cycle = gsap.delayedCall(2.6, changer); majCycle(); } })
                 .from(rot.children, { yPercent: 100, autoAlpha: 0, duration: .55, ease: 'power4.out', stagger: .045 })
@@ -494,7 +443,6 @@
             });
         };
         cycle = gsap.delayedCall(3.2 + retard, changer);
-        // en pause, hors ecran ou onglet cache : la rotation s'arrete ; elle ne reprend que si rien ne la retient
         document.addEventListener('af:pause', majCycle); majCycle();
         if (window.ScrollTrigger) ScrollTrigger.create({ trigger: '.af-hero', start: 'top bottom', end: 'bottom top',
           onToggle: function (st) { actif = st.isActive; majCycle(); } });
@@ -503,11 +451,9 @@
     var reveals = $$('[data-reveal]');
     if (reveals.length && window.ScrollTrigger) {
       gsap.set(reveals, { y: 30, autoAlpha: 0 });
-      // clearProps garde la transform : l'inclinaison 3D des cartes revelees conserve sa perspective
       ScrollTrigger.batch(reveals, { start: 'top bottom', once: true, onEnter: function (lot) { gsap.to(lot, { y: 0, autoAlpha: 1, duration: .8, stagger: .08, clearProps: 'opacity,visibility' }); } });
     }
 
-    /* Compteurs : partout, declenches a l'apparition */
     $$('[data-compteur]').forEach(function (el) {
       var m = el.textContent.trim().match(/^(\d+)(.*)$/);
       if (!m) return;
@@ -519,7 +465,6 @@
       else tw.delay(.2).play();
     });
 
-    /* Espace connecte : entree des blocs, lignes, impulsions */
     var main = document.getElementById('contenu');
     if (main && !vitrine) {
       var blocs = [];
@@ -530,7 +475,6 @@
       var hauteur = innerHeight;
       var visibles = blocs.filter(function (el) { return el.getBoundingClientRect().top < hauteur; });
       var plusBas = blocs.filter(function (el) { return visibles.indexOf(el) < 0; });
-      // outil utilise tous les jours : entree breve, cascade bornee quel que soit le nombre de blocs
       if (entreeAJouer) gsap.from(visibles, { y: 14, autoAlpha: 0, duration: .45, stagger: { amount: .25 }, clearProps: 'transform,opacity,visibility' });
       if (window.ScrollTrigger && plusBas.length) {
         gsap.set(plusBas, { y: 24, autoAlpha: 0 });
@@ -548,12 +492,10 @@
   racine.classList.remove('af-prep');
   appliquerPause(enPause());
 
-  /* ================= Objet 3D (Three.js, vitrine uniquement) ================= */
   function objet3D() {
     var conteneur = document.querySelector('.af-3d');
     if (!conteneur) return;
     if (!window.THREE) {
-      // Three.js est charge apres ce script : on attend sa fin de chargement
       var s = document.querySelector('script[src*="three"]');
       if (s && !s.dataset.attente) { s.dataset.attente = '1'; s.addEventListener('load', objet3D); }
       return;
@@ -565,17 +507,14 @@
     conteneur.appendChild(rendu.domElement);
     var sc = new T.Scene(), cam = new T.PerspectiveCamera(45, largeur / hauteurC, .1, 100); cam.position.z = 7;
     var groupe = new T.Group(); sc.add(groupe);
-    // Icosaedre en fil de fer + enveloppe translucide
     var geo = new T.IcosahedronGeometry(2.1, 1);
     groupe.add(new T.LineSegments(new T.WireframeGeometry(geo), new T.LineBasicMaterial({ color: 0x7fe0d5, transparent: true, opacity: .55 })));
     groupe.add(new T.Mesh(geo, new T.MeshBasicMaterial({ color: 0x2bc4b4, transparent: true, opacity: .06 })));
-    // Anneau de particules
     var nb = 900, pos = new Float32Array(nb * 3);
     for (var i = 0; i < nb; i++) { var a = Math.random() * Math.PI * 2, r = 3 + (Math.random() - .5) * .5; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = (Math.random() - .5) * .25; pos[i * 3 + 2] = Math.sin(a) * r; }
     var pg = new T.BufferGeometry(); pg.setAttribute('position', new T.BufferAttribute(pos, 3));
     var anneau = new T.Points(pg, new T.PointsMaterial({ color: 0xf4a940, size: .035, transparent: true, opacity: .9 }));
     anneau.rotation.x = Math.PI / 2.6; groupe.add(anneau);
-    // Nuage d'etoiles lointaines
     var ne = 500, pe = new Float32Array(ne * 3);
     for (var j = 0; j < ne; j++) { pe[j * 3] = (Math.random() - .5) * 24; pe[j * 3 + 1] = (Math.random() - .5) * 16; pe[j * 3 + 2] = -4 - Math.random() * 8; }
     var eg = new T.BufferGeometry(); eg.setAttribute('position', new T.BufferAttribute(pe, 3));
@@ -583,12 +522,11 @@
     function taille() { largeur = conteneur.clientWidth; hauteurC = conteneur.clientHeight; cam.aspect = largeur / hauteurC; cam.updateProjectionMatrix(); rendu.setSize(largeur, hauteurC); }
     window.addEventListener('resize', taille);
     var visible = true; document.addEventListener('visibilitychange', function () { visible = !document.hidden; });
-    // l'objet ne se dessine que lorsqu'il est a l'ecran
     var enVue = true;
     if (window.IntersectionObserver) new IntersectionObserver(function (e) { enVue = e[0].isIntersecting; }).observe(conteneur);
     (function trame(t) {
       requestAnimationFrame(trame);
-      if (!visible || !enVue || (enPause() && trame.v === versionImage)) return;   // en pause : la derniere image reste affichee
+      if (!visible || !enVue || (enPause() && trame.v === versionImage)) return;
       trame.v = versionImage;
       groupe.rotation.y = t * .00018 + (souris.x - .5) * .6;
       groupe.rotation.x = Math.sin(t * .0002) * .15 + (souris.y - .5) * .4;

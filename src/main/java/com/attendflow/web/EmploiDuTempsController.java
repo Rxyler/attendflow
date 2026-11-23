@@ -23,14 +23,11 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.IntStream;
 
-/** F-13 a F-15 : emploi du temps hebdomadaire (lundi-vendredi), en lecture seule. */
 @Controller
 public class EmploiDuTempsController {
 
-    /** Creneaux de 2h de 8h a 18h, comme la maquette. */
     static final List<LocalTime> CRENEAUX = IntStream.of(8, 10, 12, 14, 16).mapToObj(h -> LocalTime.of(h, 0)).toList();
 
-    /** Une ligne de la grille : un creneau horaire et, pour chaque jour, ses seances. */
     public record Ligne(LocalTime debut, LocalTime fin, List<List<Seance>> jours) {}
 
     private final EmploiDuTempsService emploiDuTemps;

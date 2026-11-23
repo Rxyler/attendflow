@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-/** Charge le compte depuis la table utilisateur ; le role devient ROLE_ADMIN / ROLE_ENSEIGNANT / ROLE_ETUDIANT. */
 @Service
 public class UtilisateurDetailsService implements UserDetailsService {
 
@@ -21,7 +20,6 @@ public class UtilisateurDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        // Les emails sont enregistres en minuscules : "Admin@Univ.tn" doit aussi fonctionner.
         return utilisateurRepository.findByEmail(TentativesConnexion.cle(email))
                 .map(u -> User.withUsername(u.getEmail())
                         .password(u.getMotDePasse())

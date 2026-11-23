@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 
-<!-- En-tete commun : polices, Bootstrap 5, theme, mouvement (GSAP + Lenis), icones (Lucide) -->
 <head th:fragment="head(titre)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,16 +16,12 @@
   <link href="https://unpkg.com/lenis@1.1.13/dist/lenis.css" integrity="sha384-pAFowDtEJGvoq8dGiFmgKkO1h5cvbHkCysvXumyjfJBsi8qJwG429whEp2xanR+c" crossorigin="anonymous" rel="stylesheet">
   <link th:href="@{/css/attendflow.css}" rel="stylesheet">
   <link th:href="@{/css/doodle.css}" rel="stylesheet">
-  <!-- Masque le contenu jusqu'a l'animation d'entree (evite le clignotement) ; filet de securite 1,5 s -->
   <script>
     var t = 'dark'; try { t = localStorage.getItem('af-theme') || 'dark'; } catch (e) {}
     document.documentElement.setAttribute('data-bs-theme', t);
     document.documentElement.classList.add('af-fond-attente');
-    // ?lang=en a deja ete pris en compte par le serveur : on le retire de l'adresse affichee
     if (/[?&]lang=/.test(location.search) && history.replaceState) { var u = new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null, '', u); }
-    // une navigation rapide interrompt la transition entre pages : ce n'est pas une erreur
     addEventListener('pagereveal', function (e) { var v = e.viewTransition; if (v) { v.ready.catch(function () {}); v.finished.catch(function () {}); } });
-    // avant le premier rendu : rideau deja vu dans la session, pause choisie par l'utilisateur
     try { if (sessionStorage.getItem('af-charge')) document.documentElement.classList.add('af-deja');
           if (localStorage.getItem('af-calme') === '1') document.documentElement.classList.add('af-calme'); } catch (e) {}
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -46,19 +41,14 @@
 </head>
 
 <body>
-<!-- Fond commun : aurora animee (canvas), grille, grain -->
-<!-- Fond du carnet : le papier pointe est dessine en CSS (doodle.css) ; plus d'aurore ni de particules a animer -->
 <th:block th:fragment="fond"></th:block>
 
-<!-- "Etes-vous un humain ?" (Cloudflare Turnstile, voir security/VerificationHumaine) : rien sans cles configurees -->
 <th:block th:fragment="humain" th:if="${cleTurnstile}">
   <div class="cf-turnstile af-humain" data-size="flexible" th:attr="data-sitekey=${cleTurnstile},data-language=${#locale.language}"></div>
   <script>document.querySelectorAll('.af-humain').forEach(function (w) { w.dataset.theme = document.documentElement.getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark'; });</script>
-  <!-- pas de SRI : Cloudflare met a jour ce script sans changer son adresse et interdit de le figer -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </th:block>
 
-<!-- Interrupteur clair / sombre -->
 <th:block th:fragment="theme">
   <button type="button" class="af-theme af-langue" th:attr="data-lang=#{langue.autre},aria-label=#{langue.basculer},title=#{langue.basculer}" th:text="#{langue.autreCode}">EN</button>
   <button type="button" class="af-theme af-pause" aria-pressed="false" th:attr="aria-label=#{bouton.pause},title=#{bouton.pause}">
@@ -71,7 +61,6 @@
   </button>
 </th:block>
 
-<!-- Barre laterale commune -->
 <nav th:fragment="sidebar(utilisateur, actif)" class="af-sidebar d-flex flex-column px-3 py-3 flex-shrink-0"
      th:attr="aria-label=#{nav.principale}"
      th:with="role=${utilisateur.role.name()}">
@@ -164,7 +153,6 @@
   </div>
 </nav>
 
-<!-- Carte statistique : icone et teinte deduites du libelle ; la valeur s'anime si elle est numerique -->
 <div th:fragment="carte(libelle, valeur, detail)" class="af-glass af-stat h-100"
      th:with="l=${#strings.toLowerCase(libelle)},
               icone=${#strings.contains(l, 'taux') or #strings.contains(l, 'rate')} ? 'percent' :
@@ -187,7 +175,6 @@
   <p class="af-stat-detail" th:if="${detail}" th:text="${detail}">détail</p>
 </div>
 
-<!-- Graphique du taux de presence (Chart.js) ; donnees : joursGraphique et tauxGraphique -->
 <section th:fragment="graphique(titre, sousTitre)" class="af-glass p-4 h-100" aria-labelledby="g7-titre">
   <h2 id="g7-titre" class="h6 mb-1" th:text="${titre}">Taux de présence</h2>
   <p class="small text-secondary mb-3" th:text="${sousTitre}">détail</p>

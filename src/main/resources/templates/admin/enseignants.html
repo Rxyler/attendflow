@@ -67,7 +67,6 @@
               <input id="e-naissance" name="dateNaissance" type="date" class="form-control" th:value="${form?.dateNaissance}"></div>
             <div><label for="e-spec" class="form-label" th:text="#{champ.specialite}">Spécialité</label>
               <input id="e-spec" name="specialite" class="form-control" th:value="${form?.specialite}" maxlength="120"></div>
-            <!-- F-08 : affectation aux matieres -->
             <fieldset>
               <legend class="form-label fs-6" th:text="#{enseignants.matieresEnseignees}">Matières enseignées</legend>
               <div class="form-check" th:each="m : ${matieres}">

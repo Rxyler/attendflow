@@ -23,11 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-/**
- * Ecrans 6 et 7 + matieres et enseignants (F-05 a F-10), reserves a l'admin (voir SecurityConfig).
- * Apres une erreur, le formulaire est rouvert avec les valeurs saisies.
- */
 @Controller
 public class ReferentielController {
 
@@ -41,8 +38,6 @@ public class ReferentielController {
         this.utilisateurs = utilisateurs;
         this.etudiants = etudiants;
     }
-
-    // ================= Etudiants =================
 
     @GetMapping("/admin/etudiants")
     public String etudiants(@AuthenticationPrincipal UserDetails compte, @RequestParam(required = false) String q,
@@ -91,7 +86,6 @@ public class ReferentielController {
         return "redirect:/admin/etudiants";
     }
 
-    /** Photo d'un etudiant : visible par l'admin et par l'etudiant lui-meme. */
     @GetMapping("/etudiants/{id}/photo")
     public ResponseEntity<Resource> photo(@PathVariable Long id, @AuthenticationPrincipal UserDetails compte) {
         Utilisateur u = utilisateurs.findByEmail(compte.getUsername()).orElseThrow();
@@ -104,8 +98,6 @@ public class ReferentielController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // ================= Classes =================
 
     @GetMapping("/admin/classes")
     public String classes(@AuthenticationPrincipal UserDetails compte, @RequestParam(required = false) Long modifier, Model model) {
@@ -132,8 +124,6 @@ public class ReferentielController {
         return executer(r, () -> { referentiel.supprimerClasse(id); return t("Classe supprimée."); }, null, null, "/admin/classes");
     }
 
-    // ================= Matieres =================
-
     @GetMapping("/admin/matieres")
     public String matieres(@AuthenticationPrincipal UserDetails compte, @RequestParam(required = false) Long modifier, Model model) {
         commun(compte, model);
@@ -158,8 +148,6 @@ public class ReferentielController {
         return executer(r, () -> { referentiel.supprimerMatiere(id); return t("Matière supprimée."); }, null, null, "/admin/matieres");
     }
 
-    // ================= Enseignants =================
-
     @GetMapping("/admin/enseignants")
     public String enseignants(@AuthenticationPrincipal UserDetails compte, @RequestParam(required = false) Long modifier, Model model) {
         commun(compte, model);
@@ -168,7 +156,7 @@ public class ReferentielController {
         if (modifier != null && !model.containsAttribute("form")) {
             referentiel.enseignants().stream().filter(e -> e.getId().equals(modifier)).findFirst().ifPresent(e -> {
                 model.addAttribute("form", new EnseignantForm(e.getNom(), e.getPrenom(), e.getEmail(), e.getTelephone(),
-                        e.getSpecialite(), e.getMatieres().stream().map(m -> m.getId()).collect(java.util.stream.Collectors.toSet()),
+                        e.getSpecialite(), e.getMatieres().stream().map(m -> m.getId()).collect(Collectors.toSet()),
                         e.getDateNaissance()));
                 model.addAttribute("formId", e.getId());
             });
@@ -189,13 +177,10 @@ public class ReferentielController {
         return executer(r, () -> { referentiel.supprimerEnseignant(id); return t("Enseignant supprimé."); }, null, null, "/admin/enseignants");
     }
 
-    // ================= Outils =================
-
     private void commun(UserDetails compte, Model model) {
         model.addAttribute("utilisateur", utilisateurs.findByEmail(compte.getUsername()).orElseThrow());
     }
 
-    /** Execute l'action ; en cas d'erreur, renvoie le message et les valeurs saisies pour rouvrir le formulaire. */
     private String executer(RedirectAttributes r, Supplier<String> action, Object form, Long id, String page) {
         try {
             r.addFlashAttribute("succes", action.get());

@@ -16,7 +16,6 @@
       <div th:if="${succes}" class="alert alert-success mb-0" role="status" th:text="${succes}">ok</div>
       <div th:if="${erreur}" class="alert alert-danger mb-0" role="alert" th:text="${erreur}">erreur</div>
 
-      <!-- F-25 : a traiter -->
       <section aria-labelledby="attente-titre" class="d-grid gap-3">
         <h2 id="attente-titre" class="h6 fw-bold mb-0" th:text="#{justif.enAttente}">En attente</h2>
         <p th:if="${#lists.isEmpty(enAttente)}" class="af-glass p-4 text-secondary mb-0" th:text="#{justif.aucunEnAttente}">Aucun justificatif en attente.</p>
@@ -43,7 +42,6 @@
         </article>
       </section>
 
-      <!-- Historique des decisions -->
       <div class="af-glass p-0 overflow-hidden" th:unless="${#lists.isEmpty(traites)}">
         <table class="table align-middle mb-0">
           <caption class="px-4" th:text="#{justif.dernieresDecisions}">20 dernières décisions</caption>

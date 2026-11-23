@@ -15,10 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Enregistrement sur disque des fichiers deposes (justificatifs, photos).
- * Verifie l'extension ET les premiers octets du fichier ; le nom d'origine n'est jamais utilise.
- */
 @Component
 public class StockageFichiers {
 
@@ -29,11 +25,6 @@ public class StockageFichiers {
             "image/png", new byte[]{(byte) 0x89, 'P', 'N', 'G'},
             "image/jpeg", new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF});
 
-    /**
-     * @param extensions extensions autorisees, ex. Set.of("pdf", "png", "jpg", "jpeg")
-     * @return le nom (aleatoire) du fichier enregistre dans {@code dossier}
-     * @throws IllegalArgumentException fichier vide, format non autorise ou contenu qui ne correspond pas
-     */
     public String enregistrer(MultipartFile fichier, Path dossier, Set<String> extensions, String formatsLisibles) {
         if (fichier == null || fichier.isEmpty()) {
             throw new IllegalArgumentException(t("Ajoutez un fichier ({0}).", formatsLisibles));
@@ -55,7 +46,6 @@ public class StockageFichiers {
         }
     }
 
-    /** Chemin du fichier, en refusant toute sortie du dossier (ex. "../"). */
     public Path chemin(Path dossier, String nom) {
         Path chemin = dossier.resolve(nom).normalize();
         if (!chemin.startsWith(dossier)) throw new IllegalArgumentException("Chemin invalide");
@@ -71,7 +61,6 @@ public class StockageFichiers {
         try {
             Files.deleteIfExists(chemin(dossier, nom));
         } catch (IOException | IllegalArgumentException ignored) {
-            // un ancien fichier introuvable n'empeche pas l'operation en cours
         }
     }
 

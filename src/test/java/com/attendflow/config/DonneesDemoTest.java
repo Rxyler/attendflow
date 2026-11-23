@@ -19,7 +19,6 @@ class DonneesDemoTest {
     @Autowired UtilisateurRepository utilisateurs;
     @Autowired NotificationRepository notifications;
 
-    /** Une base creee avant le changement de nom : le compte est renomme sur place, sans doublon. */
     @Test
     void renommeLAncienneEtudianteEtSesMentions() {
         var lina = utilisateurs.findByEmail("lina.ferjani@univ.tn").orElseThrow();

@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Chaque test cree sa propre seance (3ème INFO, Ahmed) ; tout est annule a la fin (@Transactional). */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -56,7 +55,7 @@ class PresenceTest {
     }
 
     Seance ouverte() {
-        return seance(LocalDate.now().minusDays(1), EtatSeance.PLANIFIEE);   // finie hier, dans le delai de 48 h
+        return seance(LocalDate.now().minusDays(1), EtatSeance.PLANIFIEE);
     }
 
     List<Etudiant> classe() {
@@ -94,9 +93,9 @@ class PresenceTest {
 
         mvc.perform(envoi(s, AHMED, StatutPresence.ABSENT)).andExpect(flash().attributeExists("succes"));
         List<Presence> apres = presences.findBySeance(s);
-        assertThat(apres).hasSize(classe().size());   // RG-02 : pas de doublon
+        assertThat(apres).hasSize(classe().size());
         Presence modifiee = apres.stream().filter(p -> p.getStatut() == StatutPresence.ABSENT).findFirst().orElseThrow();
-        assertThat(modifiee.getHistorique()).singleElement().satisfies(h -> {   // RG-08
+        assertThat(modifiee.getHistorique()).singleElement().satisfies(h -> {
             assertThat(h.getAncienStatut()).isEqualTo(StatutPresence.PRESENT);
             assertThat(h.getNouveauStatut()).isEqualTo(StatutPresence.ABSENT);
             assertThat(h.getAuteur().getEmail()).isEqualTo("ahmed.bensalah@univ.tn");
@@ -106,7 +105,7 @@ class PresenceTest {
     @Test
     void autreEnseignantEtEtudiantRefuses() throws Exception {
         Seance s = ouverte();
-        mvc.perform(get("/seances/" + s.getId() + "/presences").with(SARA)).andExpect(status().isForbidden());   // RG-03
+        mvc.perform(get("/seances/" + s.getId() + "/presences").with(SARA)).andExpect(status().isForbidden());
         mvc.perform(envoi(s, SARA, StatutPresence.ABSENT)).andExpect(status().isForbidden());
         mvc.perform(get("/seances/" + s.getId() + "/presences").with(LINA)).andExpect(status().isForbidden());
         assertThat(presences.findBySeance(s)).isEmpty();
@@ -115,22 +114,25 @@ class PresenceTest {
     @Test
     void seanceAnnuleeVerrouilleePourTous() throws Exception {
         Seance s = seance(LocalDate.now().minusDays(1), EtatSeance.ANNULEE);
-        assertThat(feuille(s, ADMIN).modifiable()).isFalse();   // RG-10
+        assertThat(feuille(s, ADMIN).modifiable()).isFalse();
         mvc.perform(envoi(s, ADMIN, StatutPresence.PRESENT)).andExpect(flash().attributeExists("erreur"));
         assertThat(presences.findBySeance(s)).isEmpty();
     }
 
     @Test
-    void seanceFutureVerrouilleePourEnseignantMaisPasAdmin() throws Exception {
+    void seanceFutureVerrouilleePourTous() throws Exception {
         Seance s = seance(LocalDate.now().plusDays(3), EtatSeance.PLANIFIEE);
-        assertThat(feuille(s, AHMED).modifiable()).isFalse();   // F-23
-        assertThat(feuille(s, ADMIN).modifiable()).isTrue();
+        assertThat(feuille(s, AHMED).modifiable()).isFalse();
+        assertThat(feuille(s, ADMIN).modifiable()).isFalse();
+        mvc.perform(envoi(s, AHMED, StatutPresence.PRESENT)).andExpect(flash().attributeExists("erreur"));
+        mvc.perform(envoi(s, ADMIN, StatutPresence.PRESENT)).andExpect(flash().attributeExists("erreur"));
+        assertThat(presences.findBySeance(s)).isEmpty();
     }
 
     @Test
     void delaiDepassePourEnseignantMaisPasAdmin() throws Exception {
-        Seance s = seance(LocalDate.now().minusDays(5), EtatSeance.PLANIFIEE);   // delai par defaut : 48 h
-        assertThat(feuille(s, AHMED).modifiable()).isFalse();   // F-22
+        Seance s = seance(LocalDate.now().minusDays(5), EtatSeance.PLANIFIEE);
+        assertThat(feuille(s, AHMED).modifiable()).isFalse();
         mvc.perform(envoi(s, AHMED, StatutPresence.PRESENT)).andExpect(flash().attributeExists("erreur"));
         mvc.perform(envoi(s, ADMIN, StatutPresence.PRESENT)).andExpect(flash().attributeExists("succes"));
     }

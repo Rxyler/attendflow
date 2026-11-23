@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Matiere enseignee (F-07). */
 @Entity
 @Table(name = "matiere")
 @Getter
@@ -28,7 +27,6 @@ public class Matiere {
 
     private Double coefficient;
 
-    /** Cote inverse de Enseignant.matieres. */
     @ManyToMany(mappedBy = "matieres")
     private Set<Enseignant> enseignants = new HashSet<>();
 

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Salle de cours, alimentee par la synchronisation avec le projet partenaire. */
 @Entity
 @Table(name = "salle")
 @Getter

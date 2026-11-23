@@ -9,11 +9,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Jeu de donnees fictif (mock) prevu par le cahier des charges (gestion des risques)
- * en attendant l'API du projet partenaire. Meme planning que la maquette Figma,
- * genere pour la semaine precedente, la semaine en cours et la suivante.
- */
 @Component
 public class EmploiDuTempsMock implements EmploiDuTempsProvider {
 
@@ -21,7 +16,6 @@ public class EmploiDuTempsMock implements EmploiDuTempsProvider {
     private static final String SARA = "sara.mansouri@univ.tn";
     private static final String RAMI = "rami.gharbi@univ.tn";
 
-    /** jour (1 = lundi), heure de debut, classe, code matiere, salle, enseignant, annulee */
     private record Creneau(int jour, int heure, String classe, String matiere, String salle, String prof, boolean annulee) {}
 
     private static final List<Creneau> SEMAINE_TYPE = List.of(

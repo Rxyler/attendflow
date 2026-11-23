@@ -17,10 +17,6 @@ import java.security.Principal;
 import java.time.Duration;
 import java.util.Locale;
 
-/**
- * Francais (par defaut) ou anglais. ?lang=en|fr change la langue : elle est gardee dans un cookie
- * et, pour un compte connecte, enregistree sur l'utilisateur (ses emails et notifications suivent).
- */
 @Configuration
 public class LangueConfig implements WebMvcConfigurer {
 
@@ -28,16 +24,13 @@ public class LangueConfig implements WebMvcConfigurer {
 
     public LangueConfig(UtilisateurRepository utilisateurs) {
         this.utilisateurs = utilisateurs;
-        // hors requete (taches planifiees, tests) : francais, jamais la langue de la machine
         org.springframework.context.i18n.LocaleContextHolder.setDefaultLocale(Locale.FRENCH);
     }
 
-    /** Seules fr et en existent : toute autre valeur retombe sur le francais. */
     public static Locale supportee(Locale l) {
         return l != null && "en".equals(l.getLanguage()) ? Locale.ENGLISH : Locale.FRENCH;
     }
 
-    /** Langue d'un destinataire (emails, notifications). */
     public static Locale de(Utilisateur u) {
         return u != null && "en".equals(u.getLangue()) ? Locale.ENGLISH : Locale.FRENCH;
     }
@@ -51,7 +44,6 @@ public class LangueConfig implements WebMvcConfigurer {
             }
         };
         r.setCookieMaxAge(Duration.ofDays(365));
-        // sans cookie (nouvel appareil) : la langue enregistree sur le compte, sinon le francais
         r.setDefaultLocaleFunction(req -> {
             Principal p = req.getUserPrincipal();
             return p == null ? Locale.FRENCH : utilisateurs.findByEmail(p.getName()).map(LangueConfig::de).orElse(Locale.FRENCH);

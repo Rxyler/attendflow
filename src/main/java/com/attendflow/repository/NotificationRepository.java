@@ -15,7 +15,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findByDestinataireAndLueFalse(Utilisateur destinataire);
 
-    /** Le filtre sur le destinataire empeche de lire ou modifier la notification de quelqu'un d'autre. */
     Optional<Notification> findByIdAndDestinataire(Long id, Utilisateur destinataire);
 
     void deleteByDestinataire(Utilisateur destinataire);

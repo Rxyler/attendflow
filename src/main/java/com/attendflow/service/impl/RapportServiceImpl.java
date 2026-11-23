@@ -44,8 +44,7 @@ public class RapportServiceImpl implements RapportService {
     public Rapport generer(Utilisateur utilisateur, Filtres demandes) {
         LocalDate au = demandes.au() != null ? demandes.au() : LocalDate.now();
         LocalDate du = demandes.du() != null ? demandes.du() : au.minusDays(30);
-        if (du.isAfter(au)) { LocalDate t = du; du = au; au = t; }   // periode saisie a l'envers
-        // Un enseignant ne peut jamais voir les donnees d'un autre, quel que soit le filtre envoye.
+        if (du.isAfter(au)) { LocalDate t = du; du = au; au = t; }
         Long enseignantId = utilisateur instanceof Enseignant e ? e.getId() : demandes.enseignantId();
         Filtres f = new Filtres(du, au, demandes.classeId(), demandes.matiereId(), enseignantId);
         Parametre p = parametres.findFirstByOrderByIdAsc().orElseGet(Parametre::new);

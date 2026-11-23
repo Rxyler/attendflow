@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -38,9 +39,8 @@ public class ReferentielServiceImpl implements ReferentielService {
 
     private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     private static final Set<String> FORMATS_PHOTO = Set.of("png", "jpg", "jpeg");
-    /** Nom de personne : lettres (accents compris), separees par un espace, un tiret ou une apostrophe. "Ben Ali", "N'Diaye". */
     private static final Pattern NOM_PERSONNE = Pattern.compile("\\p{L}[\\p{L}\\p{M}]*([ '’-]\\p{L}[\\p{L}\\p{M}]*)*");
-    private static final Pattern MATRICULE = Pattern.compile("[A-Za-z0-9-]{2,30}");
+    private static final Pattern MATRICULE = Pattern.compile("[0-9]{8}");
     private static final Pattern TELEPHONE = Pattern.compile("\\+?[0-9 ]{8,20}");
     private static final int AGE_ETUDIANT_MIN = 5, AGE_ETUDIANT_MAX = 24, AGE_ENSEIGNANT_MIN = 24, AGE_ENSEIGNANT_MAX = 100;
     private static final double COEFFICIENT_MAX = 20;
@@ -77,8 +77,6 @@ public class ReferentielServiceImpl implements ReferentielService {
         this.dossierPhotos = Paths.get(dossierPhotos).toAbsolutePath().normalize();
     }
 
-    // ================= Etudiants =================
-
     @Override
     @Transactional(readOnly = true)
     public List<Etudiant> rechercherEtudiants(String recherche, Long classeId) {
@@ -93,10 +91,10 @@ public class ReferentielServiceImpl implements ReferentielService {
         String email = emailValide(f.email(), id);
         String matricule = requis(f.matricule(), "Le matricule", 30);
         if (!MATRICULE.matcher(matricule).matches()) {
-            throw new IllegalArgumentException(t("Le matricule ne contient que des lettres, des chiffres ou des tirets (2 à 30)."));
+            throw new IllegalArgumentException(t("Le matricule doit contenir exactement 8 chiffres (ex. 20260001)."));
         }
         if (id == null ? etudiants.existsByMatricule(matricule) : etudiants.existsByMatriculeAndIdNot(matricule, id)) {
-            throw new IllegalArgumentException(t("Le matricule {0} existe déjà.", matricule));   // RG-06
+            throw new IllegalArgumentException(t("Le matricule {0} existe déjà.", matricule));
         }
         verifierAge(f.dateNaissance(), AGE_ETUDIANT_MIN, AGE_ETUDIANT_MAX, "l'étudiant");
         Classe classe = f.classeId() == null ? null : classes.findById(f.classeId()).orElse(null);
@@ -170,14 +168,12 @@ public class ReferentielServiceImpl implements ReferentielService {
         try (BufferedReader r = new BufferedReader(new InputStreamReader(fichier.getInputStream(), StandardCharsets.UTF_8))) {
             List<String> lignes = r.lines().toList();
             String sep = !lignes.isEmpty() && lignes.getFirst().contains(";") ? ";" : ",";
-            // shortcut: pas de champs entre guillemets contenant le separateur ; utiliser une librairie CSV si les fichiers recus en ont
             return lignes.stream().map(l -> Arrays.asList(l.split(sep, -1))).toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    /** Premiere feuille du classeur ; les dates Excel sont converties en AAAA-MM-JJ. */
     private List<List<String>> lireExcel(MultipartFile fichier) {
         DataFormatter formateur = new DataFormatter(Locale.FRANCE);
         try (Workbook wb = WorkbookFactory.create(fichier.getInputStream())) {
@@ -205,8 +201,6 @@ public class ReferentielServiceImpl implements ReferentielService {
                 .orElseThrow(() -> new IllegalArgumentException("Pas de photo"));
         return new JustificatifService.Fichier(stockage.chemin(dossierPhotos, e.getPhoto()), stockage.typeContenu(e.getPhoto()));
     }
-
-    // ================= Classes =================
 
     @Override
     @Transactional(readOnly = true)
@@ -250,8 +244,6 @@ public class ReferentielServiceImpl implements ReferentielService {
         classes.delete(c);
     }
 
-    // ================= Matieres =================
-
     @Override
     @Transactional(readOnly = true)
     public List<Matiere> matieres() {
@@ -264,7 +256,7 @@ public class ReferentielServiceImpl implements ReferentielService {
         if (id == null ? matieres.findByCode(code).isPresent() : matieres.existsByCodeAndIdNot(code, id)) {
             throw new IllegalArgumentException(t("Le code {0} existe déjà.", code));
         }
-        if (f.coefficient() != null && !(f.coefficient() > 0 && f.coefficient() <= COEFFICIENT_MAX)) {   // NaN aussi refuse
+        if (f.coefficient() != null && !(f.coefficient() > 0 && f.coefficient() <= COEFFICIENT_MAX)) {
             throw new IllegalArgumentException(t("Le coefficient doit être compris entre 0 et {0}.", (int) COEFFICIENT_MAX));
         }
         Matiere m = id == null ? new Matiere()
@@ -279,11 +271,9 @@ public class ReferentielServiceImpl implements ReferentielService {
     public void supprimerMatiere(Long id) {
         Matiere m = matieres.findById(id).orElseThrow(() -> new IllegalArgumentException(t("Matière introuvable.")));
         if (seances.existsByMatiere(m)) throw new IllegalStateException(t("La matière {0} a des séances.", m.getIntitule()));
-        m.getEnseignants().forEach(e -> e.getMatieres().remove(m));   // l'enseignant porte l'association
+        m.getEnseignants().forEach(e -> e.getMatieres().remove(m));
         matieres.delete(m);
     }
-
-    // ================= Enseignants =================
 
     @Override
     @Transactional(readOnly = true)
@@ -296,7 +286,7 @@ public class ReferentielServiceImpl implements ReferentielService {
         String email = emailValide(f.email(), id);
         List<Matiere> choisies = f.matiereIds() == null ? List.of() : matieres.findAllById(f.matiereIds());
         if (choisies.isEmpty()) {
-            throw new IllegalArgumentException(t("Affectez au moins une matière."));   // Enseignant "0..*" -- "1..*" Matiere
+            throw new IllegalArgumentException(t("Affectez au moins une matière."));
         }
         Enseignant e = id == null
                 ? new Enseignant(null, null, email, motDePasseAleatoire(), null)
@@ -324,9 +314,6 @@ public class ReferentielServiceImpl implements ReferentielService {
         enseignants.delete(e);
     }
 
-    // ================= Outils =================
-
-    /** Les comptes crees n'ont pas de mot de passe connu : l'utilisateur le choisit via "Mot de passe oublie" (F-02). */
     private String motDePasseAleatoire() {
         return encoder.encode(UUID.randomUUID().toString());
     }
@@ -340,7 +327,7 @@ public class ReferentielServiceImpl implements ReferentielService {
         String e = requis(email, "L'email", 150).toLowerCase(Locale.ROOT);
         if (!EMAIL.matcher(e).matches()) throw new IllegalArgumentException(t("Email invalide : {0}", e));
         if (id == null ? utilisateurs.existsByEmail(e) : utilisateurs.existsByEmailAndIdNot(e, id)) {
-            throw new IllegalArgumentException(t("L'email {0} est déjà utilisé.", e));   // RG-06
+            throw new IllegalArgumentException(t("L'email {0} est déjà utilisé.", e));
         }
         return e;
     }
@@ -351,7 +338,6 @@ public class ReferentielServiceImpl implements ReferentielService {
         return valeur.trim();
     }
 
-    /** Nom ou prenom reel : pas de chiffres ni de symboles ; les espaces multiples sont ramenes a un seul. */
     private static String nomPersonne(String valeur, String champ) {
         String nom = requis(valeur, champ, 80).replaceAll("\\s+", " ");
         if (!NOM_PERSONNE.matcher(nom).matches()) {
@@ -360,7 +346,6 @@ public class ReferentielServiceImpl implements ReferentielService {
         return nom;
     }
 
-    /** Un intitule fait uniquement de chiffres ou de symboles ("1234", "!!!") n'a pas de sens. */
     private static String avecLettre(String valeur, String champ) {
         if (valeur.codePoints().noneMatch(Character::isLetter)) {
             throw new IllegalArgumentException(t("{0} doit contenir au moins une lettre.", t(champ)));
@@ -368,19 +353,17 @@ public class ReferentielServiceImpl implements ReferentielService {
         return valeur;
     }
 
-    /** Date de naissance facultative ; si saisie : pas dans le futur et age compris entre min et max (inclus). */
     private static void verifierAge(LocalDate naissance, int min, int max, String qui) {
         if (naissance == null) return;
         if (naissance.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException(t("La date de naissance ne peut pas être dans le futur."));
         }
-        int age = java.time.Period.between(naissance, LocalDate.now()).getYears();
+        int age = Period.between(naissance, LocalDate.now()).getYears();
         if (age < min || age > max) {
             throw new IllegalArgumentException(t("Date de naissance invalide : {0} doit avoir entre {1} et {2} ans.", t(qui), min, max));
         }
     }
 
-    /** Facultatif ; 8 a 15 chiffres, "+" international et espaces permis ("+216 20 123 456"). */
     private static String telephone(String valeur) {
         String tel = optionnel(valeur, 30);
         if (tel == null) return null;
@@ -403,7 +386,6 @@ public class ReferentielServiceImpl implements ReferentielService {
             try {
                 return LocalDate.parse(texte.trim(), DateTimeFormatter.ofPattern(format));
             } catch (DateTimeParseException ignored) {
-                // essaie le format suivant
             }
         }
         throw new IllegalArgumentException(t("date « {0} » invalide (AAAA-MM-JJ ou JJ/MM/AAAA)", texte));

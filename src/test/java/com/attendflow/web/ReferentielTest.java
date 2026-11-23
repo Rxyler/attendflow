@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -45,7 +47,6 @@ class ReferentielTest {
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
 
-    /** Annee courante : les dates de naissance restent dans la tranche d'age autorisee quelle que soit l'annee. */
     static final int AN = LocalDate.now().getYear();
 
     Long info3() { return classes.findByNom("3ème INFO").orElseThrow().getId(); }
@@ -63,10 +64,9 @@ class ReferentielTest {
                         .param("nom", "Test").param("prenom", "Nouvel").param("email", "Nouvel.Test@univ.tn")
                         .param("matricule", "20269999").param("classeId", info3().toString()).param("dateNaissance", (AN - 20) + "-05-06"))
                 .andExpect(flash().attributeExists("succes"));
-        Etudiant e = etudiants.findWithClasseByEmail("nouvel.test@univ.tn").orElseThrow();   // email mis en minuscules
+        Etudiant e = etudiants.findWithClasseByEmail("nouvel.test@univ.tn").orElseThrow();
         assertThat(e.getDateNaissance()).isEqualTo(LocalDate.of(AN - 20, 5, 6));
 
-        // RG-06 : email ou matricule deja pris -> refuse, formulaire rouvert
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN)
                         .param("nom", "X").param("prenom", "Y").param("email", "lina.ferjani@univ.tn")
                         .param("matricule", "20268888").param("classeId", info3().toString()))
@@ -76,7 +76,6 @@ class ReferentielTest {
                         .param("matricule", "20260001").param("classeId", info3().toString()))
                 .andExpect(flash().attributeExists("erreur"));
 
-        // modification
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN).param("id", e.getId().toString())
                         .param("nom", "Modifié").param("prenom", "Nouvel").param("email", "nouvel.test@univ.tn")
                         .param("matricule", "20269999").param("classeId", info3().toString()))
@@ -122,26 +121,24 @@ class ReferentielTest {
                 + "Delta;Dan;dan.delta@univ.tn;20265004;2ème INFO;12/03/" + (AN - 20) + "\n";
         mvc.perform(multipart("/admin/etudiants/import").file(new MockMultipartFile("fichier", "e.csv", "text/csv", csv.getBytes()))
                         .with(csrf()).with(ADMIN))
-                .andExpect(flash().attribute("avertissement", org.hamcrest.Matchers.startsWith("2 étudiant(s) importé(s)")))
-                .andExpect(flash().attribute("erreursImport", org.hamcrest.Matchers.hasSize(2)));
+                .andExpect(flash().attribute("avertissement", startsWith("2 étudiant(s) importé(s)")))
+                .andExpect(flash().attribute("erreursImport", hasSize(2)));
         assertThat(etudiants.findWithClasseByEmail("dan.delta@univ.tn").orElseThrow().getDateNaissance())
                 .isEqualTo(LocalDate.of(AN - 20, 3, 12));
     }
 
     @Test
     void classesMatieresEnseignants() throws Exception {
-        // classe : ajout puis suppression refusee si elle contient des etudiants
         mvc.perform(post("/admin/classes").with(csrf()).with(ADMIN).param("nom", "Master 1").param("anneeUniversitaire", "2026-2027"))
                 .andExpect(flash().attributeExists("succes"));
         mvc.perform(post("/admin/classes").with(csrf()).with(ADMIN).param("nom", "Master 1"))
-                .andExpect(flash().attributeExists("erreur"));   // doublon
+                .andExpect(flash().attributeExists("erreur"));
         mvc.perform(post("/admin/classes/" + info3() + "/supprimer").with(csrf()).with(ADMIN))
                 .andExpect(flash().attributeExists("erreur"));
         Long master = classes.findByNom("Master 1").orElseThrow().getId();
         mvc.perform(post("/admin/classes/" + master + "/supprimer").with(csrf()).with(ADMIN))
                 .andExpect(flash().attributeExists("succes"));
 
-        // matiere puis enseignant affecte a cette matiere (F-08)
         mvc.perform(post("/admin/matieres").with(csrf()).with(ADMIN).param("intitule", "Génie logiciel").param("code", "gl").param("coefficient", "2"))
                 .andExpect(flash().attributeExists("succes"));
         Matiere gl = matieres.findByCode("GL").orElseThrow();
@@ -152,9 +149,8 @@ class ReferentielTest {
                 && e.getMatieres().stream().anyMatch(m -> m.getCode().equals("GL")));
         mvc.perform(post("/admin/enseignants").with(csrf()).with(ADMIN).param("nom", "Sans").param("prenom", "Matiere")
                         .param("email", "sans.matiere@univ.tn"))
-                .andExpect(flash().attributeExists("erreur"));   // au moins une matiere
+                .andExpect(flash().attributeExists("erreur"));
 
-        // matiere ou enseignant ayant des seances : suppression refusee
         mvc.perform(post("/admin/matieres/" + matieres.findByCode("JAVA").orElseThrow().getId() + "/supprimer").with(csrf()).with(ADMIN))
                 .andExpect(flash().attributeExists("erreur"));
         mvc.perform(post("/admin/enseignants/" + enseignants.findByEmail("ahmed.bensalah@univ.tn").orElseThrow().getId() + "/supprimer")

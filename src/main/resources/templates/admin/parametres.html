@@ -18,7 +18,6 @@
       <div th:if="${erreur}" class="alert alert-danger mb-0" role="alert" th:text="${erreur}">erreur</div>
 
       <form th:action="@{/admin/parametres}" method="post" class="d-grid gap-4">
-        <!-- RG-05 -->
         <section class="af-glass p-4" aria-labelledby="t-seuils">
           <h2 id="t-seuils" class="h6 fw-bold" th:text="#{parametres.seuils}">Seuils d’alerte</h2>
           <p class="small text-secondary" th:text="#{parametres.seuilsTexte}">Un étudiant est signalé.</p>
@@ -32,7 +31,6 @@
           </div>
         </section>
 
-        <!-- F-22 -->
         <section class="af-glass p-4" aria-labelledby="t-delai">
           <h2 id="t-delai" class="h6 fw-bold" th:text="#{parametres.modification}">Modification des présences</h2>
           <label for="delai" class="form-label" th:text="#{parametres.delai}">Délai de modification</label>
@@ -42,7 +40,6 @@
           <div id="delai-aide" class="form-text" th:text="#{parametres.delaiAide}">Passé ce délai.</div>
         </section>
 
-        <!-- RG-04 -->
         <section class="af-glass p-4" aria-labelledby="t-taux">
           <h2 id="t-taux" class="h6 fw-bold" th:text="#{parametres.calcul}">Calcul du taux de présence</h2>
           <div class="form-check form-switch mb-2">

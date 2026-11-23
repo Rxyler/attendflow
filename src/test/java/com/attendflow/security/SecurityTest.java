@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
@@ -11,7 +12,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Utilise les comptes de demo crees par DonneesDemo dans la base H2 de test. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityTest {
@@ -22,7 +22,7 @@ class SecurityTest {
         var session = mvc.perform(formLogin().user("email", email).password("motDePasse", motDePasse))
                 .andExpect(redirectedUrl("/"))
                 .andReturn().getRequest().getSession();
-        mvc.perform(get("/").session((org.springframework.mock.web.MockHttpSession) session))
+        mvc.perform(get("/").session((MockHttpSession) session))
                 .andExpect(redirectedUrl(page));
     }
 

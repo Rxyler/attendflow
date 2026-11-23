@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** Ecran Parametres : seuils RG-05, delai F-22, calcul du taux RG-04 (admin uniquement, voir SecurityConfig). */
 @Controller
 @RequestMapping("/admin/parametres")
 public class ParametreController {
@@ -46,7 +45,7 @@ public class ParametreController {
             r.addFlashAttribute("succes", t("Paramètres enregistrés. Ils s’appliquent immédiatement."));
         } catch (IllegalArgumentException e) {
             r.addFlashAttribute("erreur", e.getMessage());
-            r.addFlashAttribute("form", form);   // garde la saisie
+            r.addFlashAttribute("form", form);
         }
         return "redirect:/admin/parametres";
     }

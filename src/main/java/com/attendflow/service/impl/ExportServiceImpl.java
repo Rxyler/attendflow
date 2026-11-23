@@ -7,6 +7,7 @@ import com.attendflow.service.RapportService.ParClasse;
 import com.attendflow.service.RapportService.ParMatiere;
 import com.attendflow.service.RapportService.Rapport;
 import com.attendflow.service.StatistiqueService.EtudiantARisque;
+import com.attendflow.service.Textes;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
 import com.lowagie.text.PageSize;
@@ -29,10 +30,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-/** Apache POI (Excel) et OpenPDF (PDF), comme prevu dans l'architecture technique du cahier. */
 @Service
 public class ExportServiceImpl implements ExportService {
 
@@ -42,8 +43,6 @@ public class ExportServiceImpl implements ExportService {
 
     private static final String[] COLONNES_SEANCES =
             {"Date", "Horaire", "Matière", "Classe", "Enseignant", "Présents", "Absents", "Retards", "Justifiés", "Taux (%)"};
-
-    // ======================= PDF =======================
 
     @Override
     public byte[] pdf(Rapport r) {
@@ -105,7 +104,7 @@ public class ExportServiceImpl implements ExportService {
             c.setPadding(4);
             t.addCell(c);
         }
-        t.setHeaderRows(1);   // en-tete repete sur chaque page
+        t.setHeaderRows(1);
         for (T ligne : lignes) {
             for (Object v : valeurs.apply(ligne)) {
                 PdfPCell c = new PdfPCell(new Phrase(String.valueOf(v), cellule));
@@ -120,8 +119,6 @@ public class ExportServiceImpl implements ExportService {
         }
         doc.add(t);
     }
-
-    // ======================= Excel =======================
 
     @Override
     public byte[] excel(Rapport r) {
@@ -163,7 +160,6 @@ public class ExportServiceImpl implements ExportService {
         s.createFreezePane(0, 1);
     }
 
-    /** Nombres ecrits comme nombres (et non texte) pour que les formules Excel fonctionnent. */
     private void ligne(Sheet s, int numero, CellStyle style, Object... valeurs) {
         Row row = s.createRow(numero);
         for (int i = 0; i < valeurs.length; i++) {
@@ -175,8 +171,6 @@ public class ExportServiceImpl implements ExportService {
         }
     }
 
-    // ======================= Commun =======================
-
     private Object[] ligneSeance(LigneSeance l) {
         return new Object[]{l.seance().getDate().format(JOUR), l.seance().getHeureDebut() + " - " + l.seance().getHeureFin(),
                 l.seance().getMatiere().getIntitule(), l.seance().getClasse().getNom(),
@@ -184,7 +178,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private static String[] traduits(String[] francais) {
-        return java.util.Arrays.stream(francais).map(com.attendflow.service.Textes::t).toArray(String[]::new);
+        return Arrays.stream(francais).map(Textes::t).toArray(String[]::new);
     }
 
     private static String pourcent(Integer taux) {

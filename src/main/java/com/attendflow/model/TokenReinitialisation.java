@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** F-02 : jeton a usage unique envoye pour reinitialiser un mot de passe oublie. */
 @Entity
 @Table(name = "token_reinitialisation")
 @Getter
@@ -28,7 +27,6 @@ public class TokenReinitialisation {
     @Column(nullable = false)
     private boolean utilise = false;
 
-    /** Utilisateur "1" -- "0..*" TokenReinitialisation : demande */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateur_id", nullable = false)
     private Utilisateur utilisateur;

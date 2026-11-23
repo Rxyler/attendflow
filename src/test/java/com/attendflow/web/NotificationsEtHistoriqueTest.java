@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,7 +67,7 @@ class NotificationsEtHistoriqueTest {
         long avant = notificationService.nbNonLues(ahmed());
 
         mvc.perform(get("/notifications").with(AHMED)).andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Message de test")))
+                .andExpect(content().string(containsString("Message de test")))
                 .andExpect(model().attribute("nbNonLues", avant));
 
         mvc.perform(post("/notifications/" + n.getId() + "/lue").with(csrf()).with(AHMED))
@@ -87,9 +88,9 @@ class NotificationsEtHistoriqueTest {
     @Test
     void rappelF32UneSeuleFoisDansLaFenetre() {
         LocalDateTime maintenant = LocalDateTime.of(2031, 3, 3, 7, 50);
-        seance(maintenant.toLocalDate(), LocalTime.of(8, 5));   // commence dans 15 min
+        seance(maintenant.toLocalDate(), LocalTime.of(8, 5));
         assertThat(notificationService.rappelsAvantSeance(maintenant)).isEqualTo(1);
-        assertThat(notificationService.rappelsAvantSeance(maintenant.plusMinutes(5))).isZero();   // tick suivant
+        assertThat(notificationService.rappelsAvantSeance(maintenant.plusMinutes(5))).isZero();
     }
 
     @Test

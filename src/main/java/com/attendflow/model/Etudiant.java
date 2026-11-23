@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/** Etudiant : appartient a une seule classe par annee universitaire (RG-07). */
 @Entity
 @Table(name = "etudiant")
 @Getter
@@ -16,17 +15,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Etudiant extends Utilisateur {
 
-    /** RG-06 : un matricule est unique. */
     @Column(nullable = false, unique = true, length = 30)
     private String matricule;
 
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
 
-    /** Chemin ou nom du fichier photo. */
     private String photo;
 
-    /** Classe "1" -- "0..*" Etudiant : contient */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "classe_id", nullable = false)
     private Classe classe;

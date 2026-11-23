@@ -53,12 +53,10 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification notifier(Notification n) {
         Notification enregistree = notifications.save(n);
         String a = n.getDestinataire().getEmail();
-        // dans la langue du destinataire (le titre et le message de la notification le sont deja)
         Locale langue = LangueConfig.de(n.getDestinataire());
         String sujet = t(langue, "Fas3a - {0}", n.getTitre());
         String texte = t(langue, "Bonjour {0},\n\n{1}\n\nVoir vos notifications : {2}/notifications\n\n-- Fas3a",
                 n.getDestinataire().getNomComplet(), n.getMessage(), urlApplication);
-        // Apres le commit : pas d'email pour une operation annulee (rollback).
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override public void afterCommit() { email.envoyer(a, sujet, texte); }
@@ -93,13 +91,11 @@ public class NotificationServiceImpl implements NotificationService {
         notifications.findByDestinataireAndLueFalse(utilisateur).forEach(n -> n.setLue(true));
     }
 
-    /** F-32 : toutes les 5 minutes, fenetre ]+10 ; +15] minutes, donc un seul rappel par seance. */
     @Scheduled(cron = "${attendflow.rappels.cron:0 */5 * * * *}")
     public void rappelsPlanifies() {
         rappelsAvantSeance(LocalDateTime.now().withSecond(0).withNano(0));
     }
 
-    /** F-33 : resume des absences chaque jour ouvre a 18h. */
     @Scheduled(cron = "${attendflow.resume.cron:0 0 18 * * MON-FRI}")
     public void resumePlanifie() {
         resumeDuJour(LocalDate.now());

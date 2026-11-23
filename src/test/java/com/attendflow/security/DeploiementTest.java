@@ -11,8 +11,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Reglages de mise en ligne : mots de passe de demo remplaces, en-tetes de securite, limite de requetes. */
-// base a part : le changement des mots de passe de demo ne doit pas toucher les autres classes de test
 @SpringBootTest(properties = {"attendflow.demo.motdepasse=un-secret-solide", "attendflow.limite.requetes-par-minute=5",
         "spring.datasource.url=jdbc:h2:mem:attendflow-deploiement;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"})
 @AutoConfigureMockMvc
@@ -22,7 +20,6 @@ class DeploiementTest {
 
     @Test
     void lesMotsDePassePublicsNeMarchentPlus() throws Exception {
-        // 3 essais depuis la meme adresse : sous la limite de 5 de cette classe
         mvc.perform(formLogin().user("email", "admin@univ.tn").password("motDePasse", "admin"))
                 .andExpect(redirectedUrl("/login?erreur"));
         mvc.perform(formLogin().user("email", "admin@univ.tn").password("motDePasse", "un-secret-solide"))
@@ -48,7 +45,6 @@ class DeploiementTest {
         mvc.perform(get("/login").with(r -> { r.setRemoteAddr("10.0.0.9"); return r; }))
                 .andExpect(status().is(429))
                 .andExpect(header().exists("Retry-After"));
-        // un autre visiteur n'est pas touche, et les fichiers statiques ne comptent pas
         mvc.perform(get("/login").with(r -> { r.setRemoteAddr("10.0.0.10"); return r; })).andExpect(status().isOk());
         mvc.perform(get("/css/attendflow.css").with(r -> { r.setRemoteAddr("10.0.0.9"); return r; })).andExpect(status().isOk());
     }

@@ -8,27 +8,25 @@ import com.attendflow.repository.ParametreRepository;
 import com.attendflow.repository.SeanceRepository;
 import com.attendflow.repository.UtilisateurRepository;
 import com.attendflow.service.SynchronisationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static com.attendflow.service.Textes.t;
 
-/**
- * Jeu de donnees de demonstration (livrable du cahier des charges), identique a la maquette Figma.
- * Ne cree que ce qui manque : relancer l'application ne duplique rien.
- */
 @Component
 public class DonneesDemo implements CommandLineRunner {
 
     private static final String MDP_DEMO = "1234";
     private static final String MDP_ADMIN_DEMO = "admin";
 
-    /** En ligne, DEMO_PASSWORD remplace les mots de passe de demonstration publics (ils sont dans ce fichier, sur GitHub). */
-    @org.springframework.beans.factory.annotation.Value("${attendflow.demo.motdepasse:}")
+    @Value("${attendflow.demo.motdepasse:}")
     private String motDePasseDemo = "";
 
     private final UtilisateurRepository utilisateurs;
@@ -71,7 +69,6 @@ public class DonneesDemo implements CommandLineRunner {
         if (!utilisateurs.existsByEmail("admin@univ.tn")) {
             utilisateurs.save(new Admin("Admin", "Admin", "admin@univ.tn", encoder.encode(mdp(MDP_ADMIN_DEMO))));
         }
-        // l'ancien "Super Admin" de la base en ligne s'appelle desormais "Admin"
         utilisateurs.findByEmail("admin@univ.tn").filter(u -> "Super".equals(u.getPrenom()))
                 .ifPresent(u -> { u.setPrenom("Admin"); utilisateurs.save(u); });
         enseignant("Ben Salah", "Ahmed", "ahmed.bensalah@univ.tn", "Développement Web", devWeb, java);
@@ -93,9 +90,8 @@ public class DonneesDemo implements CommandLineRunner {
         etudiant("Zouari", "Nour", "20260010", res3);
         etudiant("Ben Amor", "Oussama", "20260011", res3);
 
-        if (parametres.count() == 0) parametres.save(new Parametre());   // valeurs par defaut (20 %, 8 abs., 48 h)
+        if (parametres.count() == 0) parametres.save(new Parametre());
 
-        // Premier demarrage : importer l'emploi du temps pour avoir des seances a afficher.
         if (seances.count() == 0) synchronisation.synchroniser(null);
         remplacerMotsDePassePublics();
     }
@@ -112,15 +108,10 @@ public class DonneesDemo implements CommandLineRunner {
         return motDePasseDemo != null && motDePasseDemo.length() >= 8;
     }
 
-    /** Le mot de passe de demonstration public, ou DEMO_PASSWORD s'il est defini (8 caracteres minimum). */
     private String mdp(String publicParDefaut) {
         return motDePasseDemoDefini() ? motDePasseDemo : publicParDefaut;
     }
 
-    /**
-     * Comptes deja crees avec un mot de passe public ("admin", "1234") : il est remplace par DEMO_PASSWORD.
-     * Ainsi la base en ligne, creee avant ce reglage, cesse d'accepter les mots de passe lus sur GitHub.
-     */
     private void remplacerMotsDePassePublics() {
         if (motDePasseDemo != null && !motDePasseDemo.isEmpty() && !motDePasseDemoDefini()) {
             org.slf4j.LoggerFactory.getLogger(DonneesDemo.class).warn("DEMO_PASSWORD ignore : 8 caracteres minimum");
@@ -144,10 +135,6 @@ public class DonneesDemo implements CommandLineRunner {
         utilisateurs.save(e);
     }
 
-    /**
-     * La premiere etudiante de demonstration portait le nom d'une personne reelle : la base deja en ligne
-     * la renomme sur place (meme compte, meme historique) et corrige les notifications qui citaient ce nom.
-     */
     static final String ANCIEN_NOM = "Manar Nouira", ANCIEN_EMAIL = "manar.nouira@univ.tn";
 
     private void renommerEtudiante() {
@@ -166,12 +153,8 @@ public class DonneesDemo implements CommandLineRunner {
         }
     }
 
-    /**
-     * Les notifications creees avant les liens n'ouvraient rien : on leur donne la page de leur sujet,
-     * reconnue a leur titre (francais ou anglais). Celles qui ont deja un lien ne sont pas touchees.
-     */
     private void lierAnciennesNotifications() {
-        java.util.Map<String, String> liens = java.util.Map.of(
+        Map<String, String> liens = Map.of(
                 "Nouveau justificatif", "/admin/justificatifs",
                 "Justificatif accepté", "/etudiant/justificatifs",
                 "Justificatif refusé", "/etudiant/justificatifs",
@@ -182,8 +165,7 @@ public class DonneesDemo implements CommandLineRunner {
         for (var n : notifications.findAll()) {
             if (n.getLien() != null) continue;
             liens.forEach((fr, lien) -> {
-                if (!fr.equals(n.getTitre()) && !t(java.util.Locale.ENGLISH, fr).equals(n.getTitre())) return;
-                // le seuil depasse concerne l'admin (vue des risques) ou l'etudiant (son historique)
+                if (!fr.equals(n.getTitre()) && !t(Locale.ENGLISH, fr).equals(n.getTitre())) return;
                 n.setLien(!lien.isEmpty() ? lien
                         : n.getDestinataire().getRole() == com.attendflow.model.enums.Role.ADMIN ? "/rapports" : "/etudiant/historique");
                 notifications.save(n);

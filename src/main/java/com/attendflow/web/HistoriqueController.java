@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeFormatter;
 
-/** Ecran 5 / F-28 : historique des presences d'un etudiant (l'etudiant lui-meme ou l'admin). */
 @Controller
 public class HistoriqueController {
 

@@ -66,7 +66,7 @@ public class JustificatifServiceImpl implements JustificatifService {
 
         String nomFichier = stockage.enregistrer(fichier, dossier, FORMATS, t("PDF, PNG ou JPG"));
         Justificatif j;
-        if (existant != null) {   // remplace un justificatif refuse
+        if (existant != null) {
             stockage.supprimer(dossier, existant.getFichier());
             j = existant;
             j.setFichier(nomFichier);
@@ -84,7 +84,7 @@ public class JustificatifServiceImpl implements JustificatifService {
                     t(LangueConfig.de(admin), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet()),
                     "/admin/justificatifs"));
         }
-        Enseignant enseignant = presence.getSeance().getEnseignant();   // il peut aussi trancher
+        Enseignant enseignant = presence.getSeance().getEnseignant();
         notifications.notifier(new Notification(enseignant, TypeNotification.INFORMATION, t(LangueConfig.de(enseignant), "Nouveau justificatif"),
                 t(LangueConfig.de(enseignant), "{0} a déposé un justificatif en attente de validation.", etudiant.getNomComplet()),
                 "/enseignant/justificatifs"));
@@ -150,7 +150,6 @@ public class JustificatifServiceImpl implements JustificatifService {
         return new Fichier(stockage.chemin(dossier, j.getFichier()), stockage.typeContenu(j.getFichier()));
     }
 
-    /** L'administrateur, ou l'enseignant de la seance ou l'absence a ete notee. */
     private static boolean peutTrancher(Utilisateur u, Justificatif j) {
         return u instanceof Admin
                 || u instanceof Enseignant && j.getPresence().getSeance().getEnseignant().getId().equals(u.getId());

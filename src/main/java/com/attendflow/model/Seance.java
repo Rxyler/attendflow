@@ -12,10 +12,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Seance planifiee, fournie par le projet partenaire (RG-09) :
- * AttendFlow la stocke localement mais ne la cree ni ne la modifie.
- */
 @Entity
 @Table(name = "seance")
 @Getter
@@ -27,7 +23,6 @@ public class Seance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Identifiant d'origine dans le planning du projet partenaire (RG-09). */
     @Column(name = "id_externe", nullable = false, unique = true, length = 64)
     private String idExterne;
 
@@ -47,30 +42,22 @@ public class Seance {
     @Column(name = "date_synchro")
     private LocalDateTime dateSynchro;
 
-    /** Classe "1" -- "0..*" Seance : planifie */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "classe_id", nullable = false)
     private Classe classe;
 
-    /** Matiere "1" -- "0..*" Seance : concerne */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "matiere_id", nullable = false)
     private Matiere matiere;
 
-    /** Salle "1" -- "0..*" Seance : accueille */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "salle_id", nullable = false)
     private Salle salle;
 
-    /** Enseignant "1" -- "0..*" Seance : assure (RG-03) */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "enseignant_id", nullable = false)
     private Enseignant enseignant;
 
-    /**
-     * Seance "1" *-- "0..*" Presence : genere (composition).
-     * Une seance annulee n'est jamais supprimee : ses presences sont conservees (RG-10).
-     */
     @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Presence> presences = new ArrayList<>();
 
@@ -86,7 +73,6 @@ public class Seance {
         this.enseignant = enseignant;
     }
 
-    /** RG-10 : une seance annulee n'est plus proposee a la prise de presences. */
     public boolean isOuvertePourPresences() {
         return etat != EtatSeance.ANNULEE;
     }

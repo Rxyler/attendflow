@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
-/** Administrateur de la plateforme : acces complet. */
 @Entity
 @Table(name = "admin")
 @NoArgsConstructor

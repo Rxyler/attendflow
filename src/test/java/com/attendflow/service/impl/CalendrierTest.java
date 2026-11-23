@@ -28,8 +28,8 @@ class CalendrierTest {
         assertThat(jours).hasSize(84);
         assertThat(jours.getFirst().date()).isEqualTo(lundi.minusWeeks(11));
         assertThat(jours.getLast().date()).isEqualTo(lundi.plusDays(6));
-        assertThat(jours.get(77).etat()).isEqualTo("absent");   // le pire des deux statuts du lundi
+        assertThat(jours.get(77).etat()).isEqualTo("absent");
         assertThat(jours.get(78).etat()).isEqualTo("retard");
-        assertThat(jours).filteredOn(j -> !j.etat().isEmpty()).hasSize(2); // hors fenetre ignore
+        assertThat(jours).filteredOn(j -> !j.etat().isEmpty()).hasSize(2);
     }
 }

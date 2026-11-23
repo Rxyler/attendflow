@@ -1,4 +1,3 @@
-/* Apparence commune des graphiques Chart.js, suit le theme clair / sombre. A charger juste apres chart.umd.min.js. */
 (function () {
   if (!window.Chart) return;
   var calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -35,10 +34,8 @@
   d.interaction = { mode: 'index', intersect: false };
   d.scales.category.grid = { display: false };
   appliquer(palette());
-  // Changement de theme : les graphiques deja traces se recolorent
   document.addEventListener('af:theme', function () {
     var p = palette(); appliquer(p);
-    // Les couleurs viennent des defauts : un update() suffit (ecrire dans c.options casse les proxies de Chart.js)
     Object.values(Chart.instances).forEach(function (c) {
       if (c.config.type === 'doughnut') c.data.datasets.forEach(function (ds) { ds.borderColor = p.arc; });
       c.update();

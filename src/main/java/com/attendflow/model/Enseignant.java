@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Enseignant : assure des seances et enseigne une ou plusieurs matieres. */
 @Entity
 @Table(name = "enseignant")
 @Getter
@@ -20,11 +20,9 @@ public class Enseignant extends Utilisateur {
     @Column(length = 120)
     private String specialite;
 
-    /** Facultative ; si saisie, l'enseignant a au moins 24 ans (ReferentielServiceImpl). */
     @Column(name = "date_naissance")
-    private java.time.LocalDate dateNaissance;
+    private LocalDate dateNaissance;
 
-    /** Enseignant "0..*" -- "1..*" Matiere : enseigne */
     @ManyToMany
     @JoinTable(
             name = "enseignant_matiere",

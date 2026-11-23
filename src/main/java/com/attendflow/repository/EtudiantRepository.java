@@ -12,10 +12,8 @@ import java.util.Optional;
 
 public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
 
-    /** F-17 : liste des etudiants chargee a l'ouverture d'une seance. */
     List<Etudiant> findByClasseOrderByNomAscPrenomAsc(Classe classe);
 
-    /** RG-06 : verifier l'unicite du matricule avant creation. */
     boolean existsByMatricule(String matricule);
 
     @EntityGraph(attributePaths = "classe")
@@ -24,7 +22,6 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
     @EntityGraph(attributePaths = "classe")
     Optional<Etudiant> findWithClasseById(Long id);
 
-    /** F-10 : recherche par nom, prenom, matricule ou email ({@code motif} deja en minuscules, avec %). */
     @EntityGraph(attributePaths = "classe")
     @Query("select e from Etudiant e where lower(e.nom) like :motif or lower(e.prenom) like :motif "
             + "or lower(e.matricule) like :motif or lower(e.email) like :motif order by e.nom, e.prenom")
@@ -34,7 +31,6 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
 
     boolean existsByClasse(Classe classe);
 
-    /** Effectif de chaque classe : [id classe, nombre d'etudiants]. */
     @Query("select e.classe.id, count(e) from Etudiant e group by e.classe.id")
     List<Object[]> compterParClasse();
 }

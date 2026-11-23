@@ -6,10 +6,8 @@ import com.attendflow.model.Utilisateur;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Ecran 8 / F-29 et F-30 : rapports filtrables et indicateurs. Un enseignant ne voit que ses seances. */
 public interface RapportService {
 
-    /** Filtres F-29 ; null = tous. Periode par defaut : les 30 derniers jours. */
     record Filtres(LocalDate du, LocalDate au, Long classeId, Long matiereId, Long enseignantId) {}
 
     record ParClasse(String classe, Integer taux, long presences) {}

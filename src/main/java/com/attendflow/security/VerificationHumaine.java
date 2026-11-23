@@ -23,13 +23,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * "Etes-vous un humain ?" (Cloudflare Turnstile) sur les formulaires publics : connexion et mot de passe oublie.
- * Le navigateur recoit un jeton du widget ; on le fait valider par Cloudflare avant que Spring Security ne lise le mot de passe.
- * En local, sans cles : cles de test de Cloudflare (widget visible). Tests : cles vides, verification desactivee.
- */
-@ControllerAdvice   // aussi un @Component : filtre + cle du widget donnee aux pages
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)   // juste apres LimiteRequetes, avant la chaine Spring Security
+@ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class VerificationHumaine extends OncePerRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(VerificationHumaine.class);
@@ -42,7 +37,6 @@ public class VerificationHumaine extends OncePerRequestFilter {
 
     public VerificationHumaine(@Value("${attendflow.turnstile.site-key:}") String cleSite,
                                @Value("${attendflow.turnstile.secret-key:}") String cleSecrete) {
-        // Les cles de test (par defaut, voir application.properties) acceptent tout : jamais en ligne (Render definit RENDER).
         this.cleSite = System.getenv("RENDER") != null && cleSite.startsWith("1x0000") ? "" : cleSite;
         this.cleSecrete = cleSecrete;
         var fabrique = new JdkClientHttpRequestFactory(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build());
@@ -50,7 +44,6 @@ public class VerificationHumaine extends OncePerRequestFilter {
         this.client = RestClient.builder().requestFactory(fabrique).build();
     }
 
-    /** Cle publique du widget pour les pages (fragments/layout :: humain) ; null = pas de widget. */
     @ModelAttribute("cleTurnstile")
     public String cleTurnstile() {
         return isActive() ? cleSite : null;
@@ -76,7 +69,6 @@ public class VerificationHumaine extends OncePerRequestFilter {
         }
     }
 
-    /** Refuse aussi si Cloudflare ne repond pas : un robot ne doit pas passer pendant une panne. */
     boolean valide(String jeton, String ip) {
         if (jeton == null || jeton.isBlank() || jeton.length() > 2048) return false;
         var formulaire = new LinkedMultiValueMap<String, String>();

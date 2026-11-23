@@ -1,16 +1,14 @@
-/* Compagnons : reactions au clic, confettis (nouveau badge, niveau, appel complet) et un petit secret. */
 (function () {
   var calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var en = document.documentElement.lang === 'en';
   function confettis(opts) {
     if (calme || !window.confetti) return;
-    var c = ['#ffd93d', '#ff6fa3', '#13a89e', '#1f1d1a', '#fffaf0'];   // marqueurs du carnet
+    var c = ['#ffd93d', '#ff6fa3', '#13a89e', '#1f1d1a', '#fffaf0'];
     confetti(Object.assign({ particleCount: 120, spread: 80, origin: { y: .6 }, colors: c, disableForReducedMotion: true }, opts));
   }
   function lire(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function ecrire(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  // Toast discret en bas de l'ecran
   function toast(html) {
     var t = document.createElement('div');
     t.className = 'af-toast af-glass'; t.setAttribute('role', 'status'); t.innerHTML = html;
@@ -23,7 +21,6 @@
   if (compagnon) {
     var nom = compagnon.dataset.nom, bulle = document.querySelector('.af-bulle');
     var phrases = [
-      // la page dit sa langue (<html lang>) : le compagnon parle la meme
       en ? 'Hey, that tickles!' : 'Hé, ça chatouille !',
       en ? nom + ' checked: your next class is waiting for you.' : nom + ' a vérifié : ta prochaine séance t’attend.',
       en ? 'One class a day keeps the catch-up away.' : 'Une présence par jour éloigne les rattrapages.',
@@ -44,7 +41,6 @@
           .to(compagnon, { scaleX: 1, scaleY: 1, duration: .5, ease: 'elastic.out(1, .4)' });
       }
       if (bulle) { bulle.textContent = phrases[i++ % phrases.length]; }
-      // petits coeurs qui s'envolent
       if (!calme) for (var k = 0; k < 5; k++) {
         var c = document.createElement('span'); c.className = 'af-coeur'; c.textContent = '♥';
         c.style.left = (30 + Math.random() * 40) + '%'; c.style.animationDelay = (k * .08) + 's';
@@ -52,7 +48,6 @@
       }
     });
 
-    // Nouveau badge ou nouveau niveau depuis la derniere visite : on fete ca
     var badges = +compagnon.dataset.badges, niveau = +compagnon.dataset.niveau;
     var avantB = lire('af-badges'), avantN = lire('af-niveau');
     if (avantB !== null && badges > +avantB) {
@@ -63,14 +58,12 @@
     ecrire('af-badges', badges); ecrire('af-niveau', niveau);
   }
 
-  // Appel : "Tous presents" fait pleuvoir quelques confettis
   var tous = document.getElementById('tous-presents');
   if (tous) tous.addEventListener('click', function () {
     var r = tous.getBoundingClientRect();
     confettis({ particleCount: 70, spread: 60, origin: { x: (r.left + r.width / 2) / innerWidth, y: r.top / innerHeight } });
   });
 
-  // Secret : haut haut bas bas gauche droite gauche droite B A = pluie de compagnons
   var code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], pos = 0;
   document.addEventListener('keydown', function (e) {
     pos = (e.key === code[pos]) ? pos + 1 : (e.key === code[0] ? 1 : 0);

@@ -1,6 +1,3 @@
-/* Fas3a : petit film de 10 s joue une fois apres l'intro de la vitrine (ouvert par attendflow.js).
-   Image : SVG dessine a la main, une seule timeline GSAP. Son : musique et bruitages synthetises en Web Audio,
-   rendus d'avance dans un seul tampon (OfflineAudioContext) puis lus a partir de tl.time() : jamais de decalage. */
 (function () {
   'use strict';
   var film = document.querySelector('.dd-film');
@@ -9,7 +6,6 @@
   var cadre = $('.dd-film-cadre'), scene = $('.dd-film-scene'), legendes = $$('.dd-film-legendes p'),
       progres = $('.dd-film-progres span'), vitrine = document.querySelector('.af-vitrine');
 
-  /* ================= Bande son (musique + bruitages), calee sur les memes temps que l'image ================= */
   function hz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
   function partition() {
     var O = window.OfflineAudioContext || window.webkitOfflineAudioContext;
@@ -33,7 +29,6 @@
       s.buffer = bb; s.loop = true; fl.type = type; fl.frequency.setValueAtTime(f, t); fl.Q.value = q || 1;
       env(g, t, a || .003, v, dur); s.connect(fl).connect(g).connect(dest); s.start(t, r() * 1.5); s.stop(t + dur + .05); return fl;
     }
-    // instruments
     function marimba(t, m, v) { osc(mus, t, 'sine', hz(m), hz(m), v || .2, .35); osc(mus, t, 'sine', hz(m) * 4, hz(m) * 4, (v || .2) * .25, .07); }
     function basse(t, m, dur) { osc(mus, t, 'triangle', hz(m), hz(m), .34, dur || .42, .01); }
     function pizz(t, m) { osc(mus, t, 'triangle', hz(m), hz(m), .14, .16); }
@@ -44,7 +39,6 @@
     function cloche(dest, t, m, v, dur) {
       [[1, 1, 1], [2.76, .4, .5], [5.4, .15, .25]].forEach(function (p) { osc(dest, t, 'sine', hz(m) * p[0], hz(m) * p[0], v * p[1], dur * p[2]); });
     }
-    // bruitages
     function gratte(t, dur) { for (var k = t; k < t + dur; k += .03 + r() * .03) bruit(fx, k, .025 + r() * .02, 'bandpass', 2500 + r() * 2500, 2, .06 + r() * .08); }
     function froisse(t, dur, n) { for (var k = 0; k < (n || 45); k++) bruit(fx, t + r() * dur, .006 + r() * .02, 'bandpass', 900 + r() * 5000, 1.5, .1 + r() * .25); }
     function souffle(t, dur, f1, f2, v) { bruit(fx, t, dur, 'bandpass', f1, .9, v, dur * .45).frequency.exponentialRampToValueAtTime(f2, t + dur); }
@@ -63,23 +57,21 @@
     function etincelle(t) { [96, 100, 103, 108].forEach(function (m, k) { cloche(fx, t + k * .05, m, .08, .5); }); }
     function popper(t) { bruit(fx, t, .05, 'bandpass', 1400, .8, .3); froisse(t + .03, .3, 20); etincelle(t + .08); }
 
-    // musique : 120 bpm, chaque coupure (2, 4, 7, 9 s) tombe sur un temps, avec un changement d'accord
     var b = .5, e = .25;
-    [45, 44, 43, 42].forEach(function (m, k) { basse(k * b, m); bloc(k * b); pizz(k * b + e, 64); });   // 0-2 : le probleme, la basse descend, l'horloge fait tic
-    [72, 76, 79, 84, 79, 76, 72, 76].forEach(function (m, k) { marimba(2 + k * e, m); });                // 2-4 : la mascotte, tout s'eclaire
-    [48, 48, 55, 55].forEach(function (m, k) { basse(2 + k * b, m); if (k) kick(2 + k * b); });   // la batterie entre un temps apres la coupure : pas de sursaut
-    [[65, 69, 72, 77], [67, 71, 74, 79], [64, 67], [67, 71]].reduce(function (t, ac) {                 // 4-7 : le groove
+    [45, 44, 43, 42].forEach(function (m, k) { basse(k * b, m); bloc(k * b); pizz(k * b + e, 64); });
+    [72, 76, 79, 84, 79, 76, 72, 76].forEach(function (m, k) { marimba(2 + k * e, m); });
+    [48, 48, 55, 55].forEach(function (m, k) { basse(2 + k * b, m); if (k) kick(2 + k * b); });
+    [[65, 69, 72, 77], [67, 71, 74, 79], [64, 67], [67, 71]].reduce(function (t, ac) {
       ac.forEach(function (m, k) { marimba(t + k * e, m); }); return t + ac.length * e;
     }, 4);
     [41, 41, 43, 43, 40, 43].forEach(function (m, k) { basse(4 + k * b, m); kick(4 + k * b); });
     for (var t = 4; t < 8.75; t += e) shaker(t);
     [4.5, 5.5, 6.5, 7.5, 8.5].forEach(clap);
-    [72, 76, 79, 84, 74, 77, 79].forEach(function (m, k) { marimba(7 + k * e, m); });   // 7-8.75 puis un demi-temps de silence avant la chute
+    [72, 76, 79, 84, 74, 77, 79].forEach(function (m, k) { marimba(7 + k * e, m); });
     [48, 48, 50, 43].forEach(function (m, k) { basse(7 + k * b, m); kick(7 + k * b); });
-    [72, 76, 79, 84].forEach(function (m, k) { cloche(mus, 9 + k * .03, m, .16, 1.6); });                // 9 : la chute, accord de do
+    [72, 76, 79, 84].forEach(function (m, k) { cloche(mus, 9 + k * .03, m, .16, 1.6); });
     basse(9, 36, 1.5); basse(9, 48, 1.2);
 
-    // bruitages, aux temps de l'image
     gratte(.4, 1.05); souffle(.2, .3, 400, 1800, .2); froisse(1.45, .25); souffle(1.68, .32, 600, 2400, .25); poubelle(2);
     marqueur(2.02, .28); boing(2.35); tap(2.63); etincelle(2.85); hop(3.6);
     souffle(4, .35, 300, 1500, .3); clic(4.5, 1); clic(4.75, 1.12); clic(5, 1.25); nope(5.25);
@@ -100,13 +92,12 @@
     }
     if (ac.state !== 'running') ac.resume().catch(function () {});
   }
-  function couperSon() { if (source) { try { source.stop(); } catch (e) { /* deja fini */ } source = null; } }
+  function couperSon() { if (source) { try { source.stop(); } catch (e) {} source = null; } }
   function lancerSon() {
     couperSon();
     if (!piste || !ac || ac.state !== 'running' || !tl || tl.time() >= piste.duration) return;
     source = ac.createBufferSource(); source.buffer = piste; source.connect(sortie); source.start(0, tl.time());
   }
-  // le navigateur bloque le son tant que le visiteur n'a pas touche la page : on l'invite a le faire
   function majSon() {
     var marche = actif && ac && ac.state === 'running';
     if (sortie) sortie.gain.value = actif ? 1 : 0;
@@ -115,7 +106,6 @@
     $('.dd-film-son').setAttribute('aria-pressed', marche ? 'true' : 'false');
   }
 
-  /* ================= Sous-titres : mot a mot, *mot* surligne au feutre ================= */
   function echap(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   function decouper(p) {
     var html = '', dedans = false;
@@ -128,12 +118,9 @@
     p.innerHTML = '<span class="ligne">' + html.trim() + (dedans ? '</span>' : '') + '</span>';
   }
 
-  /* ================= Le film : 5 temps, 10 s ================= */
-  // construit a la premiere ouverture : cache, le SVG n'a pas de dimensions et les pivots seraient faux
   function construire() {
     legendes.forEach(decouper);
     tl = gsap.timeline({
-      // autoRound: false, sinon GSAP arrondit stroke-dashoffset au pixel et les traits (longueur 1) sautent au lieu de se dessiner
       paused: true, defaults: { ease: 'power3.out', smoothOrigin: false, autoRound: false },
       onUpdate: function () { progres.style.transform = 'scaleX(' + tl.progress() + ')'; },
       onComplete: function () { film.classList.add('fini'); }
@@ -149,14 +136,12 @@
           { autoAlpha: 1, y: 0, rotation: 0, duration: .4, stagger: .04, ease: 'back.out(2.2)' }, t)
         .fromTo(p.querySelectorAll('.marque'), { backgroundSize: '0% 100%' }, { backgroundSize: '100% 100%', duration: .35, ease: 'power2.inOut' }, t + .3);
     }
-    // coup de feutre : il couvre l'image, on change de decor dessous, puis il s'efface
     function balai(t, couleur) {
       tl.set('#f-balai', { attr: { stroke: couleur }, strokeDashoffset: 2 }, t)
         .to('#f-balai', { strokeDashoffset: 0, duration: .26, ease: 'power2.in' }, t)
         .to('#f-balai', { strokeDashoffset: -1, duration: .3, ease: 'power2.out' }, t + .3);
     }
 
-    // 1. le probleme : la feuille papier griffonnee, l'horloge qui s'affole, puis a la poubelle
     legende(0, .05);
     tl.fromTo('#f-feuille', { autoAlpha: 0, y: 60, rotation: -6 }, { autoAlpha: 1, y: 0, rotation: -2, duration: .5, ease: 'back.out(1.6)', svgOrigin: '460 270' }, 0)
       .fromTo('#f-horloge', { autoAlpha: 0, scale: 0 }, { autoAlpha: 1, scale: 1, duration: .4, ease: 'back.out(2.2)', svgOrigin: '780 190' }, .2)
@@ -170,7 +155,6 @@
       .to('#f-crayon, #f-horloge', { autoAlpha: 0, y: '+=40', duration: .25, ease: 'power2.in' }, 1.45)
       .to('#f-feuille', { autoAlpha: 0, scale: .25, rotation: 30, duration: .2, ease: 'power2.in', svgOrigin: '460 270' }, 1.45)
       .fromTo('#f-boule', { autoAlpha: 0, scale: .3, rotation: -40 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: .22, ease: 'back.out(2)', svgOrigin: '460 270' }, 1.5)
-      // lancer en cloche : x regulier, y monte puis retombe
       .to('#f-boule', { x: 390, rotation: 400, scale: .55, duration: .32, ease: 'none', svgOrigin: '460 270' }, 1.68)
       .to('#f-boule', { y: -150, duration: .14, ease: 'power2.out' }, 1.68)
       .to('#f-boule', { y: 125, duration: .18, ease: 'power2.in' }, 1.82)
@@ -180,7 +164,6 @@
     balai(2, 'var(--dd-jaune)');
     tl.set('#f-feuille, #f-poubelle, #f-boule', { autoAlpha: 0 }, 2.27);
 
-    // 2. la solution : la mascotte bondit, ecrase, s'etire, fait un clin d'oeil
     legende(1, 2.35);
     tl.fromTo('#f-mascotte', { autoAlpha: 0, y: 330, scaleX: 1.2, scaleY: .75, rotation: 0 },
         { autoAlpha: 1, y: -40, scaleX: .88, scaleY: 1.15, duration: .28, ease: 'power2.out', svgOrigin: PIED }, 2.35)
@@ -195,12 +178,10 @@
     });
     tl.to('#f-oeil-d', { scaleY: .1, transformOrigin: '50% 60%', duration: .08, yoyo: true, repeat: 1, ease: 'none' }, 3.35)
       .to('#f-nom, #f-etoiles > *', { autoAlpha: 0, y: '-=14', duration: .22, stagger: .03, ease: 'power2.in' }, 3.55)
-      // petit saut en cloche vers le coin, d'ou elle regarde la suite
       .to('#f-mascotte', { x: -400, scale: .3, duration: .42, ease: 'power2.inOut', svgOrigin: M }, 3.6)
       .to('#f-mascotte', { y: -230, duration: .2, ease: 'power2.out' }, 3.6)
       .to('#f-mascotte', { y: -178, duration: .22, ease: 'power2.in' }, 3.8);
 
-    // 3. comment : la feuille Fas3a tombe, les cases se cochent, une absence est justifiee et tamponnee
     legende(2, 4.05);
     tl.fromTo('#f-carte', { autoAlpha: 0, y: -380, rotation: -8 }, { autoAlpha: 1, y: 0, rotation: -1, duration: .5, ease: 'back.out(1.3)', svgOrigin: '485 270' }, 4)
       .fromTo('#f-camera', { scale: 1 }, { scale: 1.04, duration: 2.9, ease: 'none', svgOrigin: '480 270' }, 4)
@@ -225,7 +206,6 @@
     balai(6.75, 'var(--dd-rose)');
     tl.set('#f-carte', { autoAlpha: 0 }, 7.02).set('#f-camera', { scale: 1, x: 0, y: 0 }, 7.02);
 
-    // 4. le resultat : les barres montent, le taux grimpe, tout le monde est dans la boucle
     legende(3, 7.1);
     tl.set('#f-stats', { autoAlpha: 1 }, 7.02)
       .fromTo('.f-barre', { scaleY: 0 }, { scaleY: 1, transformOrigin: '50% 100%', duration: .45, stagger: .08, ease: 'back.out(1.7)' }, 7.15)
@@ -240,7 +220,6 @@
       .fromTo('#f-badge', { scale: 0 }, { scale: 1, duration: .3, ease: 'back.out(3)', transformOrigin: '50% 50%' }, 8.15)
       .to('#f-stats', { autoAlpha: 0, y: 24, duration: .22, ease: 'power2.in' }, 8.78);
 
-    // 5. la chute : la mascotte revient au centre sous les confettis
     legende(4, 9.05);
     tl.to('#f-mascotte', { x: 0, scale: 1, duration: .45, ease: 'back.out(1.6)', svgOrigin: M }, 9)
       .to('#f-mascotte', { y: -60, duration: .2, ease: 'power2.out' }, 9)
@@ -248,7 +227,6 @@
       .to('#f-antennes', { keyframes: { rotation: [-10, 8, -5, 0] }, duration: .5, ease: 'none', transformOrigin: '50% 100%' }, 9.3)
       .to('#f-nom', { autoAlpha: 1, y: 0, scale: 1, duration: .35, ease: 'back.out(2.5)' }, 9.3)
       .to('#f-oeil-d', { scaleY: .1, transformOrigin: '50% 60%', duration: .08, yoyo: true, repeat: 1, ease: 'none' }, 9.7);
-    // confettis dessines : ils partent du centre et retombent avec la gravite
     var couleurs = ['var(--dd-jaune)', 'var(--dd-rose)', 'var(--dd-sarcelle)', 'var(--dd-encre)'], NS = 'http://www.w3.org/2000/svg';
     for (var k = 0; k < 22; k++) {
       var c = document.createElementNS(NS, 'path');
@@ -264,7 +242,6 @@
     }
   }
 
-  /* ================= Lecteur : 80 % de l'ecran, un clic sur le fond le ferme ================= */
   var lenis = null, retour = null;
   function clavier(e) { if (e.key === 'Escape') fermer(); }
   function rejouer() { film.classList.remove('fini'); scene.classList.remove('en-pause'); tl.restart(); lancerSon(); }
@@ -290,7 +267,6 @@
     if (retour && retour.focus) retour.focus({ preventScroll: true });
   }
   function basculer() {
-    // le premier toucher sert d'abord a debloquer le son, sans couper le film
     if (actif && ac && ac.state !== 'running') { audio(); return; }
     if (film.classList.contains('fini')) { rejouer(); return; }
     tl.paused(!tl.paused()); scene.classList.toggle('en-pause', tl.paused());

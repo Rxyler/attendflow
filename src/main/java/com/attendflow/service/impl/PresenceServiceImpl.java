@@ -48,7 +48,6 @@ public class PresenceServiceImpl implements PresenceService {
     public Feuille ouvrir(Utilisateur utilisateur, Long seanceId) {
         Seance seance = charger(utilisateur, seanceId);
         Map<Long, Presence> existantes = presencesParEtudiant(seance);
-        // F-17 : la classe et ses etudiants sont charges automatiquement ; nouveau = Present par defaut
         List<Ligne> lignes = etudiants.findByClasseOrderByNomAscPrenomAsc(seance.getClasse()).stream()
                 .map(e -> new Ligne(e, existantes.containsKey(e.getId())
                         ? existantes.get(e.getId()).getStatut() : StatutPresence.PRESENT))
@@ -70,15 +69,13 @@ public class PresenceServiceImpl implements PresenceService {
                 .collect(Collectors.toMap(Etudiant::getId, e -> TauxPresence.seuilDepasse(statutsDe(e), p)));
 
         int enregistrees = 0;
-        // Seuls les etudiants de la classe sont pris en compte : un id envoye en trop est ignore.
         for (Etudiant etudiant : classe) {
             StatutPresence statut = statuts.get(etudiant.getId());
             if (statut == null) continue;
             Presence presence = existantes.get(etudiant.getId());
             if (presence == null) {
-                presences.save(new Presence(seance, etudiant, statut));   // RG-02 : une seule par etudiant
+                presences.save(new Presence(seance, etudiant, statut));
             } else if (presence.getStatut() != statut) {
-                // RG-08 : trace de l'auteur, de la date et des deux valeurs
                 presence.getHistorique().add(new HistoriqueModification(presence, utilisateur, presence.getStatut(), statut));
                 presence.setStatut(statut);
                 presence.setDateSaisie(LocalDateTime.now());
@@ -86,7 +83,6 @@ public class PresenceServiceImpl implements PresenceService {
             enregistrees++;
         }
 
-        // F-34 : alerte une seule fois, au moment ou l'etudiant franchit le seuil.
         presences.flush();
         for (Etudiant etudiant : classe) {
             List<StatutPresence> historique = statutsDe(etudiant);
@@ -114,7 +110,6 @@ public class PresenceServiceImpl implements PresenceService {
         return parametres.findFirstByOrderByIdAsc().orElseGet(Parametre::new);
     }
 
-    /** RG-03 : seul l'enseignant affecte (ou un administrateur) accede a la feuille. */
     private Seance charger(Utilisateur utilisateur, Long seanceId) {
         Seance seance = seances.findWithDetailsById(seanceId)
                 .orElseThrow(() -> new AccessDeniedException("Séance introuvable"));
@@ -127,23 +122,21 @@ public class PresenceServiceImpl implements PresenceService {
         return seance;
     }
 
-    /** null si la saisie est ouverte, sinon la raison du verrouillage. */
     private String raisonVerrou(Utilisateur utilisateur, Seance seance) {
         if (seance.getEtat() == EtatSeance.ANNULEE) {
-            return t("Séance annulée dans le planning source : la prise des présences est impossible.");   // RG-10
+            return t("Séance annulée dans le planning source : la prise des présences est impossible.");
         }
-        if (utilisateur instanceof Admin) return null;
         LocalDateTime maintenant = LocalDateTime.now();
         if (maintenant.isBefore(seance.getDate().atTime(seance.getHeureDebut()))) {
-            return t("La séance n'a pas encore commencé.");   // F-23
+            return t("La séance n'a pas encore commencé.");
         }
+        if (utilisateur instanceof Admin) return null;
         if (maintenant.isAfter(limiteModification(seance))) {
-            return t("Le délai de modification est dépassé. Contactez l'administration.");   // F-22
+            return t("Le délai de modification est dépassé. Contactez l'administration.");
         }
         return null;
     }
 
-    /** F-22 : l'enseignant peut saisir ou modifier jusqu'a N heures apres la fin de la seance. */
     private LocalDateTime limiteModification(Seance seance) {
         return seance.getDate().atTime(seance.getHeureFin()).plusHours(parametres().getDelaiModificationHeures());
     }

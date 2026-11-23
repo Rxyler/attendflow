@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public interface JustificatifRepository extends JpaRepository<Justificatif, Long> {
 
-    /** F-25 : liste admin, avec l'etudiant, sa classe et la seance concernee. */
     @EntityGraph(attributePaths = {"presence", "presence.etudiant", "presence.etudiant.classe",
             "presence.seance", "presence.seance.matiere"})
     List<Justificatif> findByEtatOrderByDateDepotAsc(EtatJustificatif etat);
@@ -21,7 +20,6 @@ public interface JustificatifRepository extends JpaRepository<Justificatif, Long
             "presence.seance", "presence.seance.matiere", "traitePar", "traiteParEnseignant"})
     List<Justificatif> findTop20ByEtatNotOrderByDateTraitementDesc(EtatJustificatif etat);
 
-    /** Vue enseignant : seulement les absences de ses propres seances. */
     @EntityGraph(attributePaths = {"presence", "presence.etudiant", "presence.etudiant.classe",
             "presence.seance", "presence.seance.matiere"})
     List<Justificatif> findByEtatAndPresenceSeanceEnseignantOrderByDateDepotAsc(EtatJustificatif etat, Enseignant enseignant);
@@ -30,7 +28,6 @@ public interface JustificatifRepository extends JpaRepository<Justificatif, Long
             "presence.seance", "presence.seance.matiere", "traitePar", "traiteParEnseignant"})
     List<Justificatif> findTop20ByEtatNotAndPresenceSeanceEnseignantOrderByDateTraitementDesc(EtatJustificatif etat, Enseignant enseignant);
 
-    /** Page "Mes justificatifs" de l'etudiant. */
     @EntityGraph(attributePaths = {"presence", "presence.seance", "presence.seance.matiere"})
     List<Justificatif> findByPresenceEtudiantOrderByDateDepotDesc(Etudiant etudiant);
 

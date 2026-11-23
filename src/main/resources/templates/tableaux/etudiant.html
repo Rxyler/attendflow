@@ -17,7 +17,6 @@
         <span th:text="${h < 5 or h >= 22} ? #{tableau.encoreDebout} : (${h < 12} ? #{tableau.bonjour} : (${h < 18} ? #{tableau.bonApresMidi} : #{tableau.bonsoir}))">Bonjour</span>,
         <span th:text="${utilisateur.prenom}">Prénom</span></h2>
 
-      <!-- F-27 -->
       <div class="row g-3">
         <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte(#{carte.taux}, ${t.taux != null} ? ${t.taux} + ' %' : '—', null)}"></div></div>
         <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte(#{carte.presences}, ${t.presents}, null)}"></div></div>
@@ -25,7 +24,6 @@
         <div class="col-6 col-xl-3"><div th:replace="~{fragments/layout :: carte(#{carte.retards}, ${t.retards}, null)}"></div></div>
       </div>
 
-      <!-- Compagnon et progression ludique -->
       <section class="af-glass af-beam af-beam-lent af-compagnon p-4" aria-labelledby="progression-titre"
                th:with="g=${t.progression}, m=${utilisateur.mascotte ?: T(com.attendflow.model.enums.Mascotte).PLUME}">
         <div class="row g-4 align-items-center">
@@ -73,7 +71,6 @@
       </section>
 
       <div class="row g-4">
-        <!-- Defi de la semaine -->
         <div class="col-xl-5">
           <section class="af-glass p-4 h-100 af-defi" aria-labelledby="defi-titre"
                    th:with="fini=${t.defiTotal > 0 and t.defiFaites >= t.defiTotal}"
@@ -90,7 +87,6 @@
             </div>
           </section>
         </div>
-        <!-- Calendrier des 12 dernieres semaines -->
         <div class="col-xl-7">
           <section class="af-glass p-4 h-100" aria-labelledby="cal-titre">
             <h2 id="cal-titre" class="h6 fw-bold mb-3" th:text="#{calendrier.titre}">Mes 12 dernières semaines</h2>

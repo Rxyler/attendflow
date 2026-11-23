@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
-/** F-16 a F-21 : feuille de presence d'une seance (enseignant affecte ou admin, voir SecurityConfig). */
 @Controller
 public class PresenceController {
 
@@ -40,7 +39,6 @@ public class PresenceController {
         return "seances/presences";
     }
 
-    /** Les statuts arrivent sous la forme statut_{idEtudiant}=PRESENT|ABSENT|RETARD|JUSTIFIE. */
     @PostMapping("/seances/{id}/presences")
     public String enregistrer(@PathVariable Long id, @AuthenticationPrincipal UserDetails compte,
                               @RequestParam Map<String, String> parametres, RedirectAttributes redirect) {
@@ -53,7 +51,7 @@ public class PresenceController {
                 }
             });
             int n = presenceService.enregistrer(utilisateur, id, statuts);
-            redirect.addFlashAttribute("succes", t("{0} présence(s) enregistrée(s) avec succès.", n));   // F-21
+            redirect.addFlashAttribute("succes", t("{0} présence(s) enregistrée(s) avec succès.", n));
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("erreur", t("Statut invalide : rien n'a été enregistré."));
         } catch (IllegalStateException e) {

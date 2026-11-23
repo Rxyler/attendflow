@@ -15,7 +15,6 @@
     <main id="contenu" class="p-4 d-grid gap-4">
       <h2 class="h4 fw-bold mb-0">[[#{tableau.bonjour}]], <span th:text="${utilisateur.prenom}">Prénom</span></h2>
 
-      <!-- Seance actuelle (F-16) -->
       <section class="af-glass p-4" aria-labelledby="actuelle-titre">
         <h2 id="actuelle-titre" class="h6 fw-bold" th:text="#{tableau.seanceActuelle}">Séance actuelle</h2>
         <div th:if="${t.seanceActuelle}" th:with="s=${t.seanceActuelle}">
@@ -35,7 +34,6 @@
 
       <div class="row g-4">
         <div class="col-xl-7 d-grid gap-4 align-content-start">
-          <!-- Prochaines seances du jour (F-16) -->
           <section class="af-glass p-4" aria-labelledby="prochaines-titre">
             <h2 id="prochaines-titre" class="h6 fw-bold" th:text="#{tableau.prochaines}">Prochaines séances aujourd’hui</h2>
             <p th:if="${#lists.isEmpty(t.prochaines)}" class="text-secondary mb-0" th:text="#{tableau.plusDeSeance}">Plus de séance prévue aujourd’hui.</p>

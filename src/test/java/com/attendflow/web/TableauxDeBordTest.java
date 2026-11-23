@@ -44,7 +44,6 @@ class TableauxDeBordTest {
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
     static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
 
-    /** Seance d'Ahmed pour 3ème INFO. */
     Seance seance(LocalDate date, LocalTime debut, LocalTime fin) {
         Seance s = new Seance("T-" + UUID.randomUUID(), date, debut, fin, classes.findByNom("3ème INFO").orElseThrow(),
                 matieres.findByCode("JAVA").orElseThrow(), salles.findByNom("A05").orElseThrow(),
@@ -73,9 +72,7 @@ class TableauxDeBordTest {
     @Test
     void seanceEnCoursApparaitDansLeTableauEnseignant() throws Exception {
         LocalTime maintenant = LocalTime.now();
-        // shortcut: ignore les minutes autour de minuit, ou la seance ne tiendrait pas dans la journee
         if (maintenant.isBefore(LocalTime.of(0, 30)) || maintenant.isAfter(LocalTime.of(23, 30))) return;
-        // les seances de demo du jour peuvent etre en cours a cette heure : on les annule (rollback en fin de test)
         seances.findByEnseignantAndDateBetweenOrderByDateAscHeureDebutAsc(
                         enseignants.findByEmail("ahmed.bensalah@univ.tn").orElseThrow(), LocalDate.now(), LocalDate.now())
                 .forEach(s -> s.setEtat(EtatSeance.ANNULEE));
@@ -93,12 +90,10 @@ class TableauxDeBordTest {
         long alertesLina = notifications.countByDestinataireAndLueFalse(lina);
 
         absent(lina, seance(LocalDate.now().minusDays(1), LocalTime.of(8, 0), LocalTime.of(10, 0)));
-        // 1 absence sur 1 seance : seuil franchi -> une alerte pour l'admin et une pour l'etudiant
         assertThat(notifications.countByDestinataireAndLueFalse(admin)).isEqualTo(alertesAdmin + 1);
         assertThat(notifications.countByDestinataireAndLueFalse(lina)).isEqualTo(alertesLina + 1);
 
         absent(lina, seance(LocalDate.now().minusDays(2), LocalTime.of(8, 0), LocalTime.of(10, 0)));
-        // deja au-dela du seuil : pas de nouvelle alerte
         assertThat(notifications.countByDestinataireAndLueFalse(admin)).isEqualTo(alertesAdmin + 1);
 
         var tEtudiant = (StatistiqueService.TableauEtudiant) tableau("/etudiant", LINA);

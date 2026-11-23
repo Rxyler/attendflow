@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
-/** Francais par defaut, anglais sur demande (?lang=en, retenu dans un cookie), aucune cle sans traduction. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class LangueTest {
@@ -31,7 +30,6 @@ class LangueTest {
                 .andExpect(content().string(containsString("Forgot your password?")))
                 .andExpect(content().string(containsString("lang=\"en\"")))
                 .andExpect(cookie().value("af-langue", "en"));
-        // une langue non prise en charge retombe sur le francais
         mvc.perform(get("/login").param("lang", "de")).andExpect(content().string(containsString("Mot de passe oublié ?")));
     }
 
@@ -40,7 +38,7 @@ class LangueTest {
         for (String lang : new String[] {"fr", "en"}) {
             for (String page : new String[] {"/", "/login", "/mot-de-passe-oublie"}) {
                 mvc.perform(get(page).param("lang", lang))
-                        .andExpect(content().string(not(containsString(" th:"))))   // un attribut Thymeleaf affiche tel quel
+                        .andExpect(content().string(not(containsString(" th:"))))
                         .andExpect(content().string(not(containsString("#{"))))
                         .andExpect(content().string(not(containsString("??"))));
             }

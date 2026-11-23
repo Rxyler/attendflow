@@ -26,7 +26,6 @@
 
       <div th:if="${#lists.isEmpty(notifications)}" class="af-glass p-5 text-center text-secondary" th:text="#{notif.aucune}">Aucune notification pour le moment.</div>
 
-      <!-- F-35 : trois niveaux visuels -->
       <article th:each="n : ${notifications}" class="af-glass p-3 d-flex gap-3 align-items-start position-relative"
                th:classappend="${(n.lue ? 'opacity-75 ' : '') + (n.lien != null ? 'af-notif-lien' : '')}">
         <span class="badge rounded-pill flex-shrink-0 mt-1"
@@ -43,7 +42,6 @@
           <p class="small text-secondary mb-0" th:text="${#temporals.format(n.date, 'dd/MM/yyyy HH:mm')}">date</p>
         </div>
         <i th:if="${n.lien != null}" data-lucide="arrow-up-right" aria-hidden="true" class="af-notif-fleche flex-shrink-0 mt-1"></i>
-        <!-- au-dessus du lien etire : ce bouton marque lue sans ouvrir la page -->
         <form th:unless="${n.lue}" th:action="@{/notifications/{id}/lue(id=${n.id})}" method="post" class="position-relative" style="z-index:2">
           <button type="submit" class="btn btn-sm btn-light border"><i data-lucide="check" aria-hidden="true"></i>[[#{notif.marquerLu}]]</button>
         </form>

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-/** Ecran 9 : notifications de l'utilisateur connecte, tous roles. */
 @Controller
 @RequestMapping("/notifications")
 public class NotificationController {
@@ -36,7 +35,6 @@ public class NotificationController {
         return "redirect:/notifications";
     }
 
-    /** Clic sur une notification : elle est lue, puis sa page s'ouvre (chemin interne uniquement, jamais une autre adresse). */
     @GetMapping("/{id}")
     public String ouvrir(@PathVariable Long id, @AuthenticationPrincipal UserDetails compte) {
         String lien = notificationService.marquerLue(utilisateur(compte), id);

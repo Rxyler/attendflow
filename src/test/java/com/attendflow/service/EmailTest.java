@@ -23,7 +23,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
-/** Pas @Transactional : les emails partent apres le commit, il faut de vrais commits. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class EmailTest {
@@ -43,7 +42,6 @@ class EmailTest {
 
     @Test
     void lienDeReinitialisationParEmail() throws Exception {
-        // En-tete Host falsifie : le lien doit rester sur l'adresse configuree (sinon vol du jeton).
         mvc.perform(post("/mot-de-passe-oublie").with(csrf()).header("Host", "pirate.example")
                         .param("email", "Sara.Mansouri@univ.tn"))
                 .andExpect(redirectedUrl("/mot-de-passe-oublie?envoye"));

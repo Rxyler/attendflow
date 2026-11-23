@@ -37,7 +37,6 @@ public class AccueilController {
         return "login";
     }
 
-    /** Visiteur : page vitrine. Connecte (F-03) : redirection vers le tableau de bord adapte au role. */
     @GetMapping("/")
     public String accueil(@AuthenticationPrincipal UserDetails compte) {
         if (compte == null) return "accueil";
@@ -57,7 +56,6 @@ public class AccueilController {
         return "tableaux/admin";
     }
 
-    /** F-26 */
     @GetMapping("/enseignant")
     public String enseignant(@AuthenticationPrincipal UserDetails compte, Model model) {
         StatistiqueService.TableauEnseignant tableau =
@@ -68,7 +66,6 @@ public class AccueilController {
         return "tableaux/enseignant";
     }
 
-    /** F-27 */
     @GetMapping("/etudiant")
     public String etudiant(@AuthenticationPrincipal UserDetails compte, Model model) {
         var etudiant = etudiants.findWithClasseByEmail(compte.getUsername()).orElseThrow();
@@ -77,7 +74,6 @@ public class AccueilController {
         return "tableaux/etudiant";
     }
 
-    /** Donnees du graphique des 7 derniers jours (Chart.js). */
     private void graphique(List<StatistiqueService.Point> points, Model model) {
         model.addAttribute("joursGraphique", points.stream().map(p -> p.jour().format(JOUR)).toList());
         model.addAttribute("tauxGraphique", points.stream().map(StatistiqueService.Point::taux).toList());

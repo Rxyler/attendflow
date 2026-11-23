@@ -33,7 +33,6 @@ class ProfilTest {
         mvc.perform(post("/profil/mascotte").with(csrf()).with(admin).param("mascotte", "FILOU"))
                 .andExpect(redirectedUrl("/profil")).andExpect(flash().attributeExists("succes"));
         assertThat(utilisateurs.findByEmail("admin@univ.tn").orElseThrow().getMascotte()).isEqualTo(Mascotte.FILOU);
-        // la barre laterale affiche le compagnon
         mvc.perform(get("/admin").with(admin)).andExpect(content().string(containsString("/images/mascottes/filou.svg")));
 
         mvc.perform(post("/profil/mascotte").with(csrf()).with(admin).param("mascotte", ""))

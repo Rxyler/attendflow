@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Cles de test publiques de Cloudflare ; la reponse de Cloudflare est simulee : aucun appel reseau. */
 @SpringBootTest(properties = {"attendflow.turnstile.site-key=1x00000000000000000000AA",
         "attendflow.turnstile.secret-key=1x0000000000000000000000000000000AA",
         "spring.datasource.url=jdbc:h2:mem:attendflow-humain;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"})
@@ -56,6 +55,6 @@ class VerificationHumaineTest {
                 .andExpect(redirectedUrl("/"));
         mvc.perform(post("/login").with(csrf()).param("email", "admin@univ.tn").param("motDePasse", "admin")
                         .param("cf-turnstile-response", "jeton-faux"))
-                .andExpect(redirectedUrl("/login?robot"));   // jeton inconnu : Cloudflare repond non
+                .andExpect(redirectedUrl("/login?robot"));
     }
 }

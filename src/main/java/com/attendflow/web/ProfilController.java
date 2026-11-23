@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** Mon profil : chaque utilisateur choisit son compagnon (ou garde ses initiales). */
 @Controller
 public class ProfilController {
 
@@ -30,7 +29,6 @@ public class ProfilController {
         return "profil";
     }
 
-    /** mascotte absente ou vide : retour aux initiales. Une valeur inconnue est refusee (400) par la conversion d'enum. */
     @PostMapping("/profil/mascotte")
     public String choisir(@AuthenticationPrincipal UserDetails compte,
                           @RequestParam(required = false) Mascotte mascotte, RedirectAttributes redirection) {

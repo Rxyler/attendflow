@@ -9,12 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** F-02 : "Mot de passe oublie" puis reinitialisation via le lien recu. */
 @Controller
 public class MotDePasseController {
 
     private final MotDePasseService motDePasseService;
-    /** Adresse publique configuree : jamais l'en-tete Host, qu'un attaquant peut falsifier pour detourner le lien. */
     private final String urlApplication;
 
     public MotDePasseController(MotDePasseService motDePasseService,
@@ -31,7 +29,6 @@ public class MotDePasseController {
     @PostMapping("/mot-de-passe-oublie")
     public String demander(@RequestParam String email) {
         motDePasseService.demanderReinitialisation(email, urlApplication);
-        // Meme reponse que l'email existe ou non : on ne revele pas les comptes.
         return "redirect:/mot-de-passe-oublie?envoye";
     }
 

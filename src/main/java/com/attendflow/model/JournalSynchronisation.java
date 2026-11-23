@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** F-12 : journal de chaque synchronisation de l'emploi du temps avec le projet partenaire. */
 @Entity
 @Table(name = "journal_synchronisation")
 @Getter
@@ -39,7 +38,6 @@ public class JournalSynchronisation {
     @Column(length = 1000)
     private String message;
 
-    /** Admin "0..1" -- "0..*" : null si la synchronisation est automatique (periodique). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "declenche_par_id")
     private Admin declenchePar;

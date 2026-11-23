@@ -16,7 +16,6 @@
       <div th:if="${succes}" class="alert alert-success mb-0" role="status" th:text="${succes}">ok</div>
       <div th:if="${erreur}" class="alert alert-danger mb-0" role="alert" th:text="${erreur}">erreur</div>
 
-      <!-- F-24 : depot -->
       <section class="af-glass p-4" aria-labelledby="depot-titre">
         <h2 id="depot-titre" class="h6 fw-bold" th:text="#{justif.justifier}">Justifier une absence</h2>
         <p th:if="${#lists.isEmpty(absences)}" class="text-secondary mb-0" th:text="#{justif.aucuneAbsence}">Aucune absence à justifier.</p>
@@ -45,7 +44,6 @@
         </form>
       </section>
 
-      <!-- Suivi -->
       <div class="af-glass p-0 overflow-hidden">
         <table class="table align-middle mb-0">
           <caption class="px-4" th:text="#{justif.deposes}">Mes justificatifs déposés</caption>

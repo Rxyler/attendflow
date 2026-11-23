@@ -10,11 +10,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Statut d'un etudiant pour une seance.
- * RG-01 : rattachee a une et une seule seance.
- * RG-02 : un seul statut par etudiant et par seance (contrainte unique).
- */
 @Entity
 @Table(
         name = "presence",
@@ -46,16 +41,13 @@ public class Presence {
     @JoinColumn(name = "seance_id", nullable = false)
     private Seance seance;
 
-    /** Etudiant "1" -- "0..*" Presence : possede */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "etudiant_id", nullable = false)
     private Etudiant etudiant;
 
-    /** Presence "1" *-- "0..*" HistoriqueModification : trace (RG-08) */
     @OneToMany(mappedBy = "presence", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistoriqueModification> historique = new ArrayList<>();
 
-    /** Presence "1" -- "0..1" Justificatif : justifie par */
     @OneToOne(mappedBy = "presence")
     private Justificatif justificatif;
 

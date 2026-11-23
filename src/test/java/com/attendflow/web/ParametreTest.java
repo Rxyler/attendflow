@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,6 @@ class ParametreTest {
         mvc.perform(get("/admin/parametres").with(ADMIN)).andExpect(status().isOk())
                 .andExpect(model().attributeExists("form"));
 
-        // retardCommePresent absent = case decochee
         mvc.perform(post("/admin/parametres").with(csrf()).with(ADMIN)
                         .param("seuilAbsence", "25.5").param("nbMaxAbsencesNonJustifiees", "5")
                         .param("delaiModificationHeures", "72").param("justifieCommePresent", "true"))
@@ -49,9 +49,8 @@ class ParametreTest {
         assertThat(p.getModifiePar().getEmail()).isEqualTo("admin@univ.tn");
     }
 
-    /** Comme en ligne : sans transaction de test, la page relue apres un enregistrement ne doit pas planter (erreur 500). */
     @Test
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void pageRelueApresEnregistrementSansTransaction() throws Exception {
         Parametre avant = courant();
         try {

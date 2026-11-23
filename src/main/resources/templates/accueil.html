@@ -4,7 +4,6 @@
 <body>
 <th:block th:replace="~{fragments/layout :: fond}"></th:block>
 
-<!-- Prechargement : la mascotte se dessine au crayon, cligne de l'oeil, puis la page se souleve (attendflow.js) -->
 <div class="af-chargement" aria-hidden="true">
   <div class="dd-intro">
     <svg class="dd-intro-logo" viewBox="0 0 64 64" width="132" height="132">
@@ -28,7 +27,6 @@
   </div>
 </div>
 
-<!-- Petit film de 10 s joue apres l'intro (film.js) : un clic sur le fond le ferme -->
 <div class="dd-film" role="dialog" aria-modal="true" th:attr="aria-label=#{film.titre}" hidden>
   <div class="dd-film-cadre">
     <button type="button" class="dd-film-btn dd-film-fermer" th:attr="aria-label=#{commun.fermer}"><i data-lucide="x"></i></button>
@@ -36,7 +34,6 @@
       <svg viewBox="0 0 960 540" aria-hidden="true">
         <g id="f-camera">
         <g fill="none" stroke="var(--dd-encre)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <!-- 1. la feuille d'appel papier, griffonnee, froissee, jetee -->
           <g id="f-feuille">
             <path d="M302 74 C 400 66, 520 70, 618 78 C 624 200, 622 340, 614 466 C 510 474, 400 472, 296 462 C 292 330, 294 200, 302 74 Z" fill="var(--dd-papier)"/>
             <path class="f-trait" pathLength="1" d="M330 114 C 380 104, 430 118, 500 108" stroke="var(--dd-rose)" stroke-width="6"/>
@@ -54,7 +51,6 @@
             <g id="f-couvercle"><path d="M798 384 h104 c 2 -10, -2 -12, -6 -12 h-92 c -6 0, -8 4, -6 12 Z" fill="var(--dd-sarcelle)"/><path d="M838 372 c 0 -10, 24 -10, 24 0"/></g>
           </g>
 
-          <!-- 3. la feuille Fas3a : les cases se cochent, une absence, un justificatif tamponne -->
           <g id="f-carte">
             <path d="M262 64 C 420 58, 560 60, 714 68 C 720 200, 718 330, 712 474 C 560 480, 410 480, 256 472 C 250 340, 252 200, 262 64 Z" fill="var(--dd-encre)" transform="translate(8 10)" stroke="none"/>
             <path d="M262 64 C 420 58, 560 60, 714 68 C 720 200, 718 330, 712 474 C 560 480, 410 480, 256 472 C 250 340, 252 200, 262 64 Z" fill="var(--dd-papier)"/>
@@ -67,7 +63,6 @@
             <circle id="f-tampon" cx="633" cy="328" r="34" stroke="var(--dd-jaune)" stroke-width="6" stroke-dasharray="10 6"/>
           </g>
 
-          <!-- 4. les chiffres, et tout le monde dans la boucle -->
           <g id="f-stats">
             <path d="M170 110 V 440 H 540"/>
             <g fill="var(--dd-sarcelle)"><path class="f-barre" d="M200 440 V 300 h40 V 440"/><path class="f-barre" d="M270 440 V 240 h40 V 440"/><path class="f-barre" d="M340 440 V 270 h40 V 440"/><path class="f-barre" d="M410 440 V 190 h40 V 440" fill="var(--dd-jaune)"/><path class="f-barre" d="M480 440 V 210 h40 V 440"/></g>
@@ -82,7 +77,6 @@
           </g>
         </g>
 
-        <!-- 2 et 5. la mascotte -->
         <g id="f-mascotte"><g transform="translate(371 120) scale(3.4)">
           <path d="M7.5 6.5 C 21 3.8, 42 4.6, 57 6.8 C 59.6 20, 60.4 41, 58.2 56.6 C 43 59.8, 21.5 60.6, 6.4 58 C 4.2 42.5, 3.6 21.5, 7.5 6.5 Z" fill="#ffd93d" stroke="#1f1d1a" stroke-width="3" stroke-linejoin="round"/>
           <g id="f-antennes"><path d="M26 21.5 C 23 15, 19 12, 14.5 11.5 M38.5 21.5 C 41.5 15, 45.5 12.2, 50 12.5" fill="none" stroke="#1f1d1a" stroke-width="3" stroke-linecap="round"/><circle cx="14.5" cy="11.5" r="2.8" fill="#1f1d1a"/><circle cx="50" cy="12.5" r="2.8" fill="#1f1d1a"/></g>
@@ -103,7 +97,6 @@
         </g>
         <g id="f-confettis"></g>
         </g>
-        <!-- transition : un grand coup de feutre balaie l'image -->
         <path id="f-balai" class="f-trait" pathLength="1" d="M-80 -20 L1040 60 L-80 140 L1040 220 L-80 300 L1040 380 L-80 460 L1040 540 L-80 620" fill="none" stroke="var(--dd-jaune)" stroke-width="150" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="dd-film-pause" aria-hidden="true"><i data-lucide="play"></i></span>
@@ -125,7 +118,6 @@
   </div>
 </div>
 
-<!-- Griffonnages dans les marges : ils flottent et "bouillent" comme un dessin anime a la main (grands ecrans) -->
 <div class="dd-marges" aria-hidden="true">
   <svg class="g" style="--y:20%; --t:7s; --r:-8deg" viewBox="0 0 48 48"><path d="M24 5 L29 18 L43 18 L32 27 L36 41 L24 33 L12 41 L16 27 L5 18 L19 18 Z" fill="var(--dd-jaune)"/></svg>
   <svg class="g" style="--y:52%; --t:6s; --r:6deg" viewBox="0 0 48 48"><path d="M24 42 C 6 30, 4 16, 14 11 C 20 8, 24 13, 24 17 C 24 13, 28 8, 34 11 C 44 16, 42 30, 24 42 Z" fill="var(--dd-rose)"/></svg>
@@ -155,7 +147,6 @@
 
   <main id="contenu" class="container-xl px-3 px-lg-4" style="max-width: 76rem">
 
-    <!-- ===== Hero ===== -->
     <section class="af-hero position-relative">
 
       <div class="row align-items-center g-5">
@@ -178,7 +169,6 @@
           </div>
         </div>
 
-        <!-- Croquis : la feuille d'appel posee de biais, la fourmi Fas3a la montre du doigt -->
         <div class="col-lg-6">
           <div class="dd-scene" aria-hidden="true">
             <div class="dd-feuille" data-hero>
@@ -190,18 +180,15 @@
                 <li><span>4</span><span>Rim Saad</span><span class="dd-tampon a">A</span></li>
                 <li><span>5</span><span>Ahmed Trabelsi</span><span class="dd-tampon p">P</span></li>
               </ol>
-              <!-- etoile griffonnee dans le coin de la feuille -->
               <svg class="dd-etoile dd-doodle" style="right:-1.6rem; top:-1.8rem; width:2.6rem" viewBox="0 0 40 40">
                 <path class="dd-dessin" pathLength="1" d="M20 4 L20 36 M6 12 L34 28 M34 12 L6 28" stroke="var(--dd-rose)" stroke-width="3.5"/>
               </svg>
             </div>
-            <!-- fleche dessinee de la fourmi vers la feuille -->
             <svg class="dd-fleche" style="left:5.5rem; bottom:9.5rem; width:7rem" viewBox="0 0 120 90">
               <path class="dd-dessin" pathLength="1" d="M8 82 C 20 40, 60 14, 108 18" stroke="var(--dd-sarcelle)" stroke-width="4"/>
               <path class="dd-dessin" pathLength="1" d="M92 6 L110 18 L94 32" stroke="var(--dd-sarcelle)" stroke-width="4"/>
             </svg>
             <p class="dd-note" style="left:9rem; bottom:1rem" th:utext="#{accueil.note}">Un clic,<br>c’est noté !</p>
-            <!-- Fas3a, la fourmi, dessinee au trait -->
             <svg class="dd-mascotte" viewBox="0 0 160 170">
               <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
                 <g class="dd-antennes"><path class="dd-dessin" pathLength="1" d="M58 34 C 52 18, 44 10, 34 6 M98 34 C 104 18, 112 10, 124 8"/>
@@ -221,7 +208,6 @@
       </div>
     </section>
 
-    <!-- ===== Bandeau defilant ===== -->
     <div class="af-bandeau my-4" aria-hidden="true">
       <div class="af-bandeau-piste">
         <th:block th:each="i : ${#numbers.sequence(1, 2)}">
@@ -236,7 +222,6 @@
       </div>
     </div>
 
-    <!-- ===== Chiffres ===== -->
     <section class="py-4" data-reveal>
       <div class="af-chiffres">
         <div><div class="af-grand">7h00</div><div class="af-legende" th:text="#{accueil.chiffre1}">synchronisation</div></div>
@@ -246,7 +231,6 @@
       </div>
     </section>
 
-    <!-- ===== Fonctions : le titre tient a gauche, les six fonctions forment un champ a droite ===== -->
     <section id="fonctions" class="py-5">
       <div class="row g-5">
         <div class="col-lg-4" data-reveal>
@@ -291,7 +275,6 @@
       </div>
     </section>
 
-    <!-- ===== Parcours ===== -->
     <section id="parcours" class="py-5">
       <div class="row g-5 align-items-center">
         <div class="col-lg-5" data-reveal>
@@ -320,7 +303,6 @@
       </div>
     </section>
 
-    <!-- ===== Roles : un seul panneau, trois colonnes separees par des filets ===== -->
     <section id="roles" class="py-5">
       <h2 class="af-h2 text-white mb-4" data-reveal th:text="#{accueil.rolesTitre}">Un espace par rôle</h2>
       <div class="af-glass af-roles" data-reveal>
@@ -342,7 +324,6 @@
       </div>
     </section>
 
-    <!-- ===== Compagnons ===== -->
     <section id="compagnons" class="py-5">
       <div class="af-section-titre text-center mb-5" data-reveal>
         <h2 class="af-h2 text-white" th:text="#{accueil.compagnonsTitre}">Choisis ton compagnon.</h2>
@@ -364,7 +345,6 @@
       </div>
     </section>
 
-    <!-- ===== Appel a l'action ===== -->
     <section class="py-5" data-reveal>
       <div class="af-glass af-beam af-cta">
         <img th:src="@{/images/logo-croquis.svg}" th:alt="#{accueil.fourmiAlt}" class="dd-cta-fourmi mb-3" width="128" height="128">

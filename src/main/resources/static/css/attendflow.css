@@ -1,13 +1,6 @@
-/* =====================================================================
-   AttendFlow : theme verre, deux modes (sombre / clair)
-   Fond shader anime + particules, cartes en verre depoli, lueurs,
-   faisceaux de bordure, profondeur 3D, curseur lumineux.
-   ===================================================================== */
-
 @property --af-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 :root {
-  /* Palette : bleu nuit (base), sarcelle (voisin sur le cercle chromatique), ambre (complementaire du bleu, reserve aux actions) */
   --af-blue: #3d7fe0; --af-teal: #2bc4b4; --af-amber: #f4a940; --af-coral: #f2766b;
   --af-grad: linear-gradient(135deg, #f8c065 0%, #f4a940 50%, #e88f2a 100%);
   --af-grad-cool: linear-gradient(135deg, #2bc4b4, #3d7fe0);
@@ -27,13 +20,11 @@
   --bs-font-monospace: var(--af-mono);
 }
 
-/* ---------- Mode sombre (defaut) ---------- */
 :root, [data-bs-theme="dark"] {
   --af-bg: #08121c;
   --af-ink: #eaf1f6; --af-ink-2: #c3d0da; --af-muted: #8fa1b0; --af-subtle: #8193a3; --af-teal-ink: #5fd8cb;
   --af-success: #4cc38a; --af-success-soft: rgba(76, 195, 138, .14); --af-success-line: rgba(76, 195, 138, .35);
   --af-danger:  #f0566f; --af-danger-soft:  rgba(240, 86, 111, .14); --af-danger-line:  rgba(240, 86, 111, .38);
-  /* retard / avertissement : orange franc, distinct de l'ambre reserve aux actions */
   --af-warning: #ff8550; --af-warning-soft: rgba(255, 133, 80, .14);  --af-warning-line: rgba(255, 133, 80, .38);
   --af-neutral-soft: rgba(255, 255, 255, .08);
   --af-glass-bg: rgba(255, 255, 255, .055);
@@ -54,7 +45,6 @@
   color-scheme: dark;
 }
 
-/* ---------- Mode clair ---------- */
 [data-bs-theme="light"] {
   --af-bg: #eef3f6;
   --af-ink: #0d1b26; --af-ink-2: #22384a; --af-muted: #4f6070; --af-subtle: #5c6c7a; --af-teal-ink: #09695f;
@@ -80,7 +70,6 @@
   color-scheme: light;
 }
 
-/* ---------- Base ---------- */
 html, body { overflow-x: clip; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -113,7 +102,6 @@ td, .badge, .af-stat-value { font-variant-numeric: tabular-nums; }
 @keyframes af-trait { from { background-size: 0 .14em; } }
 [data-bs-theme="light"] .af-gradient-text { background-image: linear-gradient(#f4a940, #f4a940); }
 
-/* ---------- Fond : shader (WebGL) / secours CSS, particules, grain ---------- */
 .af-fond-shader, .af-particules, .af-grain, .af-voile { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .af-fond-shader {
   z-index: -3;
@@ -148,7 +136,6 @@ body > .d-flex.min-vh-100, body > main, body > .af-vitrine { position: relative;
 }
 @media (pointer: coarse) { .af-curseur { display: none; } }
 
-/* ---------- Verre ---------- */
 .af-glass {
   position: relative; background: var(--af-glass-bg);
   -webkit-backdrop-filter: blur(var(--af-blur)); backdrop-filter: blur(var(--af-blur));
@@ -183,7 +170,6 @@ body > .d-flex.min-vh-100, body > main, body > .af-vitrine { position: relative;
 @keyframes af-beam { to { --af-angle: 360deg; } }
 .af-beam-lent::after { animation-duration: 9s; }
 
-/* ---------- Boutons ---------- */
 .btn {
   --bs-btn-font-weight: 500; --bs-btn-font-size: .875rem; --bs-btn-padding-y: .55rem; --bs-btn-padding-x: 1rem; --bs-btn-border-radius: var(--af-r);
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; overflow: hidden;
@@ -238,7 +224,6 @@ body > .d-flex.min-vh-100, body > main, body > .af-vitrine { position: relative;
 [data-bs-theme="light"] .af-theme .af-soleil { opacity: 0; transform: rotate(90deg) scale(.5); }
 [data-bs-theme="light"] .af-theme .af-lune { opacity: 1; transform: none; }
 
-/* ---------- Formulaires ---------- */
 .form-label { font-size: .8125rem; font-weight: 500; color: var(--af-ink-2); margin-bottom: .375rem; }
 .form-control, .form-select {
   font-size: .9rem; color: var(--af-ink); background-color: var(--af-input-bg); border-color: var(--af-glass-line); border-radius: var(--af-r); padding: .55rem .8rem;
@@ -260,7 +245,6 @@ body > .d-flex.min-vh-100, body > main, body > .af-vitrine { position: relative;
 .form-control::file-selector-button { margin: -.4rem .75rem -.4rem -.5rem; padding: .55rem .8rem; border: 0; border-right: 1px solid var(--af-glass-line); background: var(--af-neutral-soft); color: var(--af-ink); font-weight: 500; }
 [data-bs-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8); }
 
-/* ---------- Tableaux ---------- */
 .table { --bs-table-bg: transparent; --bs-table-color: var(--af-ink); --bs-table-hover-bg: var(--af-neutral-soft); --bs-table-hover-color: var(--af-ink); --bs-table-border-color: var(--af-glass-line); font-size: .875rem; margin-bottom: 0; }
 [data-bs-theme="light"] .table { --bs-table-border-color: rgba(15, 23, 42, .08); }
 .table > thead th { font-size: .8rem; font-weight: 600; color: var(--af-muted); background: var(--af-neutral-soft); padding-top: .7rem; padding-bottom: .7rem; white-space: nowrap; }
@@ -275,7 +259,6 @@ body > .d-flex.min-vh-100, body > main, body > .af-vitrine { position: relative;
 abbr[title] { text-decoration: none; cursor: help; }
 caption { color: var(--af-subtle); }
 
-/* ---------- Badges, alertes ---------- */
 .badge { font-weight: 500; letter-spacing: 0; padding: .32em .65em; border-radius: 999px; }
 .text-bg-light { background: var(--af-neutral-soft) !important; color: var(--af-ink-2) !important; border-color: var(--af-glass-line) !important; }
 .text-bg-primary { background: rgba(61, 127, 224, .18) !important; color: var(--bs-link-color) !important; }
@@ -296,7 +279,6 @@ caption { color: var(--af-subtle); }
 .alert-link { color: inherit; font-weight: 600; }
 .alert.af-sortie { transition: opacity var(--af-base) var(--af-ease), transform var(--af-base) var(--af-ease); opacity: 0; transform: translateY(-4px); }
 
-/* ---------- Listes, modales ---------- */
 .list-group-item { background: transparent; border-color: var(--af-glass-line); color: var(--af-ink); }
 .list-group-item a { color: var(--af-ink); text-decoration: none; }
 .list-group-item a:hover { color: var(--bs-link-color); }
@@ -312,13 +294,10 @@ caption { color: var(--af-subtle); }
 [data-bs-theme="dark"] .btn-close { filter: invert(1) grayscale(1); }
 pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-neutral-soft) !important; border-color: var(--af-glass-line) !important; }
 
-/* ---------- Logo ---------- */
 .af-logo { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 13px; background: #0e2233 url(/images/logo.jpg) center / cover; color: #fff; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 6px 16px -6px rgba(0, 0, 0, .45); }
 
-/* ---------- Barre laterale ---------- */
 .af-sidebar { width: 15.5rem; position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; background: var(--af-glass-bg); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-right: 1px solid var(--af-glass-line); color: var(--af-ink-2); view-transition-name: af-sidebar; }
 .af-sidebar .af-marque { color: var(--af-ink); }
-/* seuls les liens defilent : le compte (theme, deconnexion) reste toujours visible en bas */
 @media (min-width: 768px) { .af-sidebar { overflow-y: hidden; } .af-navs { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; margin-right: -.5rem; padding-right: .5rem; } }
 .af-sidebar .af-espace, .af-sidebar .af-section { color: var(--af-subtle); font-size: .78rem; font-weight: 600; }
 .af-sidebar .af-section { padding: 1rem .7rem .4rem; }
@@ -342,14 +321,12 @@ pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-
 .af-deconnexion:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 .af-deconnexion svg.lucide { width: 1rem; height: 1rem; }
 
-/* ---------- En-tete ---------- */
 .af-header { position: sticky; top: 0; z-index: 20; min-height: 4.25rem; display: flex; flex-direction: column; justify-content: center; background: var(--af-glass-bg); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 1px solid var(--af-glass-line); view-transition-name: af-header; }
 .af-header.d-flex { flex-direction: row; justify-content: flex-start; }
 .af-header.flex-wrap { flex-wrap: wrap; }
 .af-header h1 { margin: 0; }
 .af-header p.small { margin-top: .1rem; }
 
-/* ---------- Cartes statistiques ---------- */
 .af-stat { padding: 1.1rem 1.25rem !important; transform-style: preserve-3d; }
 .af-stat .af-stat-tete { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .6rem; }
 .af-stat .af-stat-libelle { font-size: .8125rem; font-weight: 500; color: var(--af-muted); margin: 0; }
@@ -362,7 +339,6 @@ pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-
 .af-stat .af-stat-value { font-size: 1.9rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin: 0; color: var(--af-ink); }
 .af-stat .af-stat-detail { font-size: .78rem; color: var(--af-subtle); margin: .35rem 0 0; }
 
-/* ---------- Emploi du temps ---------- */
 .af-edt th, .af-edt td { min-width: 9rem; }
 .af-edt .af-heure { min-width: 5rem; width: 5rem; font-family: var(--af-mono); font-size: .75rem; color: var(--af-muted); }
 .af-seance { display: block; padding: .55rem .7rem; border-radius: var(--af-r); position: relative; padding-left: 1.45rem !important; border: 1px solid var(--af-chip-line); background: var(--af-chip-bg); color: var(--af-chip-ink); text-decoration: none; font-size: .8rem; line-height: 1.35; transition: transform var(--af-base) var(--af-ease), box-shadow var(--af-base) var(--af-ease), border-color var(--af-fast), background-color var(--af-fast); }
@@ -378,7 +354,6 @@ pre { font-family: var(--af-mono); color: var(--af-ink-2); background: var(--af-
 .af-aujourdhui { background: rgba(43, 196, 180, .08); }
 th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 
-/* ---------- Prise de presence ---------- */
 .btn-group .btn-check + .btn { box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .btn-check + .btn-outline-success, .btn-check + .btn-outline-danger, .btn-check + .btn-outline-warning, .btn-check + .btn-outline-secondary { --bs-btn-color: var(--af-muted); --bs-btn-border-color: var(--af-glass-line); --bs-btn-hover-bg: var(--af-neutral-soft); --bs-btn-hover-color: var(--af-ink); --bs-btn-hover-border-color: var(--af-glass-line-hover); background: var(--af-input-bg); }
 [data-bs-theme="light"] .btn-check + .btn { --bs-btn-border-color: rgba(15, 23, 42, .14); }
@@ -401,7 +376,6 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 .border { border-color: var(--af-glass-line) !important; }
 .border-top { border-top-color: var(--af-glass-line) !important; }
 
-/* ---------- Authentification ---------- */
 .af-auth { min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; }
 .af-auth-card { width: 100%; max-width: 26rem; padding: 2.25rem; border-radius: var(--af-r-xl); }
 .af-auth-card h1, .af-auth-card h2 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.03em; }
@@ -409,17 +383,14 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 .af-hero-item { display: flex; align-items: center; gap: .7rem; color: var(--af-ink-2); font-size: .92rem; padding: .45rem 0; }
 .af-hero-item svg.lucide { width: 1.1rem; height: 1.1rem; color: var(--af-teal-ink); flex: none; }
 
-/* ---------- Orbes ---------- */
 .af-orbe { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; pointer-events: none; will-change: transform; }
 [data-bs-theme="light"] .af-orbe { opacity: .35; }
 
-/* ---------- Prechargement ---------- */
 .af-chargement { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: var(--af-bg); }
 .af-chargement .af-logo { width: 3.5rem; height: 3.5rem; border-radius: 18px; }
 .af-chargement .af-ligne { width: 10rem; height: 2px; margin-top: 1.5rem; border-radius: 999px; background: var(--af-neutral-soft); overflow: hidden; }
 .af-chargement .af-ligne span { display: block; height: 100%; width: 0; background: var(--af-grad); }
 
-/* ---------- Vitrine ---------- */
 .af-vitrine { position: relative; z-index: 1; }
 .af-nav-vitrine { position: sticky; top: 1rem; z-index: 30; margin: 1rem auto 0; max-width: 72rem; padding: .6rem .8rem .6rem 1rem; border-radius: 999px; }
 .af-nav-vitrine .nav-link { color: var(--af-muted); font-size: .9rem; font-weight: 500; padding: .4rem .8rem; border-radius: 999px; transition: color var(--af-fast), background-color var(--af-fast); }
@@ -427,7 +398,6 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 .af-pill { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .9rem .35rem .5rem; border-radius: 999px; font-size: .8rem; font-weight: 500; color: var(--af-ink-2); background: var(--af-glass-bg); border: 1px solid var(--af-glass-line); }
 .af-pill .af-point { width: .5rem; height: .5rem; border-radius: 50%; background: var(--af-success); box-shadow: 0 0 10px var(--af-success); margin-left: .35rem; animation: af-pulse 2s infinite; }
 @keyframes af-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(76, 195, 138, .6); } 60% { box-shadow: 0 0 0 8px rgba(76, 195, 138, 0); } }
-/* Le heros remplit l'ecran sous la barre en laissant voir le bandeau, contenu centre : ni vide en haut ni coupe en bas */
 .af-hero { padding: 1.5rem 0; min-height: calc(100svh - 10rem); display: flex; align-items: center; }
 .af-hero > .row { flex: 1; }
 .af-hero h1 { font-size: clamp(2.3rem, min(5vw, 8.4vh), 5.2rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.04em; }
@@ -438,7 +408,6 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 .af-scene { perspective: 1400px; min-height: min(32rem, 64vh); position: relative; }
 .af-scene-inner { position: relative; transform-style: preserve-3d; width: 100%; height: 100%; min-height: min(32rem, 64vh); will-change: transform; }
 .af-flot { position: absolute; transform-style: preserve-3d; will-change: transform; }
-/* cartes du heros : assez denses pour que la sphere et les points restent derriere, pas a travers le texte */
 .af-flot .af-glass { background: rgba(13, 29, 43, .84); box-shadow: inset 0 1px 0 var(--af-reflet), 0 40px 80px -30px rgba(0, 0, 0, .8); }
 [data-bs-theme="light"] .af-flot .af-glass { background: rgba(255, 255, 255, .84); box-shadow: inset 0 1px 0 var(--af-reflet), 0 40px 80px -30px rgba(12, 34, 52, .4); }
 .af-3d { position: absolute; inset: -12% -22%; z-index: 0; pointer-events: none; }
@@ -484,7 +453,6 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
 .af-cta .af-orbe { opacity: .7; }
 .af-pied { border-top: 1px solid var(--af-glass-line); color: var(--af-subtle); font-size: .85rem; }
 
-/* ---------- Mouvement et transitions ---------- */
 .af-prep #contenu > :not(.modal), .af-prep .af-vitrine [data-reveal] { opacity: 0; }
 .af-deja .af-chargement { display: none; }
 @view-transition { navigation: auto; }
@@ -497,9 +465,8 @@ th.af-aujourdhui { color: var(--af-teal-ink) !important; }
   .af-glass::before, .af-glass::after, .af-curseur, .af-particules, .af-chargement { display: none !important; }
 }
 
-/* ---------- Mise en page ---------- */
 main.d-grid { grid-template-columns: minmax(0, 1fr); }
-.min-w-0 { min-width: 0 !important; }   /* absent de Bootstrap : laisse les blocs flex retrecir (compte, colonne principale) */
+.min-w-0 { min-width: 0 !important; }
 main#contenu { max-width: 92rem; width: 100%; }
 @media (max-width: 991.98px) { .af-chiffres { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 767.98px) {
@@ -517,7 +484,6 @@ main#contenu { max-width: 92rem; width: 100%; }
   .af-header { position: static; padding-left: 1rem !important; padding-right: 1rem !important; }
   main#contenu { padding: 1rem !important; }
   .af-hero { padding: 2rem 0 1rem; min-height: 0; }
-  /* phone: the 3D card stack overlaps, so lay the cards out flat */
   .af-scene, .af-scene-inner { min-height: 0; perspective: none; transform: none !important; }
   .af-scene-inner { display: grid; gap: .75rem; }
   .af-flot { position: relative; inset: auto !important; width: auto !important; transform: none !important; }
@@ -533,7 +499,6 @@ main#contenu { max-width: 92rem; width: 100%; }
   body { background: #fff; color: #000; }
 }
 
-/* ---------- Compagnons et progression ---------- */
 .af-mascotte { display: block; border-radius: 28%; animation: af-flotte 4.2s ease-in-out infinite; animation-delay: var(--af-delai, 0s); filter: drop-shadow(0 14px 22px rgba(4, 18, 28, .35)); }
 @keyframes af-flotte { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-7px) rotate(-2deg); } }
 a.af-avatar { text-decoration: none; transition: transform var(--af-fast) var(--af-ease); }
@@ -573,7 +538,6 @@ a.af-avatar:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .af-mascotte { animation: none; } }
 
-/* ---------- Compagnon vivant : rang, reactions, defi, calendrier ---------- */
 .af-compagnon-img { position: relative; display: block; border: 0; padding: 0; background: none; border-radius: 30%; cursor: pointer; }
 .af-compagnon-img:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 .af-compagnon-img::before { content: ""; position: absolute; inset: -6px; border-radius: 32%; opacity: 0; transition: opacity var(--af-base); }
@@ -610,7 +574,6 @@ a.af-avatar:focus-visible { box-shadow: var(--af-ring); outline: 0; }
 @media (prefers-reduced-motion: reduce) { .af-compagnon-img::before { animation: none !important; } }
 .af-fourmi { position: relative; margin: 0 auto; width: 9.5rem; height: 9.5rem; }
 
-/* ---------- Telephone : feuille d'appel empilee ---------- */
 @media (max-width: 575.98px) {
   .af-feuille thead { display: none; }
   .af-feuille tr.af-ligne { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: .6rem; padding: .7rem 1rem; border-bottom: 1px solid var(--af-glass-line); }
@@ -622,17 +585,14 @@ a.af-avatar:focus-visible { box-shadow: var(--af-ring); outline: 0; }
   #recherche, #filtre-statut { max-width: none !important; flex: 1 1 10rem; }
 }
 
-/* ---------- Pages de travail : meme monde, volume baisse ---------- */
 body:has(.af-sidebar) .af-fond-shader { opacity: .6; }
 body:has(.af-sidebar) .af-particules { opacity: .35; }
 body:has(.af-sidebar) .af-curseur { opacity: calc(var(--af-curseur-opacite) * .5); }
 
-/* ---------- Telephone : enregistrer reste a portee du pouce ---------- */
 @media (max-width: 575.98px) {
   .af-barre-enregistrer { position: sticky; bottom: 0; z-index: 5; background: var(--af-glass-bg-strong); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: 0 0 var(--af-r-lg) var(--af-r-lg); }
 }
 
-/* ---------- Vitrine : compositions (passe Hallmark) ---------- */
 .af-h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.08; overflow-wrap: break-word; min-width: 0; }
 .af-titre-colle { position: sticky; top: 7rem; }
 .af-champ { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
@@ -657,7 +617,6 @@ body:has(.af-sidebar) .af-curseur { opacity: calc(var(--af-curseur-opacite) * .5
 .btn:disabled, .btn.disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
 .btn-af:active:not(:disabled) { transform: translateY(0) scale(.98); }
 
-/* ---------- Pause des animations (WCAG 2.2.2) ---------- */
 .af-pause .af-pause-on, .af-calme .af-pause .af-pause-off { display: none; }
 .af-calme .af-pause .af-pause-on { display: block; }
 .af-pause[aria-pressed="true"] { border-color: var(--af-teal); color: var(--af-teal-ink); }
@@ -665,58 +624,40 @@ body:has(.af-sidebar) .af-curseur { opacity: calc(var(--af-curseur-opacite) * .5
 .af-calme *, .af-calme *::before, .af-calme *::after { animation-play-state: paused !important; }
 .af-calme .af-curseur { display: none; }
 
-/* l'anneau de focus apparait d'un coup, jamais en fondu */
 :focus-visible { transition-duration: 0s !important; }
 
-/* telephone : la feuille ne defile pas en interne, la barre d'enregistrement peut coller au bas de l'ecran */
 @media (max-width: 575.98px) { .af-feuille-form { overflow: visible !important; } }
 
-/* ---------- Passe mouvement (revue Impeccable) ---------- */
-/* cercle du changement de theme : une seule image, pas de fondus ni de groupes qui basculent avant lui */
 .af-vt-theme .af-sidebar, .af-vt-theme .af-header { view-transition-name: none; }
 .af-vt-theme *, .af-vt-theme *::before, .af-vt-theme *::after { transition: none !important; }
 .af-vt-theme::view-transition-old(root), .af-vt-theme::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-/* GSAP pilote la transform de ces elements : la transition CSS ne la double plus */
 [data-tilt], [data-magnetic], [data-reveal] { transition-property: border-color, box-shadow, background-color, color; }
-/* en pause, ce que l'utilisateur vient de declencher continue */
 .af-calme .btn.is-loading::before, .af-calme .af-coeur { animation-play-state: running !important; }
-/* toast : sortie plus rapide que l'entree */
 .af-toast { transition: transform .28s cubic-bezier(.4, 0, 1, 1); }
 .af-toast.visible { transition: transform .45s var(--af-ease); }
-/* trait ambre du heros : un pseudo-element mis a l'echelle, independant des mots qui bougent */
 .af-rotatif.af-gradient-text { background: none; animation: none; }
 .af-rotatif::after { content: ""; position: absolute; left: 0; right: 0; bottom: .02em; height: .12em; border-radius: 2px; background: var(--af-amber); transform: scaleX(var(--trait, 1)); transform-origin: left center; }
-/* feuille d'appel au telephone : barre opaque, bouton pleine largeur */
 @media (max-width: 575.98px) {
   .af-barre-enregistrer { background: color-mix(in srgb, var(--af-bg) 94%, transparent); }
   .af-barre-enregistrer .btn { width: 100%; }
 }
-/* cartes de fonctions : icone en ligne, sans tuile */
 .af-feature .af-ico { width: auto; height: auto; background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0; padding-top: .15rem; }
 .af-feature .af-ico svg.lucide { width: 1.35rem; height: 1.35rem; }
 
-/* texte pose sur la partie la plus claire de l'aurore : un voile sombre et neutre derriere les lettres, pas une lueur */
 .af-hero .lead, .af-hero .text-secondary, .af-login-hero h1, .af-login-hero p, .af-login-hero .text-white, .af-login-hero .af-hero-item { text-shadow: 0 1px 14px rgba(4, 12, 20, .55); }
 [data-bs-theme="light"] .af-hero .lead, [data-bs-theme="light"] .af-hero .text-secondary, [data-bs-theme="light"] .af-login-hero h1, [data-bs-theme="light"] .af-login-hero p, [data-bs-theme="light"] .af-login-hero .text-white, [data-bs-theme="light"] .af-login-hero .af-hero-item { text-shadow: 0 1px 14px rgba(255, 255, 255, .7); }
 .af-hero .lead { color: var(--af-ink); }
 .af-hero .text-secondary { color: var(--af-ink-2) !important; }
 .af-choix-carte .small { color: var(--af-ink-2); }
-/* nom de marque du panneau de connexion : assez grand pour rester lisible sur l'aurore */
 .af-login-hero > a .text-white { font-size: 1.2rem; font-weight: 700; }
 
-/* ---------- Performance du verre ---------- */
-/* le fond anime apparait en fondu une fois la page affichee, au lieu de rivaliser avec le premier rendu */
 .af-fond-shader, .af-particules { transition: opacity .6s ease; }
 .af-fond-attente .af-fond-shader, .af-fond-attente .af-particules { opacity: 0; }
-/* petits elements sans flou : un fond un peu plus dense garde le meme rendu */
-/* sans flou, un voile clair et un filet lumineux gardent l'aspect verre (pas un disque sombre) */
 .btn-light, .btn-outline-light, .af-theme, .af-pill { background-color: rgba(255, 255, 255, .09); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
 .af-theme:hover { background-color: rgba(255, 255, 255, .16); }
 [data-bs-theme="light"] .btn-light, [data-bs-theme="light"] .btn-outline-light, [data-bs-theme="light"] .af-theme, [data-bs-theme="light"] .af-pill { background-color: rgba(255, 255, 255, .75); }
 
-/* bouton de langue : le code de l'autre langue, en lettres */
 .af-langue { font: 700 .72rem/1 var(--af-font); letter-spacing: .02em; }
 
-/* le groupe langue / pause / theme s'aligne sur le centre, jamais sur la ligne de base du texte "FR" */
 .af-theme { vertical-align: middle; }
 .position-absolute:has(> .af-theme) { display: flex; align-items: center; gap: .35rem; }

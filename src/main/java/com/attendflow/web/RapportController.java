@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/** Ecran 8 : rapports et statistiques (admin et enseignant, voir SecurityConfig), exports F-31. */
 @Controller
 public class RapportController {
 

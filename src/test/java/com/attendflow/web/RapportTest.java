@@ -30,16 +30,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Donnees isolees en janvier 2031 : 2 seances d'Ahmed (Java) et 1 de Sara (BDD) pour 3ème INFO.
- * Premier etudiant de la classe absent a chaque seance, les autres presents.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -58,7 +56,7 @@ class RapportTest {
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
     static final RequestPostProcessor LINA = user("lina.ferjani@univ.tn").roles("ETUDIANT");
-    static final String DU = "2031-01-01", AU = "2031-01-31";
+    static final String DU = "2021-01-01", AU = "2021-01-31";
 
     int effectif;
 
@@ -67,9 +65,9 @@ class RapportTest {
         Classe info3 = classes.findByNom("3ème INFO").orElseThrow();
         List<Etudiant> classe = etudiants.findByClasseOrderByNomAscPrenomAsc(info3);
         effectif = classe.size();
-        seance(info3, "JAVA", "ahmed.bensalah@univ.tn", LocalDate.of(2031, 1, 6), classe);
-        seance(info3, "JAVA", "ahmed.bensalah@univ.tn", LocalDate.of(2031, 1, 7), classe);
-        seance(info3, "BDD", "sara.mansouri@univ.tn", LocalDate.of(2031, 1, 8), classe);
+        seance(info3, "JAVA", "ahmed.bensalah@univ.tn", LocalDate.of(2021, 1, 6), classe);
+        seance(info3, "JAVA", "ahmed.bensalah@univ.tn", LocalDate.of(2021, 1, 7), classe);
+        seance(info3, "BDD", "sara.mansouri@univ.tn", LocalDate.of(2021, 1, 8), classe);
     }
 
     void seance(Classe c, String matiere, String prof, LocalDate date, List<Etudiant> classe) {
@@ -99,7 +97,7 @@ class RapportTest {
         assertThat(r.parMatiere()).extracting(RapportService.ParMatiere::matiere).containsExactly("Java", "Base de données");
         assertThat(r.parClasse()).singleElement().satisfies(c -> assertThat(c.classe()).isEqualTo("3ème INFO"));
         assertThat(r.evolution()).hasSize(3);
-        assertThat(r.aRisque()).hasSize(1);   // l'etudiant absent 3 fois sur 3
+        assertThat(r.aRisque()).hasSize(1);
     }
 
     @Test
@@ -115,7 +113,7 @@ class RapportTest {
     @Test
     void enseignantForceASesPropresSeances() throws Exception {
         Long sara = enseignants.findByEmail("sara.mansouri@univ.tn").orElseThrow().getId();
-        RapportService.Rapport r = rapport(AHMED, "enseignant", sara.toString());   // tente de voir Sara
+        RapportService.Rapport r = rapport(AHMED, "enseignant", sara.toString());
         assertThat(r.nbSeances()).isEqualTo(2);
         assertThat(r.seances()).allMatch(l -> l.seance().getEnseignant().getEmail().equals("ahmed.bensalah@univ.tn"));
         mvc.perform(get("/rapports").with(LINA)).andExpect(status().isForbidden());
@@ -126,7 +124,7 @@ class RapportTest {
     void exportsPdfEtExcelF31() throws Exception {
         byte[] pdf = mvc.perform(get("/rapports/export.pdf").with(ADMIN).param("du", DU).param("au", AU))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
+                .andExpect(header().string("Content-Disposition", containsString("attachment")))
                 .andReturn().getResponse().getContentAsByteArray();
         assertThat(new String(pdf, 0, 5)).isEqualTo("%PDF-");
 
@@ -134,7 +132,7 @@ class RapportTest {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray();
         try (Workbook wb = new XSSFWorkbook(new ByteArrayInputStream(xlsx))) {
             Sheet s = wb.getSheet("Séances");
-            assertThat(s.getLastRowNum()).isEqualTo(3);   // en-tete + 3 seances : identique a l'ecran
+            assertThat(s.getLastRowNum()).isEqualTo(3);
             assertThat(wb.getSheet("Synthèse").getRow(5).getCell(0).getNumericCellValue()).isEqualTo(3.0);
             assertThat(wb.getSheet("Étudiants à risque").getLastRowNum()).isEqualTo(1);
         }
@@ -156,7 +154,7 @@ class RapportTest {
         }
         mvc.perform(multipart("/admin/etudiants/import").with(csrf()).with(ADMIN)
                         .file(new MockMultipartFile("fichier", "etudiants.xlsx", "application/octet-stream", fichier.toByteArray())))
-                .andExpect(flash().attribute("avertissement", org.hamcrest.Matchers.startsWith("1 étudiant(s) importé(s)")));
+                .andExpect(flash().attribute("avertissement", startsWith("1 étudiant(s) importé(s)")));
         assertThat(etudiants.findWithClasseByEmail("eva.excel@univ.tn")).isPresent();
     }
 }

@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** F-02 : chaque test est annule a la fin (@Transactional) pour ne pas toucher aux comptes de demo. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -67,10 +66,9 @@ class MotDePasseTest {
         mvc.perform(get("/reinitialiser").param("token", token))
                 .andExpect(model().attribute("lienValide", true));
 
-        // confirmation differente, puis mot de passe trop court : refuses
         envoyer(token, "nouveau-mdp-1", "autre-chose-1");
         envoyer(token, "court", "court");
-        envoyer(token, "a".repeat(80), "a".repeat(80));   // au-dela de la limite BCrypt (72 octets)
+        envoyer(token, "a".repeat(80), "a".repeat(80));
         assertThat(encoder.matches("ancien-mdp", compte.getMotDePasse())).isTrue();
 
         mvc.perform(post("/reinitialiser").with(csrf())
@@ -78,7 +76,6 @@ class MotDePasseTest {
                 .andExpect(redirectedUrl("/login?reinitialise"));
         assertThat(encoder.matches("nouveau-mdp-1", compte.getMotDePasse())).isTrue();
 
-        // usage unique
         mvc.perform(get("/reinitialiser").param("token", token))
                 .andExpect(model().attribute("lienValide", false));
     }

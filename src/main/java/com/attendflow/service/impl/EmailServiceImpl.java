@@ -23,7 +23,6 @@ public class EmailServiceImpl implements EmailService {
         this.expediteur = expediteur;
     }
 
-    /** En arriere-plan : un serveur SMTP lent ou eteint ne ralentit pas la page. */
     @Async
     @Override
     public void envoyer(String destinataire, String sujet, String texte) {
@@ -36,7 +35,6 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
             log.info("Email envoye a {} : {}", destinataire, sujet);
         } catch (MailException e) {
-            // Serveur mail injoignable : le contenu reste lisible dans la console (ex. lien de reinitialisation).
             log.warn("Email NON envoye a {} ({}) - sujet : {}\n{}", destinataire, e.getMessage(), sujet, texte);
         }
     }

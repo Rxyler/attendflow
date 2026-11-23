@@ -14,7 +14,6 @@
 
     <main id="contenu" class="p-4 d-grid gap-4">
 
-      <!-- Navigation semaine (F-13) -->
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <p class="text-secondary mb-0">
           [[#{edt.semaineDu}]] <strong th:text="${#temporals.format(lundi, 'd MMMM')}">21 septembre</strong>
@@ -30,7 +29,6 @@
         </nav>
       </div>
 
-      <!-- Filtres admin (F-14) -->
       <form th:if="${admin}" th:action="@{/emploi-du-temps}" method="get" class="af-glass p-3 d-flex flex-wrap gap-3 align-items-end">
         <input type="hidden" name="semaine" th:value="${lundi}">
         <div>
@@ -53,7 +51,6 @@
         <a th:href="@{/emploi-du-temps(semaine=${lundi})}" class="btn btn-link" th:text="#{commun.reinitialiser}">Réinitialiser</a>
       </form>
 
-      <!-- Grille lundi-vendredi -->
       <div class="af-glass p-0 overflow-auto">
         <table class="table af-edt align-top mb-0">
           <caption class="px-4" th:text="#{edt.legende}">Créneaux</caption>
@@ -95,7 +92,6 @@
 
       <p th:if="${#lists.isEmpty(seances)}" class="text-secondary text-center mb-0" th:text="#{edt.aucune}">Aucune séance cette semaine.</p>
 
-      <!-- Detail d'une seance (F-15) -->
       <section th:if="${selection}" id="detail-seance" class="af-glass p-4" aria-labelledby="detail-titre">
         <div class="d-flex justify-content-between align-items-start gap-3">
           <div>

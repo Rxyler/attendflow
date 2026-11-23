@@ -26,7 +26,6 @@
       <section th:unless="${#lists.isEmpty(h.lignes)}"
                th:replace="~{fragments/layout :: graphique(#{historique.evolution}, #{historique.evolutionTexte})}"></section>
 
-      <!-- F-28 : date, matiere, enseignant, horaire, statut -->
       <div class="af-glass p-0 overflow-hidden">
         <table class="table table-hover align-middle mb-0">
           <caption class="px-4" th:text="#{historique.legende}">Toutes les séances</caption>

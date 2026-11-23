@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** Notification destinee a un utilisateur (F-32 a F-35). */
 @Entity
 @Table(name = "notification")
 @Getter
@@ -36,12 +35,10 @@ public class Notification {
     @Column(name = "date_notification", nullable = false)
     private LocalDateTime date;
 
-    /** Utilisateur "1" -- "0..*" Notification : recoit */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateur_id", nullable = false)
     private Utilisateur destinataire;
 
-    /** Page interne ouverte au clic (ex. /admin/justificatifs) ; null : la notification n'ouvre rien. */
     @Column(length = 200)
     private String lien;
 

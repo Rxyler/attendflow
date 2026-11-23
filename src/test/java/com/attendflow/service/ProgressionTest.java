@@ -21,7 +21,6 @@ class ProgressionTest {
 
     @Test
     void serieEtRecord() {
-        // du plus recent au plus ancien : 2 presents, une absence justifiee (ne casse pas), 1 retard, une absence, 3 presents
         Progression p = Progression.de(List.of(PRESENT, PRESENT, JUSTIFIE, RETARD, ABSENT, PRESENT, PRESENT, PRESENT), 80);
         assertThat(p.serie()).isEqualTo(3);
         assertThat(p.record()).isEqualTo(3);

@@ -22,7 +22,6 @@
       </div>
 
       <div class="row g-4">
-        <!-- Informations de la seance (liee automatiquement a l'emploi du temps) -->
         <div class="col-xl-4 d-grid gap-4 align-content-start order-2 order-xl-1">
           <section class="af-glass p-4" aria-labelledby="info-titre">
             <h2 id="info-titre" class="h6 mb-3" th:text="#{presences.infos}">Informations de la séance</h2>
@@ -49,7 +48,6 @@
           </section>
         </div>
 
-        <!-- Liste des etudiants -->
         <div class="col-xl-8 order-1 order-xl-2">
           <form th:action="@{/seances/{id}/presences(id=${s.id})}" method="post" class="af-glass af-feuille-form p-0 overflow-auto">
             <div class="d-flex flex-wrap gap-2 align-items-center p-3 border-bottom">

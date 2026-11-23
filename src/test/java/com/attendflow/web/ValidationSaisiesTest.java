@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 
-/** Saisies de l'administrateur : donnees reelles acceptees, donnees absurdes ou corrompues refusees avec un message. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -36,11 +36,11 @@ class ValidationSaisiesTest {
     static final ResultMatcher OK = flash().attributeExists("succes"), REFUS = flash().attributeExists("erreur");
     int n = 0;
 
-    org.springframework.test.web.servlet.RequestBuilder etudiant(String nom, String prenom, String tel, String matricule, String naissance) {
+    RequestBuilder etudiant(String nom, String prenom, String tel, String matricule, String naissance) {
         n++;
         var r = multipart("/admin/etudiants").with(csrf()).with(ADMIN)
                 .param("nom", nom).param("prenom", prenom).param("email", "v" + n + "@univ.tn")
-                .param("matricule", matricule == null ? "V2026" + n : matricule)
+                .param("matricule", matricule == null ? String.valueOf(20268000 + n) : matricule)
                 .param("classeId", classes.findByNom("3ème INFO").orElseThrow().getId().toString());
         if (tel != null) r.param("telephone", tel);
         if (naissance != null) r.param("dateNaissance", naissance);
@@ -51,7 +51,8 @@ class ValidationSaisiesTest {
     void nomsReelsAcceptes() throws Exception {
         mvc.perform(etudiant("Ben  Ali", "Mariem-Inès", "+216 20 123 456", null, LocalDate.now().minusYears(20).toString())).andExpect(OK);
         assertThat(etudiants.findWithClasseByEmail("v1@univ.tn").orElseThrow().getNom()).isEqualTo("Ben Ali");
-        mvc.perform(etudiant("N'Diaye", "Zoé", "20123456", "ABC-12", null)).andExpect(OK);
+        mvc.perform(etudiant("N'Diaye", "Zoé", "20123456", "00012345", null)).andExpect(OK);
+        assertThat(etudiants.findWithClasseByEmail("v2@univ.tn").orElseThrow().getMatricule()).isEqualTo("00012345");
         mvc.perform(etudiant("Trabelsi", "Ahmed", null, null, null)).andExpect(OK);
     }
 
@@ -68,11 +69,11 @@ class ValidationSaisiesTest {
         for (String tel : new String[] {"abc", "123", "12345678901234567", "20-123-456", "+216 2O 123 456"}) {
             mvc.perform(etudiant("Ali", "Sami", tel, null, null)).andExpect(REFUS);
         }
-        for (String matricule : new String[] {"A", "2026 0001", "=HYPERLINK(1)", "<x>"}) {
+        for (String matricule : new String[] {"A", "1234567", "123456789", "2026000A", "2026-001", "2026 0001", "２０２６０００１",
+                "-2026000", "=HYPERLINK(1)", "<x>"}) {
             mvc.perform(etudiant("Ali", "Sami", null, matricule, null)).andExpect(REFUS);
         }
         LocalDate auj = LocalDate.now();
-        // etudiant : de 5 a 24 ans inclus
         for (LocalDate d : new LocalDate[] {auj.plusDays(1), auj.minusYears(5).plusDays(1), auj.minusYears(25), LocalDate.of(1890, 1, 1)}) {
             mvc.perform(etudiant("Ali", "Sami", null, null, d.toString())).andExpect(REFUS);
         }
@@ -82,11 +83,9 @@ class ValidationSaisiesTest {
     @Test
     void limitesDAge() throws Exception {
         LocalDate auj = LocalDate.now();
-        // etudiant : 5 ans tout juste et 24 ans (veille des 25) acceptes
         mvc.perform(etudiant("Ali", "Sami", null, null, auj.minusYears(5).toString())).andExpect(OK);
         mvc.perform(etudiant("Ali", "Sami", null, null, auj.minusYears(25).plusDays(1).toString())).andExpect(OK);
 
-        // enseignant : 24 ans minimum, date facultative
         String matiere = matieres.findByCode("JAVA").orElseThrow().getId().toString();
         String[][] cas = {{auj.minusYears(24).plusDays(1).toString(), "refus"}, {auj.plusDays(1).toString(), "refus"},
                 {LocalDate.of(1890, 1, 1).toString(), "refus"}, {auj.minusYears(24).toString(), "ok"}, {"", "ok"}};

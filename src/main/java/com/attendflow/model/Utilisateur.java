@@ -7,11 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Classe mere de tous les comptes (Admin, Enseignant, Etudiant).
- * Strategie JOINED : une table "utilisateur" pour les champs communs,
- * plus une table par sous-classe reliee par le meme id.
- */
 @Entity
 @Table(name = "utilisateur")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -30,14 +25,12 @@ public abstract class Utilisateur {
     @Column(nullable = false, length = 80)
     private String prenom;
 
-    /** RG-06 : un email est unique. */
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
     @Column(length = 30)
     private String telephone;
 
-    /** Mot de passe hache avec BCrypt (jamais en clair). */
     @Column(name = "mot_de_passe", nullable = false)
     private String motDePasse;
 
@@ -45,12 +38,10 @@ public abstract class Utilisateur {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    /** Compagnon affiche a la place des initiales (null : initiales). */
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Mascotte mascotte;
 
-    /** Langue choisie (fr ou en) : sert aux emails et notifications ; null = francais. */
     @Column(length = 5)
     private String langue;
 
@@ -63,6 +54,6 @@ public abstract class Utilisateur {
     }
 
     public String getNomComplet() {
-        return prenom.equalsIgnoreCase(nom) ? nom : prenom + " " + nom;   // "Admin Admin" s'affiche "Admin"
+        return prenom.equalsIgnoreCase(nom) ? nom : prenom + " " + nom;
     }
 }

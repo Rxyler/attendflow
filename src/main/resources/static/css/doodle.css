@@ -1,14 +1,7 @@
-/* =====================================================================
-   Fas3a "carnet de croquis" : papier et encre (clair), tableau et craie (sombre).
-   Charge apres attendflow.css : redefinit les jetons, puis habille les composants.
-   Les fonctions et les classes restent celles d'attendflow.css.
-   ===================================================================== */
-
 :root {
   --dd-hand: 'Gochi Hand', 'Patrick Hand SC', cursive;
   --dd-caps: 'Patrick Hand SC', 'Gochi Hand', cursive;
   --dd-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
-  /* un trait a main levee : coins inegaux, comme un cadre trace au feutre */
   --dd-trace: 255px 14px 225px 14px / 14px 225px 14px 255px;
   --dd-trace-2: 14px 225px 14px 255px / 255px 14px 225px 14px;
   --af-font: var(--dd-body);
@@ -17,7 +10,6 @@
   --af-r-sm: 8px; --af-r: 10px; --af-r-lg: 14px; --af-r-xl: 18px;
 }
 
-/* ---------- Papier (clair) ---------- */
 :root, [data-bs-theme="light"] {
   --af-bg: #fbf5e8;
   --af-ink: #1f1d1a; --af-ink-2: #34312c; --af-muted: #57524a; --af-subtle: #6e685e;
@@ -39,7 +31,6 @@
   color-scheme: light;
 }
 
-/* ---------- Tableau a craie (sombre) ---------- */
 [data-bs-theme="dark"] {
   --af-bg: #22302a;
   --af-ink: #f3f1e8; --af-ink-2: #dedbd0; --af-muted: #b9c2b9; --af-subtle: #a3ada4;
@@ -61,7 +52,6 @@
   color-scheme: dark;
 }
 
-/* ---------- Fond : papier pointe / poussiere de craie ---------- */
 body {
   font-family: var(--dd-body);
   background-color: var(--af-bg);
@@ -75,10 +65,8 @@ body {
     radial-gradient(rgba(243, 241, 232, .07) 1px, transparent 1.2px);
   background-size: auto, auto, 24px 24px;
 }
-/* ce monde-ci est dessine, pas eclaire : pas d'aurore, de particules, de halo ni d'orbes */
 .af-fond-shader, .af-particules, .af-voile, .af-grain, .af-curseur, .af-orbe, .af-3d { display: none !important; }
 
-/* ---------- Typographie ---------- */
 h1, h2, h3, h4, h5, h6, .h4, .h5, .h6, .af-display { font-family: var(--dd-hand); font-weight: 400; letter-spacing: .01em; }
 .h5, h1.h5 { font-size: 1.35rem; font-weight: 400 !important; }
 .h6, h2.h6, h3.h6 { font-size: 1.2rem; font-weight: 400 !important; }
@@ -90,7 +78,6 @@ h1, h2, h3, h4, h5, h6, .h4, .h5, .h6, .af-display { font-family: var(--dd-hand)
 }
 ::selection { background: var(--dd-jaune); color: #1f1d1a; }
 
-/* surligneur : un trait de marqueur derriere le texte */
 .dd-surligne {
   background: linear-gradient(100deg, transparent 2%, var(--dd-jaune) 4%, var(--dd-jaune) 96%, transparent 98%) 0 70% / 100% .62em no-repeat;
   padding: 0 .12em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
@@ -98,7 +85,6 @@ h1, h2, h3, h4, h5, h6, .h4, .h5, .h6, .af-display { font-family: var(--dd-hand)
 .dd-surligne-rose { background-image: linear-gradient(100deg, transparent 2%, var(--dd-rose) 4%, var(--dd-rose) 96%, transparent 98%); }
 [data-bs-theme="dark"] .dd-surligne { color: #1f1d1a; }
 
-/* ---------- Feuilles et cadres traces ---------- */
 .af-glass {
   background: var(--af-glass-bg);
   -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
@@ -112,7 +98,6 @@ h1, h2, h3, h4, h5, h6, .h4, .h5, .h6, .af-display { font-family: var(--dd-hand)
 a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform: translate(-1px, -2px) rotate(-.4deg); box-shadow: 5px 6px 0 var(--dd-encre); }
 [data-bs-theme="dark"] a.af-glass:hover, [data-bs-theme="dark"] .af-feature:hover { box-shadow: 5px 6px 0 rgba(0, 0, 0, .5); }
 
-/* ---------- Boutons : feutre, papier, ombre d'encre ---------- */
 .btn {
   border: 2px solid var(--dd-encre) !important;
   border-radius: var(--dd-trace) !important;
@@ -136,7 +121,6 @@ a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform
 .btn-outline-danger { background: var(--dd-papier); }
 .table td .btn-sm { box-shadow: none; border-width: 1.5px !important; }
 
-/* boutons ronds (langue, pause, theme) : cercles traces */
 .af-theme {
   background: var(--dd-papier) !important; color: var(--af-ink) !important;
   border: 2px solid var(--dd-encre) !important; border-radius: 52% 48% 50% 50% / 48% 52% 48% 52% !important;
@@ -148,7 +132,6 @@ a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform
 .af-deconnexion { border: 2px solid transparent; border-radius: 50%; }
 .af-deconnexion:hover { border-color: var(--af-danger); }
 
-/* ---------- Formulaires ---------- */
 .form-control, .form-select {
   background-color: var(--af-input-bg); color: var(--af-ink);
   border: 2px solid var(--dd-encre); border-radius: 10px 14px 9px 13px;
@@ -157,7 +140,6 @@ a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform
 .form-check-input { border: 2px solid var(--dd-encre); }
 .form-check-input:checked { background-color: var(--dd-sarcelle); border-color: var(--dd-encre); }
 
-/* ---------- Barre laterale : marge du carnet ---------- */
 .af-sidebar {
   background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
   border-right: 2px solid var(--dd-encre);
@@ -178,11 +160,9 @@ a.af-glass:hover, .af-choix:hover .af-choix-carte, .af-feature:hover { transform
 .af-sidebar .nav-link.active svg.lucide { color: var(--dd-rose); }
 .af-compte { border-top: 2px dashed var(--dd-encre); }
 .af-avatar { background: var(--dd-jaune); color: #1f1d1a; border: 2px solid var(--dd-encre); box-shadow: none; }
-/* logo : la fourmi croquee sur un post-it (le cadre est dans le dessin, pas de bordure CSS) */
 .af-logo { background: url(/images/logo-croquis.svg) center / contain no-repeat !important; border: 0 !important; border-radius: 0 !important; box-shadow: none; transition: transform .3s cubic-bezier(.2, 1.6, .4, 1); }
 a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 
-/* ---------- En-tete de page ---------- */
 .af-header { background: var(--af-bg); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 2px solid var(--dd-encre); }
 .af-header h1 {
   display: inline; padding: 0 .15em;
@@ -190,17 +170,14 @@ a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 }
 [data-bs-theme="dark"] .af-header h1 { background-image: linear-gradient(100deg, transparent 1%, rgba(248, 226, 122, .45) 3%, rgba(248, 226, 122, .45) 97%, transparent 99%); }
 
-/* ---------- Cartes de chiffres ---------- */
 .af-stat .af-stat-value { font-family: var(--dd-hand); font-weight: 400; font-size: 2.6rem; }
 .af-stat .af-stat-libelle { font-size: 1rem; color: var(--af-ink-2); }
 
-/* ---------- Tableaux : lignes de cahier ---------- */
 .table { --bs-table-border-color: rgba(31, 29, 26, .25); }
 [data-bs-theme="dark"] .table { --bs-table-border-color: rgba(243, 241, 232, .22); }
 .table > thead th { background: transparent; color: var(--af-ink); font-size: .95rem; text-transform: none; border-bottom: 2px solid var(--dd-encre); }
 .table > tbody td { border-bottom-style: dashed; }
 
-/* ---------- Badges, alertes : pastilles et post-it ---------- */
 .badge { border: 1.5px solid currentColor; border-radius: 999px 900px 999px 950px; font-size: .85rem; font-weight: 400; box-shadow: none !important; }
 .text-bg-danger { background: var(--af-danger-soft) !important; color: var(--af-danger) !important; }
 .alert {
@@ -212,23 +189,19 @@ a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 [data-bs-theme="dark"] .alert-success { background: #2e4a3a; } [data-bs-theme="dark"] .alert-danger { background: #4a2f37; } [data-bs-theme="dark"] .alert-warning { background: #4a4430; }
 .modal-content { background: var(--af-bg); border: 2px solid var(--dd-encre); border-radius: var(--dd-trace); box-shadow: 6px 7px 0 var(--dd-encre); -webkit-backdrop-filter: none; backdrop-filter: none; }
 
-/* ---------- Emploi du temps : seances en etiquettes ---------- */
 .af-seance { -webkit-backdrop-filter: none; backdrop-filter: none; border: 1.5px solid var(--dd-encre) !important; border-radius: 6px 10px 7px 9px; background: var(--dd-papier); color: var(--af-ink); box-shadow: 2px 2px 0 var(--dd-encre); }
 .af-seance.af-modifiee { background: var(--af-warning-soft); }
 .af-seance.af-annulee { background: var(--af-danger-soft); }
 .af-seance:hover { transform: rotate(-1deg) translateY(-1px); }
 
-/* ---------- Feuille d'appel : boutons de statut ---------- */
 .btn-check + .btn { box-shadow: none; border-width: 1.5px !important; }
 .btn-check:checked + .btn { box-shadow: 2px 2px 0 var(--dd-encre) !important; transform: rotate(-1deg); }
 
-/* ---------- Pastilles, jauges ---------- */
 .af-pill { background: var(--dd-papier); border: 1.5px solid var(--dd-encre); border-radius: 999px 900px 999px 950px; color: var(--af-ink); }
 .af-barre, .af-jauge { background: transparent; border: 1.5px solid var(--dd-encre); height: .7rem; }
 .af-barre > span, .af-jauge span { background: repeating-linear-gradient(-45deg, var(--dd-sarcelle) 0 6px, transparent 6px 9px); }
 .af-mascotte { filter: none !important; }
 
-/* ============================ Vitrine ============================ */
 .af-nav-vitrine {
   background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
   border-bottom: 2px solid var(--dd-encre) !important;
@@ -253,7 +226,6 @@ a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 .af-cta { text-align: center; }
 .af-pied { border-top: 2px solid var(--dd-encre); font-family: var(--dd-caps); }
 
-/* le croquis du heros : une feuille d'appel posee de biais et la mascotte qui la montre */
 .dd-scene { position: relative; min-height: 26rem; }
 .dd-feuille {
   position: relative; max-width: 26rem; margin-left: auto; transform: rotate(2.2deg);
@@ -281,25 +253,17 @@ a:hover > .af-logo { transform: rotate(-8deg) scale(1.06); }
 }
 @media (prefers-reduced-motion: reduce) { .dd-feuille, .alert { transform: none; } }
 
-/* le marqueur epouse la formule affichee (la reserve de largeur ne sert que la ou le titre pourrait se reequilibrer) */
 .af-hero h1 .af-rotatif { min-width: 0 !important; }
 
-/* la barre du haut reste collee en haut : elle garde le papier sous elle, le contenu passe dessous */
 .af-nav-vitrine { background: var(--af-bg) !important; }
 
-/* la police manuscrite n%a qu%une graisse : on ne la laisse jamais simuler du gras (traits baveux) */
 h1, h2, h3, h4, h5, h6, .af-display, .af-feature h3, .af-role h3, .af-etape h3 { font-weight: 400 !important; font-synthesis: none; }
 .af-feature h3, .af-role h3, .af-etape h3 { font-size: 1.3rem; }
-/* l%en-tete est une colonne flex : le titre garde la largeur de ses mots, le marqueur aussi */
 .af-header h1 { align-self: flex-start; }
 
-/* ---------- Finitions : crayon, grain du papier, gestes ---------- */
-/* les icones passent par le filtre "crayon" (injecte une fois par attendflow.js) : traits a main levee */
 svg.lucide:not([data-crayon]) { filter: url(#dd-crayon); }
-/* icones redessinees au crayon (rough.js) : un trait d'accent rose, sauf la ou l'icone porte deja une couleur */
 svg.lucide .dd-accent { color: var(--dd-rose); }
 :is(.btn, .alert, .af-toast, .af-badge, .nav-link.active, .af-theme) svg.lucide .dd-accent, :is(.lucide-x, .lucide-arrow-left) .dd-accent { color: inherit; }
-/* grain du papier par-dessus les points (fixe : peint une fois, ne bouge pas au defilement) */
 body {
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
@@ -314,26 +278,19 @@ body {
     radial-gradient(rgba(243, 241, 232, .07) 1px, transparent 1.2px);
   background-size: 180px 180px, auto, auto, 24px 24px;
 }
-/* un bouton qu'on survole penche un peu, comme pose a la main */
 .btn:hover { transform: translate(-1px, -1px) rotate(-.6deg); }
 .btn-af:hover { transform: translate(-1px, -1px) rotate(.6deg); }
-/* barre de defilement a l'encre */
 * { scrollbar-color: var(--dd-encre) transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--dd-encre); border-radius: 10px; border: 3px solid var(--af-bg); }
-/* les traits de Rough Notation ne captent jamais un clic */
 .rough-annotation { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .btn:hover, .btn-af:hover { transform: none; } }
 
-/* le titre du detail recoit le focus par script (accessibilite), sans anneau visuel : ce n est pas une commande */
 #detail-titre:focus { outline: none; }
 
-/* ---------- Restes du theme verre : halos flous remplaces par de l'encre ---------- */
-/* anneau de focus net (clavier) : liseré papier puis trait sarcelle, sans flou */
 :root { --af-ring: 0 0 0 2px var(--dd-papier), 0 0 0 4.5px var(--dd-sarcelle); }
 .af-seance:hover, .af-seance:focus-visible { box-shadow: 3px 3px 0 var(--dd-encre); color: var(--af-ink); }
 .af-seance:focus-visible { box-shadow: var(--af-ring); }
-/* seance ouverte : etiquette surlignee, pas de halo violet */
 .af-seance.af-selection { border-width: 2.5px !important; background: color-mix(in srgb, var(--dd-sarcelle) 16%, var(--dd-papier)); box-shadow: 3px 4px 0 var(--dd-sarcelle); transform: rotate(-1deg); }
 .af-feature:hover .af-ico { box-shadow: none; }
 .af-choix input:checked + .af-choix-carte { border-color: var(--dd-sarcelle); box-shadow: 4px 5px 0 var(--dd-sarcelle); transform: rotate(-.6deg); }
@@ -342,35 +299,25 @@ body {
 .form-control:focus, .form-select:focus, .form-check-input:focus { border-color: var(--dd-sarcelle); }
 @media (prefers-reduced-motion: reduce) { .af-pill .af-point { animation: none; } }
 
-/* ---------- Petits gestes de la main ---------- */
-/* le surligneur du titre de page passe de gauche a droite a l'ouverture */
 .af-header h1 { animation: dd-surligner .55s .15s cubic-bezier(.65, 0, .35, 1) backwards; }
 @keyframes dd-surligner { from { background-size: 0 .5em; } }
-/* le post-it se plaque sur la page */
 .alert { animation: dd-coller .38s cubic-bezier(.2, 1.4, .4, 1) backwards; }
 @keyframes dd-coller { from { opacity: 0; transform: translateY(-6px) rotate(-2.2deg) scale(1.03); } }
-/* les icones du menu frissonnent au survol */
 .af-sidebar .nav-link svg.lucide { transition: transform .25s cubic-bezier(.2, 1.6, .4, 1); }
 .af-sidebar .nav-link:hover svg.lucide { transform: rotate(-12deg) scale(1.1); }
-/* listes vides : une note griffonnee plutot qu'une ligne grise */
 td[colspan]:has(> svg.lucide-inbox) { font-family: var(--dd-hand); font-size: 1.2rem; color: var(--af-ink-2) !important; }
 td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose); transform: rotate(-8deg); opacity: .9 !important; }
-/* en pause ou mouvement reduit, tout est deja en place (une animation en pause cacherait le titre) */
 .af-calme .af-header h1, .af-calme .alert { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .af-header h1, .alert { animation: none; }
   .af-sidebar .nav-link:hover svg.lucide { transform: none; }
 }
 
-/* ---------- Traits qui "bouillent" (dessin anime image par image) ---------- */
-/* trois tremblements (filtres dd-bout-*, ajoutes par attendflow.js) alternes ~4 fois par seconde */
 @keyframes dd-bouillir { 0% { filter: url(#dd-bout-1); } 33.3% { filter: url(#dd-bout-2); } 66.6% { filter: url(#dd-bout-3); } }
 .dd-doodle, .dd-fleche, .dd-trait-titre, .dd-mascotte { animation: dd-bouillir .6s steps(1) infinite; }
-/* plus discret, partout : le logo et les traits au feutre (soulignes, cercles, crochets) */
 @keyframes dd-frissonner { 0% { filter: url(#dd-frisson-1); } 33.3% { filter: url(#dd-frisson-2); } 66.6% { filter: url(#dd-frisson-3); } }
 .af-logo, svg.rough-annotation { animation: dd-frissonner .6s steps(1) infinite; }
 
-/* griffonnages des marges : seulement la ou il y a vraiment de la place a cote du contenu (76rem) */
 .dd-marges { display: none; }
 @media (min-width: 84rem) {
   .dd-marges { display: block; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -388,7 +335,6 @@ td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose
   .dd-doodle, .dd-fleche, .dd-trait-titre, .dd-mascotte, .dd-marges svg, .af-logo, svg.rough-annotation { animation: none; }
 }
 
-/* ---------- Notifications cliquables ---------- */
 .af-notif-lien { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
 .af-notif-lien:hover { transform: translate(-1px, -2px) rotate(-.3deg); box-shadow: 5px 6px 0 var(--dd-encre); }
 [data-bs-theme="dark"] .af-notif-lien:hover { box-shadow: 5px 6px 0 rgba(0, 0, 0, .5); }
@@ -398,22 +344,18 @@ td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose
 .af-notif-lien:hover .af-notif-fleche { transform: translate(2px, -2px) rotate(8deg); }
 @media (prefers-reduced-motion: reduce) { .af-notif-lien:hover, .af-notif-lien:hover .af-notif-fleche { transform: none; } }
 
-/* fourmi croquee du dernier appel : elle se balance et son trait bout, comme les doodles du haut */
 .dd-cta-fourmi { display: block; margin: 0 auto; width: 8rem; height: 8rem; --r: -4deg;
   animation: dd-flotter 3.2s ease-in-out infinite alternate, dd-bouillir .6s steps(1) infinite; }
 @media (prefers-reduced-motion: reduce) { .dd-cta-fourmi { animation: none; } }
 
-/* ---------- Intro de la vitrine : la mascotte se dessine (attendflow.js) ---------- */
 .af-chargement { background-color: var(--af-bg); background-image: radial-gradient(rgba(31, 29, 26, .09) 1px, transparent 1.2px); background-size: 22px 22px; cursor: pointer; }
 .dd-intro { display: flex; flex-direction: column; align-items: center; }
 .dd-intro-logo { overflow: visible; animation: dd-frissonner .5s steps(1) infinite; }
 .dd-intro-nom { font-family: var(--dd-hand); font-size: 2.6rem; line-height: 1; margin-top: .7rem; color: var(--dd-encre); }
 .dd-intro-nom span { display: inline-block; }
-/* le trait cache commence juste avant le chemin : pas de point d'extremite arrondie qui depasse */
 .af-chargement .i-trait { stroke-dasharray: 1 3; stroke-dashoffset: 2; }
 .af-chargement .i-postit, .af-chargement .i-tete { fill-opacity: 0; }
 
-/* ---------- Petit film de la vitrine (film.js) : 80 % de l'ecran, le fond se clique pour fermer ---------- */
 .dd-film { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 1rem;
   background: color-mix(in srgb, var(--dd-encre) 55%, transparent); backdrop-filter: blur(3px); cursor: pointer; }
 .dd-film[hidden] { display: none; }
@@ -427,7 +369,6 @@ td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose
 .dd-film-scene svg { display: block; width: 100%; height: auto; }
 .dd-film text { font-family: var(--dd-hand); }
 .dd-film #f-mascotte { animation: dd-frissonner .5s steps(1) infinite; }
-/* etat de depart : tout est cache ou pas encore trace, la timeline le fait apparaitre */
 .dd-film .f-trait { stroke-dasharray: 1 3; stroke-dashoffset: 2; }
 .dd-film :is(#f-feuille, #f-crayon, #f-horloge, #f-boule, #f-poubelle, #f-mascotte, #f-nom, #f-carte, #f-justif, #f-tampon, #f-stats, #f-cloche, .f-tete, #f-messager, #f-etoiles > *) { opacity: 0; visibility: hidden; }
 .dd-film-legendes { position: relative; height: 3.6rem; border-top: 2px dashed color-mix(in srgb, var(--dd-encre) 35%, transparent); }
@@ -437,7 +378,6 @@ td[colspan] > svg.lucide-inbox { width: 2rem; height: 2rem; color: var(--dd-rose
 .dd-film-progres { flex: 1; height: 8px; border: 2px solid var(--dd-encre); border-radius: 99px; overflow: hidden; }
 .dd-film-progres span { display: block; height: 100%; background: var(--dd-rose); transform-origin: left; transform: scaleX(0); }
 .dd-film-legendes .mot { display: inline-block; }
-/* *mot* des sous-titres : un coup de surligneur balaye sous le mot */
 .dd-film-legendes .marque { --marque: color-mix(in srgb, var(--dd-jaune) 80%, transparent);
   background: linear-gradient(transparent 52%, var(--marque) 52%, var(--marque) 88%, transparent 88%) no-repeat 0 0 / 0% 100%;
   padding: 0 .12em; margin: 0 -.12em; border-radius: 3px; }

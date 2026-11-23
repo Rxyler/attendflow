@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** RG-08 : trace de chaque modification d'une presence (auteur, date, ancienne et nouvelle valeur). */
 @Entity
 @Table(name = "historique_modification")
 @Getter
@@ -35,7 +34,6 @@ public class HistoriqueModification {
     @JoinColumn(name = "presence_id", nullable = false)
     private Presence presence;
 
-    /** Utilisateur "1" -- "0..*" HistoriqueModification : auteur */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "auteur_id", nullable = false)
     private Utilisateur auteur;
