@@ -45,6 +45,9 @@ class ReferentielTest {
     static final RequestPostProcessor ADMIN = user("admin@univ.tn").roles("ADMIN");
     static final RequestPostProcessor AHMED = user("ahmed.bensalah@univ.tn").roles("ENSEIGNANT");
 
+    /** Annee courante : les dates de naissance restent dans la tranche d'age autorisee quelle que soit l'annee. */
+    static final int AN = LocalDate.now().getYear();
+
     Long info3() { return classes.findByNom("3ème INFO").orElseThrow().getId(); }
 
     @SuppressWarnings("unchecked")
@@ -58,10 +61,10 @@ class ReferentielTest {
     void ajoutModificationEtUnicite() throws Exception {
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN)
                         .param("nom", "Test").param("prenom", "Nouvel").param("email", "Nouvel.Test@univ.tn")
-                        .param("matricule", "20269999").param("classeId", info3().toString()).param("dateNaissance", "2004-05-06"))
+                        .param("matricule", "20269999").param("classeId", info3().toString()).param("dateNaissance", (AN - 20) + "-05-06"))
                 .andExpect(flash().attributeExists("succes"));
         Etudiant e = etudiants.findWithClasseByEmail("nouvel.test@univ.tn").orElseThrow();   // email mis en minuscules
-        assertThat(e.getDateNaissance()).isEqualTo(LocalDate.of(2004, 5, 6));
+        assertThat(e.getDateNaissance()).isEqualTo(LocalDate.of(AN - 20, 5, 6));
 
         // RG-06 : email ou matricule deja pris -> refuse, formulaire rouvert
         mvc.perform(multipart("/admin/etudiants").with(csrf()).with(ADMIN)
@@ -113,16 +116,16 @@ class ReferentielTest {
     @Test
     void importCsvAvecLignesInvalidesF09() throws Exception {
         String csv = "﻿nom;prenom;email;matricule;classe;date_naissance\n"
-                + "Alpha;Ali;ali.alpha@univ.tn;20265001;3ème INFO;2005-01-02\n"
+                + "Alpha;Ali;ali.alpha@univ.tn;20265001;3ème INFO;" + (AN - 19) + "-01-02\n"
                 + "Beta;Bea;bea.beta@univ.tn;20265002;CLASSE-INCONNUE;\n"
                 + "Gamma;Gil;lina.ferjani@univ.tn;20265003;1ère INFO;\n"
-                + "Delta;Dan;dan.delta@univ.tn;20265004;2ème INFO;12/03/2004\n";
+                + "Delta;Dan;dan.delta@univ.tn;20265004;2ème INFO;12/03/" + (AN - 20) + "\n";
         mvc.perform(multipart("/admin/etudiants/import").file(new MockMultipartFile("fichier", "e.csv", "text/csv", csv.getBytes()))
                         .with(csrf()).with(ADMIN))
                 .andExpect(flash().attribute("avertissement", org.hamcrest.Matchers.startsWith("2 étudiant(s) importé(s)")))
                 .andExpect(flash().attribute("erreursImport", org.hamcrest.Matchers.hasSize(2)));
         assertThat(etudiants.findWithClasseByEmail("dan.delta@univ.tn").orElseThrow().getDateNaissance())
-                .isEqualTo(LocalDate.of(2004, 3, 12));
+                .isEqualTo(LocalDate.of(AN - 20, 3, 12));
     }
 
     @Test

@@ -42,7 +42,7 @@ public class ReferentielServiceImpl implements ReferentielService {
     private static final Pattern NOM_PERSONNE = Pattern.compile("\\p{L}[\\p{L}\\p{M}]*([ '’-]\\p{L}[\\p{L}\\p{M}]*)*");
     private static final Pattern MATRICULE = Pattern.compile("[A-Za-z0-9-]{2,30}");
     private static final Pattern TELEPHONE = Pattern.compile("\\+?[0-9 ]{8,20}");
-    private static final int AGE_MIN = 15, AGE_MAX = 100;
+    private static final int AGE_ETUDIANT_MIN = 5, AGE_ETUDIANT_MAX = 24, AGE_ENSEIGNANT_MIN = 24, AGE_ENSEIGNANT_MAX = 100;
     private static final double COEFFICIENT_MAX = 20;
 
     private final EtudiantRepository etudiants;
@@ -98,13 +98,7 @@ public class ReferentielServiceImpl implements ReferentielService {
         if (id == null ? etudiants.existsByMatricule(matricule) : etudiants.existsByMatriculeAndIdNot(matricule, id)) {
             throw new IllegalArgumentException(t("Le matricule {0} existe déjà.", matricule));   // RG-06
         }
-        if (f.dateNaissance() != null && f.dateNaissance().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException(t("La date de naissance ne peut pas être dans le futur."));
-        }
-        if (f.dateNaissance() != null && (f.dateNaissance().isAfter(LocalDate.now().minusYears(AGE_MIN))
-                || f.dateNaissance().isBefore(LocalDate.now().minusYears(AGE_MAX)))) {
-            throw new IllegalArgumentException(t("Date de naissance invalide : l'étudiant doit avoir entre {0} et {1} ans.", AGE_MIN, AGE_MAX));
-        }
+        verifierAge(f.dateNaissance(), AGE_ETUDIANT_MIN, AGE_ETUDIANT_MAX, "l'étudiant");
         Classe classe = f.classeId() == null ? null : classes.findById(f.classeId()).orElse(null);
         if (classe == null) throw new IllegalArgumentException(t("Choisissez une classe."));
 
@@ -311,6 +305,8 @@ public class ReferentielServiceImpl implements ReferentielService {
         e.setPrenom(nomPersonne(f.prenom(), "Le prénom"));
         e.setEmail(email);
         e.setTelephone(telephone(f.telephone()));
+        verifierAge(f.dateNaissance(), AGE_ENSEIGNANT_MIN, AGE_ENSEIGNANT_MAX, "l'enseignant");
+        e.setDateNaissance(f.dateNaissance());
         String specialite = optionnel(f.specialite(), 120);
         e.setSpecialite(specialite == null ? null : avecLettre(specialite, "La spécialité"));
         e.getMatieres().clear();
@@ -370,6 +366,18 @@ public class ReferentielServiceImpl implements ReferentielService {
             throw new IllegalArgumentException(t("{0} doit contenir au moins une lettre.", t(champ)));
         }
         return valeur;
+    }
+
+    /** Date de naissance facultative ; si saisie : pas dans le futur et age compris entre min et max (inclus). */
+    private static void verifierAge(LocalDate naissance, int min, int max, String qui) {
+        if (naissance == null) return;
+        if (naissance.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException(t("La date de naissance ne peut pas être dans le futur."));
+        }
+        int age = java.time.Period.between(naissance, LocalDate.now()).getYears();
+        if (age < min || age > max) {
+            throw new IllegalArgumentException(t("Date de naissance invalide : {0} doit avoir entre {1} et {2} ans.", t(qui), min, max));
+        }
     }
 
     /** Facultatif ; 8 a 15 chiffres, "+" international et espaces permis ("+216 20 123 456"). */

@@ -63,6 +63,8 @@
               <input id="e-email" name="email" type="email" class="form-control" th:value="${form?.email}" required maxlength="150"></div>
             <div><label for="e-tel" class="form-label" th:text="#{champ.telephone}">Téléphone</label>
               <input id="e-tel" name="telephone" type="tel" class="form-control" th:value="${form?.telephone}" maxlength="30"></div>
+            <div><label for="e-naissance" class="form-label" th:text="#{champ.dateNaissance}">Date de naissance</label>
+              <input id="e-naissance" name="dateNaissance" type="date" class="form-control" th:value="${form?.dateNaissance}"></div>
             <div><label for="e-spec" class="form-label" th:text="#{champ.specialite}">Spécialité</label>
               <input id="e-spec" name="specialite" class="form-control" th:value="${form?.specialite}" maxlength="120"></div>
             <!-- F-08 : affectation aux matieres -->

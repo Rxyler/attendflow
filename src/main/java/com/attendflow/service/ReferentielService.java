@@ -33,7 +33,7 @@ public interface ReferentielService {
     record MatiereForm(String intitule, String code, Double coefficient) {}
 
     record EnseignantForm(String nom, String prenom, String email, String telephone, String specialite,
-                          Set<Long> matiereIds) {}
+                          Set<Long> matiereIds, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateNaissance) {}
 
     record ResultatImport(int crees, List<String> erreurs) {}
 

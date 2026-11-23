@@ -49,7 +49,7 @@ class ValidationSaisiesTest {
 
     @Test
     void nomsReelsAcceptes() throws Exception {
-        mvc.perform(etudiant("Ben  Ali", "Mariem-Inès", "+216 20 123 456", null, "2004-05-06")).andExpect(OK);
+        mvc.perform(etudiant("Ben  Ali", "Mariem-Inès", "+216 20 123 456", null, LocalDate.now().minusYears(20).toString())).andExpect(OK);
         assertThat(etudiants.findWithClasseByEmail("v1@univ.tn").orElseThrow().getNom()).isEqualTo("Ben Ali");
         mvc.perform(etudiant("N'Diaye", "Zoé", "20123456", "ABC-12", null)).andExpect(OK);
         mvc.perform(etudiant("Trabelsi", "Ahmed", null, null, null)).andExpect(OK);
@@ -72,10 +72,30 @@ class ValidationSaisiesTest {
             mvc.perform(etudiant("Ali", "Sami", null, matricule, null)).andExpect(REFUS);
         }
         LocalDate auj = LocalDate.now();
-        for (LocalDate d : new LocalDate[] {auj.plusDays(1), auj.minusYears(5), LocalDate.of(1890, 1, 1)}) {
+        // etudiant : de 5 a 24 ans inclus
+        for (LocalDate d : new LocalDate[] {auj.plusDays(1), auj.minusYears(5).plusDays(1), auj.minusYears(25), LocalDate.of(1890, 1, 1)}) {
             mvc.perform(etudiant("Ali", "Sami", null, null, d.toString())).andExpect(REFUS);
         }
         assertThat(etudiants.findWithClasseByEmail("v1@univ.tn")).isEmpty();
+    }
+
+    @Test
+    void limitesDAge() throws Exception {
+        LocalDate auj = LocalDate.now();
+        // etudiant : 5 ans tout juste et 24 ans (veille des 25) acceptes
+        mvc.perform(etudiant("Ali", "Sami", null, null, auj.minusYears(5).toString())).andExpect(OK);
+        mvc.perform(etudiant("Ali", "Sami", null, null, auj.minusYears(25).plusDays(1).toString())).andExpect(OK);
+
+        // enseignant : 24 ans minimum, date facultative
+        String matiere = matieres.findByCode("JAVA").orElseThrow().getId().toString();
+        String[][] cas = {{auj.minusYears(24).plusDays(1).toString(), "refus"}, {auj.plusDays(1).toString(), "refus"},
+                {LocalDate.of(1890, 1, 1).toString(), "refus"}, {auj.minusYears(24).toString(), "ok"}, {"", "ok"}};
+        int i = 0;
+        for (String[] c : cas) {
+            mvc.perform(post("/admin/enseignants").with(csrf()).with(ADMIN).param("nom", "Haddad").param("prenom", "Leïla")
+                            .param("email", "age" + i++ + "@univ.tn").param("matiereIds", matiere).param("dateNaissance", c[0]))
+                    .andExpect(c[1].equals("ok") ? OK : REFUS);
+        }
     }
 
     @Test

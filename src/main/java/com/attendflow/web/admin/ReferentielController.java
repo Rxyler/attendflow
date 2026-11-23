@@ -168,7 +168,8 @@ public class ReferentielController {
         if (modifier != null && !model.containsAttribute("form")) {
             referentiel.enseignants().stream().filter(e -> e.getId().equals(modifier)).findFirst().ifPresent(e -> {
                 model.addAttribute("form", new EnseignantForm(e.getNom(), e.getPrenom(), e.getEmail(), e.getTelephone(),
-                        e.getSpecialite(), e.getMatieres().stream().map(m -> m.getId()).collect(java.util.stream.Collectors.toSet())));
+                        e.getSpecialite(), e.getMatieres().stream().map(m -> m.getId()).collect(java.util.stream.Collectors.toSet()),
+                        e.getDateNaissance()));
                 model.addAttribute("formId", e.getId());
             });
         }

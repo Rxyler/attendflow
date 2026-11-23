@@ -20,6 +20,10 @@ public class Enseignant extends Utilisateur {
     @Column(length = 120)
     private String specialite;
 
+    /** Facultative ; si saisie, l'enseignant a au moins 24 ans (ReferentielServiceImpl). */
+    @Column(name = "date_naissance")
+    private java.time.LocalDate dateNaissance;
+
     /** Enseignant "0..*" -- "1..*" Matiere : enseigne */
     @ManyToMany
     @JoinTable(
