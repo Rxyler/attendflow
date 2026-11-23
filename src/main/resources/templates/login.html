@@ -42,6 +42,7 @@
 
         <div th:if="${param.erreur}" class="alert alert-danger py-2" role="alert" th:text="#{login.erreur}">Email ou mot de passe incorrect.</div>
         <div th:if="${param.bloque}" class="alert alert-danger py-2" role="alert" th:text="#{login.bloque}">Trop de tentatives</div>
+        <div th:if="${param.robot}" class="alert alert-danger py-2" role="alert" th:text="#{humain.erreur}">Vérification anti-robot échouée.</div>
         <div th:if="${param.deconnexion}" class="alert alert-success py-2" role="status" th:text="#{login.deconnecte}">Vous êtes déconnecté.</div>
         <div th:if="${param.reinitialise}" class="alert alert-success py-2" role="status" th:text="#{login.reinitialise}">Mot de passe modifié.</div>
 
@@ -57,6 +58,7 @@
             </div>
             <input type="password" id="motDePasse" name="motDePasse" class="form-control" autocomplete="current-password" required>
           </div>
+          <th:block th:replace="~{fragments/layout :: humain}"></th:block>
           <button type="submit" class="btn btn-af py-2 mt-1" data-magnetic th:text="#{login.bouton}">Se connecter</button>
         </form>
         <a th:href="@{/}" class="d-block text-center mt-4 small text-decoration-none text-secondary" th:text="#{commun.retourAccueil}">Retour à l’accueil</a>

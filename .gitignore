@@ -38,3 +38,6 @@ build/
 .impeccable/
 .hallmark/
 .taste-skill/
+
+# Reglages locaux (cles Turnstile...) : jamais sur GitHub
+/config/

@@ -12,6 +12,7 @@
     <p class="text-secondary mb-4" th:text="#{mdp.oublieTexte}">Saisissez</p>
 
     <div th:if="${param.envoye}" class="alert alert-success" role="status" th:text="#{mdp.envoye}">Si un compte existe</div>
+    <div th:if="${param.robot}" class="alert alert-danger" role="alert" th:text="#{humain.erreur}">Vérification anti-robot échouée.</div>
 
     <form th:unless="${param.envoye}" th:action="@{/mot-de-passe-oublie}" method="post" class="d-grid gap-3">
       <div>
@@ -19,6 +20,7 @@
         <input type="email" id="email" name="email" class="form-control" placeholder="email@univ.tn"
                autocomplete="email" required autofocus>
       </div>
+      <th:block th:replace="~{fragments/layout :: humain}"></th:block>
       <button type="submit" class="btn btn-af py-2"><i data-lucide="mail" aria-hidden="true"></i>[[#{mdp.envoyer}]]</button>
     </form>
 

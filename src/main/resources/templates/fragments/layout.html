@@ -50,6 +50,14 @@
 <!-- Fond du carnet : le papier pointe est dessine en CSS (doodle.css) ; plus d'aurore ni de particules a animer -->
 <th:block th:fragment="fond"></th:block>
 
+<!-- "Etes-vous un humain ?" (Cloudflare Turnstile, voir security/VerificationHumaine) : rien sans cles configurees -->
+<th:block th:fragment="humain" th:if="${cleTurnstile}">
+  <div class="cf-turnstile af-humain" data-size="flexible" th:attr="data-sitekey=${cleTurnstile},data-language=${#locale.language}"></div>
+  <script>document.querySelectorAll('.af-humain').forEach(function (w) { w.dataset.theme = document.documentElement.getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark'; });</script>
+  <!-- pas de SRI : Cloudflare met a jour ce script sans changer son adresse et interdit de le figer -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</th:block>
+
 <!-- Interrupteur clair / sombre -->
 <th:block th:fragment="theme">
   <button type="button" class="af-theme af-langue" th:attr="data-lang=#{langue.autre},aria-label=#{langue.basculer},title=#{langue.basculer}" th:text="#{langue.autreCode}">EN</button>

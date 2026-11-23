@@ -17,7 +17,8 @@ public class SecurityConfig {
 
     static final String CDN = "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com";
     static final String CSP = "default-src 'self'; "
-            + "script-src 'self' 'unsafe-inline' " + CDN + "; "
+            + "script-src 'self' 'unsafe-inline' " + CDN + " https://challenges.cloudflare.com; "
+            + "frame-src https://challenges.cloudflare.com; "   // le widget "Etes-vous un humain ?" (VerificationHumaine)
             + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com " + CDN + "; "
             + "font-src 'self' https://fonts.gstatic.com; "
             + "img-src 'self' data: blob:; "
